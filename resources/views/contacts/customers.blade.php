@@ -1,0 +1,7 @@
+@extends('layouts.app')
+@section('title','Customers')
+@section('content')
+<div class="page-head"><div><span class="eyebrow dark">CRM</span><h1>Customers</h1><p>Manage retail and wholesale customer records.</p></div></div>
+<div class="split-layout"><section class="card"><h2>Add Customer</h2><form class="stack-form" method="POST" action="{{ route('customers.store') }}">@csrf<label>Name<input name="name" required></label><label>Phone<input name="phone"></label><label>Email<input type="email" name="email"></label><label>Type<select name="customer_type"><option value="retail">Retail</option><option value="wholesale">Wholesale</option></select></label><label>Credit limit<input type="number" step="0.01" name="credit_limit" value="0"></label><label>Address<textarea name="address"></textarea></label><button class="btn primary">Add Customer</button></form></section>
+<section class="card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Type</th><th>Credit Limit</th></tr></thead><tbody>@forelse($customers as $c)<tr><td><strong>{{ $c->name }}</strong><small class="block">{{ $c->email }}</small></td><td>{{ $c->phone }}</td><td>{{ ucfirst($c->customer_type) }}</td><td>{{ $companySettings->currency_symbol }}{{ number_format($c->credit_limit,2) }}</td></tr>@empty<tr><td colspan="4" class="empty-cell">No customers yet.</td></tr>@endforelse</tbody></table></div>{{ $customers->links() }}</section></div>
+@endsection

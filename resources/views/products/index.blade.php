@@ -1,0 +1,13 @@
+@extends('layouts.app')
+@section('title','Products')
+@section('content')
+<div class="page-head"><div><span class="eyebrow dark">PRODUCT CATALOG</span><h1>Products</h1><p>Add products dynamically with image, SKU, barcode, prices, selectable sizes and availability.</p></div>@if(auth()->user()->hasPermission('products.manage'))<a class="btn primary" href="{{ route('products.create') }}">+ Add Product</a>@endif</div>
+<div class="card"><form class="toolbar" method="GET"><input name="q" value="{{ request('q') }}" placeholder="Search name, SKU or barcode"><button class="btn secondary">Search</button>@if(auth()->user()->hasPermission('products.manage'))<a href="{{ route('categories.index') }}" class="btn ghost">Categories</a>@endif @if(auth()->user()->hasPermission('inventory.manage'))<a href="{{ route('inventory.movements') }}" class="btn ghost">Stock Management</a>@endif</form>
+<div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>SKU</th>@if(auth()->user()->hasPermission('inventory.manage'))<th>Cost</th>@endif<th>Sell</th><th>Available</th><th>Reserved</th><th></th></tr></thead><tbody>
+@forelse($products as $p)<tr>
+<td><div class="product-cell"><span class="product-thumb tiny">@if($p->image_url)<img src="{{ $p->image_url }}" alt="{{ $p->name }}">@else{{ strtoupper(substr($p->name,0,1)) }}@endif</span><div><strong>{{ $p->name }}</strong><small class="block">{{ $p->barcode ?: 'No barcode' }}</small>@if($p->has_sizes)<small class="block product-size-summary">Sizes: {{ implode(' · ', $p->normalizedSizes()) }}</small>@endif</div></div></td>
+<td>{{ $p->category?->name ?? '—' }}</td><td>{{ $p->sku }}</td>@if(auth()->user()->hasPermission('inventory.manage'))<td>{{ $companySettings->currency_symbol }}{{ number_format($p->purchase_price,2) }}</td>@endif<td><strong>{{ $companySettings->currency_symbol }}{{ number_format($p->selling_price,2) }}</strong></td>
+<td><span class="stock-pill {{ $p->available_stock <= $p->min_stock ? 'danger' : 'ok' }}">{{ number_format($p->available_stock,2) }} {{ $p->unit }}</span></td><td>{{ number_format($p->reserved_stock,2) }}</td>
+<td class="right actions">@if(auth()->user()->hasPermission('products.manage'))<a href="{{ route('products.edit',$p) }}">Edit</a>@endif @if(auth()->user()->hasPermission('inventory.manage'))<form method="POST" action="{{ route('products.destroy',$p) }}" onsubmit="return confirm('Delete this product?')">@csrf @method('DELETE')<button>Delete</button></form>@endif</td></tr>
+@empty<tr><td colspan="8" class="empty-cell">No products found.</td></tr>@endforelse</tbody></table></div><div class="pagination">{{ $products->links() }}</div></div>
+@endsection

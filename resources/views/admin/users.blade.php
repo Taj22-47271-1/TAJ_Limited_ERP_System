@@ -1,0 +1,14 @@
+@extends('layouts.app')
+@section('title','Users & Access')
+@section('content')
+<div class="page-head"><div><span class="eyebrow dark">ADMINISTRATION</span><h1>Users & Access</h1><p>Public registration creates Customers only. Create Cashier or custom internal staff accounts here and activate/deactivate any account.</p></div><a class="btn primary" href="{{ route('admin.roles.index') }}">Roles & Permissions</a></div>
+<div class="split-layout">
+<section class="card"><div class="card-head"><div><span class="eyebrow dark">ADMIN ONLY</span><h2>Create Staff Account</h2></div></div><form class="stack-form" method="POST" action="{{ route('admin.users.store') }}">@csrf
+<label>Name<input name="name" value="{{ old('name') }}" required></label><label>Email<input type="email" name="email" value="{{ old('email') }}" required></label><label>Phone<input name="phone" value="{{ old('phone') }}"></label><label>Temporary password<input type="password" name="password" required minlength="8"></label><label>Role<select name="role" required>@foreach($roles as $role)<option value="{{ $role->slug }}" @selected(old('role','cashier')===$role->slug)>{{ $role->name }}</option>@endforeach</select></label><button class="btn primary">Create Staff Account</button></form><div class="form-note">Cashiers cannot register themselves. The staff member can change their own password after login.</div></section>
+<section class="card"><div class="card-head"><div><span class="eyebrow dark">ACCESS CONTROL</span><h2>{{ $users->count() }} Users</h2></div></div><div class="table-wrap"><table><thead><tr><th>User</th><th>Role</th><th>Status</th><th class="right">Action</th></tr></thead><tbody>
+@foreach($users as $u)<tr><td><strong>{{ $u->name }}</strong><small class="block">{{ $u->email }} @if($u->phone)· {{ $u->phone }}@endif</small></td><td>
+<form id="user-{{ $u->id }}" method="POST" action="{{ route('admin.users.update',$u) }}">@csrf @method('PUT')<input type="hidden" name="name" value="{{ $u->name }}"><input type="hidden" name="phone" value="{{ $u->phone }}">
+@if(in_array($u->role,['admin','customer'],true))<span class="status-badge {{ $u->role==='admin'?'approved':'processing' }}">{{ ucfirst($u->role) }}</span>@else<select name="role" class="inline-select">@foreach($roles as $role)<option value="{{ $role->slug }}" @selected($u->role===$role->slug)>{{ $role->name }}</option>@endforeach</select>@endif
+</td><td><select name="is_active" form="user-{{ $u->id }}" class="inline-select status-select"><option value="1" @selected($u->is_active)>Active</option><option value="0" @selected(!$u->is_active)>Deactivated</option></select></td><td class="right"><button class="btn ghost" type="submit" form="user-{{ $u->id }}">Update</button></form></td></tr>@endforeach
+</tbody></table></div></section></div>
+@endsection

@@ -1,0 +1,14 @@
+@extends('layouts.app')
+@section('title','Stock Management')
+@section('content')
+<div class="page-head"><div><span class="eyebrow dark">INVENTORY LEDGER</span><h1>Stock Management</h1><p>Physical stock, reserved online stock and immutable movement history.</p></div></div>
+@if(auth()->user()->hasPermission('inventory.manage'))
+<div class="card stock-adjust-card"><div class="card-head"><div><span class="eyebrow dark">ADMIN ONLY</span><h2>Adjust Stock</h2></div></div><form class="form-grid compact-grid" method="POST" action="{{ route('inventory.adjust') }}">@csrf
+<label>Product<select name="product_id" required><option value="">Select product</option>@foreach(\App\Models\Product::orderBy('name')->get() as $p)<option value="{{ $p->id }}">{{ $p->name }} · stock {{ number_format($p->stock,0) }} · reserved {{ number_format($p->reserved_stock,0) }}</option>@endforeach</select></label>
+<label>Quantity change<input type="number" step="0.01" name="difference" placeholder="+10 or -3" required></label><label class="span-2">Reason<input name="reason" placeholder="Purchase correction, damaged stock, physical count..." required></label><div class="span-2"><button class="btn primary">Record Adjustment</button></div></form></div>
+@endif
+<div class="card"><form class="toolbar" method="GET"><input name="q" value="{{ request('q') }}" placeholder="Product name or SKU"><select name="type"><option value="">All movement types</option><option value="purchase" @selected(request('type')==='purchase')>Purchase</option><option value="sale" @selected(request('type')==='sale')>In-house Sale</option><option value="online_order" @selected(request('type')==='online_order')>Online Order</option><option value="adjustment" @selected(request('type')==='adjustment')>Adjustment</option></select><button class="btn secondary">Filter</button></form>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Product</th><th>Type</th><th class="right">IN</th><th class="right">OUT</th><th class="right">Physical Balance</th><th>Reference</th></tr></thead><tbody>
+@forelse($movements as $m)<tr><td>{{ $m->created_at->format('d M Y H:i') }}</td><td><strong>{{ $m->product->name }}</strong><small class="block">{{ $m->product->sku }}</small></td><td>{{ ucwords(str_replace('_',' ',$m->movement_type)) }}</td><td class="right">{{ $m->quantity_in > 0 ? number_format($m->quantity_in,2) : '—' }}</td><td class="right">{{ $m->quantity_out > 0 ? number_format($m->quantity_out,2) : '—' }}</td><td class="right"><strong>{{ number_format($m->balance_after,2) }}</strong></td><td>{{ $m->note ?: (($m->reference_type ?: '—').' #'.($m->reference_id ?: '—')) }}</td></tr>@empty<tr><td colspan="7" class="empty-cell">No stock movements yet.</td></tr>@endforelse
+</tbody></table></div>{{ $movements->links() }}</div>
+@endsection
