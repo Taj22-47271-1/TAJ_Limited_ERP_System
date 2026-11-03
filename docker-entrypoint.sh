@@ -20,10 +20,13 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 # Create storage symlink if not already linked
 php artisan storage:link --no-interaction || true
 
-# Run database migrations safely if requested
-if [ "${RUN_MIGRATIONS:-false}" = "true" ] || [ "${AUTO_MIGRATE:-false}" = "true" ]; then
+# Automatically run database migrations and seed system defaults
+if [ "${SKIP_MIGRATIONS:-false}" != "true" ]; then
     echo "Running database migrations..."
-    php artisan migrate --force --isolated || echo "Migration encountered an issue, continuing startup."
+    php artisan migrate --force --isolated || echo "WARNING: Migration failed or database not reachable. Continuing startup."
+
+    echo "Seeding system roles and settings..."
+    php artisan db:seed --force || echo "WARNING: Seeding skipped or encountered an issue."
 fi
 
 exec apache2-foreground

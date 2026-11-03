@@ -49,6 +49,7 @@ RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
     && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV PORT=10000
+ENV LOG_CHANNEL=stderr
 EXPOSE 10000
 
 CMD ["/usr/local/bin/docker-entrypoint.sh"]

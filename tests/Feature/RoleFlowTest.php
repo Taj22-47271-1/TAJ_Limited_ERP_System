@@ -23,6 +23,17 @@ class RoleFlowTest extends TestCase
         $this->assertTrue(Customer::where('user_id',$user->id)->exists());
     }
 
+    public function test_user_can_login(): void
+    {
+        $this->seed();
+        $response = $this->post('/login', [
+            'email' => 'admin@tajlimited.com',
+            'password' => 'Password123!',
+        ]);
+        $response->assertRedirect('/dashboard');
+        $this->assertAuthenticated();
+    }
+
     public function test_cashier_cannot_open_accounting_or_profit_report(): void
     {
         $this->seed();
