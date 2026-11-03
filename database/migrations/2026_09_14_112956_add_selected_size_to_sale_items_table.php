@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('sale_items', function (Blueprint $table) {
-            $table->string('selected_size')->nullable()->after('product_id');
-        });
+        if (Schema::hasTable('sale_items') && !Schema::hasColumn('sale_items', 'selected_size')) {
+            Schema::table('sale_items', function (Blueprint $table) {
+                $table->string('selected_size')->nullable();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('sale_items', function (Blueprint $table) {
-            $table->dropColumn('selected_size');
-        });
+        if (Schema::hasTable('sale_items') && Schema::hasColumn('sale_items', 'selected_size')) {
+            Schema::table('sale_items', function (Blueprint $table) {
+                $table->dropColumn('selected_size');
+            });
+        }
     }
 };

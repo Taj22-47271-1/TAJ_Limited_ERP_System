@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Providers;
@@ -20,8 +19,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Force HTTPS URLs in production (Render)
-        if (app()->environment('production')) {
+        // Force HTTPS URLs in production (Render) or when forwarded as HTTPS
+        if ($this->app->environment('production') || env('FORCE_HTTPS', false) || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
             URL::forceScheme('https');
         }
 

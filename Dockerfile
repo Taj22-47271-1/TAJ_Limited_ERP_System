@@ -1,45 +1,54 @@
-
 FROM php:8.3-apache
 
+# Install system dependencies and PostgreSQL driver
 RUN apt-get update && apt-get install -y \
-    git unzip libpq-dev \
-    && docker-php-ext-install pdo_pgsql pgsql \
-    && a2enmod rewrite \
+    git \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo_pgsql pgsql bcmath \
+    && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
+# Copy application files
 COPY . .
 
+# Install production dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-RUN sed -ri \
-    -e 's!/var/www/html!/var/www/html/public!g' \
-    /etc/apache2/sites-available/000-default.conf
-
-
+# Configure Apache DocumentRoot and permissions
 RUN printf '%s\n' \
-    '<Directory /var/www/html/public>' \
-    '    Options FollowSymLinks' \
-    '    AllowOverride All' \
-    '    Require all granted' \
-    '    DirectoryIndex index.php' \
-    '    FallbackResource /index.php' \
-    '</Directory>' \
-    > /etc/apache2/conf-available/laravel.conf \
-    && a2enconf laravel \
+    '<VirtualHost *:80>' \
+    '    ServerAdmin webmaster@localhost' \
+    '    DocumentRoot /var/www/html/public' \
+    '    <Directory /var/www/html/public>' \
+    '        Options -Indexes +FollowSymLinks' \
+    '        AllowOverride All' \
+    '        Require all granted' \
+    '    </Directory>' \
+    '    ErrorLog ${APACHE_LOG_DIR}/error.log' \
+    '    CustomLog ${APACHE_LOG_DIR}/access.log combined' \
+    '</VirtualHost>' \
+    > /etc/apache2/sites-available/000-default.conf \
+    && mkdir -p storage/framework/cache/data \
+               storage/framework/sessions \
+               storage/framework/views \
+               storage/logs \
+               bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
-
+# Copy entrypoint script and normalize line endings
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
+ENV PORT=10000
 EXPOSE 10000
 
 CMD ["/usr/local/bin/docker-entrypoint.sh"]
