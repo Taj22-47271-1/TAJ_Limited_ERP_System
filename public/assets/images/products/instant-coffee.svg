@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgCoffee" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="goldCap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="coffeeDark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#451a03"/>
+      <stop offset="100%" stop-color="#290e03"/>
+    </linearGradient>
+    <filter id="shadowCoffee" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#451a03" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" rx="24" fill="url(#bgCoffee)"/>
+  <ellipse cx="200" cy="305" rx="60" ry="12" fill="#0f172a" opacity="0.12"/>
+  <g filter="url(#shadowCoffee)">
+    <!-- Jar Glass Body filled with dark rich coffee -->
+    <rect x="150" y="115" width="100" height="170" rx="16" fill="url(#coffeeDark)" stroke="#78350f" stroke-width="2"/>
+    <!-- Gold Cap -->
+    <rect x="155" y="85" width="90" height="30" rx="6" fill="url(#goldCap)" stroke="#b45309" stroke-width="1.5"/>
+    <line x1="155" y1="95" x2="245" y2="95" stroke="#fef3c7" stroke-width="1.5" opacity="0.6"/>
+    <!-- Glass Gloss Reflection -->
+    <path d="M158 125 L158 270 Q164 265 164 135 Z" fill="#ffffff" opacity="0.12"/>
+    <!-- Coffee Label -->
+    <rect x="155" y="150" width="90" height="95" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+    <!-- Coffee Bean Graphic -->
+    <ellipse cx="200" cy="178" rx="12" ry="8" fill="#78350f"/>
+    <path d="M195 174 Q200 178 205 182" stroke="#fef3c7" stroke-width="1.5" fill="none"/>
+    <text x="200" y="206" font-family="'Inter', sans-serif" font-size="12" font-weight="900" fill="#451a03" text-anchor="middle" letter-spacing="0.05em">ROAST</text>
+    <text x="200" y="222" font-family="'Inter', sans-serif" font-size="9" font-weight="700" fill="#92400e" text-anchor="middle" letter-spacing="0.1em">INSTANT COFFEE</text>
+    <rect x="180" y="230" width="40" height="5" rx="2.5" fill="#d97706"/>
+  </g>
+  <text x="200" y="350" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">INSTANT COFFEE JAR 200G</text>
+</svg>

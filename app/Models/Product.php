@@ -41,7 +41,19 @@ class Product extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image_path ? Storage::disk('public')->url($this->image_path) : null;
+        if (! $this->image_path) {
+            return asset('assets/images/products/default.svg');
+        }
+
+        if (str_starts_with($this->image_path, 'http://') || str_starts_with($this->image_path, 'https://')) {
+            return $this->image_path;
+        }
+
+        if (str_starts_with($this->image_path, 'assets/') || str_starts_with($this->image_path, 'images/')) {
+            return asset($this->image_path);
+        }
+
+        return Storage::disk('public')->url($this->image_path);
     }
 
     public function normalizedSizes(): array

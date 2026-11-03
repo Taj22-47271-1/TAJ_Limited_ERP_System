@@ -11,13 +11,15 @@ sed -i "s/<VirtualHost \*:[0-9]*>/<VirtualHost \*:${PORT}>/" /etc/apache2/sites-
 mkdir -p /var/www/html/storage/framework/cache/data \
          /var/www/html/storage/framework/sessions \
          /var/www/html/storage/framework/views \
+         /var/www/html/storage/app/public/products \
          /var/www/html/storage/logs \
          /var/www/html/bootstrap/cache
 
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Create storage symlink if not already linked
+# Ensure public storage symlink is cleanly created in Linux
+rm -rf /var/www/html/public/storage
 php artisan storage:link --no-interaction || true
 
 # Automatically run database migrations and seed system defaults

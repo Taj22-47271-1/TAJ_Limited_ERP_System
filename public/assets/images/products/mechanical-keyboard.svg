@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgKb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="frameGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="shadowKb" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" rx="24" fill="url(#bgKb)"/>
+  <ellipse cx="200" cy="290" rx="140" ry="14" fill="#0f172a" opacity="0.12"/>
+  <g filter="url(#shadowKb)">
+    <!-- Keyboard Base -->
+    <rect x="50" y="115" width="300" height="150" rx="14" fill="url(#frameGrad)" stroke="#475569" stroke-width="2"/>
+    <!-- RGB Glow Underplate -->
+    <rect x="62" y="125" width="276" height="130" rx="8" fill="#1e293b"/>
+    <!-- Row 1 Keys -->
+    <g fill="#475569" stroke="#334155" stroke-width="1" rx="3">
+      <rect x="68" y="132" width="22" height="18" rx="3"/>
+      <rect x="94" y="132" width="22" height="18" rx="3"/>
+      <rect x="120" y="132" width="22" height="18" rx="3"/>
+      <rect x="146" y="132" width="22" height="18" rx="3"/>
+      <rect x="172" y="132" width="22" height="18" rx="3"/>
+      <rect x="198" y="132" width="22" height="18" rx="3"/>
+      <rect x="224" y="132" width="22" height="18" rx="3"/>
+      <rect x="250" y="132" width="22" height="18" rx="3"/>
+      <rect x="276" y="132" width="22" height="18" rx="3"/>
+      <rect x="302" y="132" width="30" height="18" rx="3" fill="#ef4444"/>
+    </g>
+    <!-- Row 2 Keys -->
+    <g fill="#334155" stroke="#1e293b" stroke-width="1" rx="3">
+      <rect x="68" y="154" width="28" height="18" rx="3" fill="#f59e0b"/>
+      <rect x="100" y="154" width="20" height="18" rx="3"/>
+      <rect x="124" y="154" width="20" height="18" rx="3"/>
+      <rect x="148" y="154" width="20" height="18" rx="3"/>
+      <rect x="172" y="154" width="20" height="18" rx="3"/>
+      <rect x="196" y="154" width="20" height="18" rx="3"/>
+      <rect x="220" y="154" width="20" height="18" rx="3"/>
+      <rect x="244" y="154" width="20" height="18" rx="3"/>
+      <rect x="268" y="154" width="20" height="18" rx="3"/>
+      <rect x="292" y="154" width="40" height="18" rx="3"/>
+    </g>
+    <!-- Row 3 Keys -->
+    <g fill="#334155" stroke="#1e293b" stroke-width="1" rx="3">
+      <rect x="68" y="176" width="34" height="18" rx="3"/>
+      <rect x="106" y="176" width="20" height="18" rx="3"/>
+      <rect x="130" y="176" width="20" height="18" rx="3"/>
+      <rect x="154" y="176" width="20" height="18" rx="3" fill="#10b981"/>
+      <rect x="178" y="176" width="20" height="18" rx="3"/>
+      <rect x="202" y="176" width="20" height="18" rx="3"/>
+      <rect x="226" y="176" width="20" height="18" rx="3"/>
+      <rect x="250" y="176" width="20" height="18" rx="3"/>
+      <rect x="274" y="176" width="20" height="18" rx="3"/>
+      <rect x="298" y="176" width="34" height="18" rx="3" fill="#3b82f6"/>
+    </g>
+    <!-- Row 4 Keys (Spacebar row) -->
+    <g fill="#475569" stroke="#1e293b" stroke-width="1" rx="3">
+      <rect x="68" y="198" width="28" height="18" rx="3"/>
+      <rect x="100" y="198" width="22" height="18" rx="3"/>
+      <rect x="126" y="198" width="130" height="18" rx="4" fill="#64748b"/>
+      <rect x="260" y="198" width="22" height="18" rx="3"/>
+      <rect x="286" y="198" width="22" height="18" rx="3"/>
+      <rect x="312" y="198" width="20" height="18" rx="3"/>
+    </g>
+  </g>
+  <text x="200" y="340" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">RGB MECHANICAL KEYBOARD</text>
+</svg>

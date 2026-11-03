@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgNote" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="coverGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="shadowNote" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect width="400" height="400" rx="24" fill="url(#bgNote)"/>
+  <ellipse cx="200" cy="310" rx="80" ry="14" fill="#0f172a" opacity="0.12"/>
+  <g filter="url(#shadowNote)">
+    <!-- Book Pages Block (edge) -->
+    <rect x="135" y="85" width="145" height="205" rx="10" fill="#fef3c7" stroke="#e2e8f0" stroke-width="1"/>
+    <!-- Hardcover Book Cover -->
+    <rect x="125" y="80" width="145" height="210" rx="8" fill="url(#coverGrad)" stroke="#334155" stroke-width="1.5"/>
+    <!-- Spine indents -->
+    <line x1="145" y1="80" x2="145" y2="290" stroke="#0f172a" stroke-width="3"/>
+    <line x1="147" y1="80" x2="147" y2="290" stroke="#475569" stroke-width="1" opacity="0.5"/>
+    <!-- Elastic Closure Band -->
+    <rect x="240" y="80" width="14" height="210" fill="#f59e0b" opacity="0.9"/>
+    <!-- Gold Foil Geometric Emblem -->
+    <circle cx="195" cy="180" r="24" fill="none" stroke="#fbbf24" stroke-width="2"/>
+    <polygon points="195,164 207,184 183,184" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+    <!-- Red Bookmark Ribbon sticking out bottom -->
+    <path d="M190 285 L190 315 L195 307 L200 315 L200 285 Z" fill="#ef4444"/>
+  </g>
+  <text x="200" y="355" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">PREMIUM HARDCOVER NOTEBOOK</text>
+</svg>
