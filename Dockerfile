@@ -29,7 +29,8 @@ RUN printf '%s\n' \
     '    FallbackResource /index.php' \
     '</Directory>' \
     > /etc/apache2/conf-available/laravel.conf \
-    && a2enconf laravel
+    && a2enconf laravel \
+    && chmod -R 775 storage bootstrap/cache
 
 
 RUN chown -R www-data:www-data storage bootstrap/cache \
