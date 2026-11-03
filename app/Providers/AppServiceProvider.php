@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Providers;
@@ -5,6 +6,7 @@ namespace App\Providers;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
@@ -15,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         View::composer('*', function ($view): void {
             $fallback = (object) [
                 'company_name' => config('company.name'),
