@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Str;
 
+$pgsqlHost = (string) env('DB_HOST', '');
+$isPgsqlHostUrl = str_starts_with($pgsqlHost, 'postgres://') || str_starts_with($pgsqlHost, 'postgresql://');
+$pgsqlUrl = env('DB_URL', env('DATABASE_URL', $isPgsqlHostUrl ? $pgsqlHost : null));
+
 return [
 
     'default' => env('DB_CONNECTION', 'pgsql'),
@@ -35,8 +39,8 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL', env('DATABASE_URL')),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'url' => $pgsqlUrl,
+            'host' => $isPgsqlHostUrl ? '127.0.0.1' : env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'taj_erp'),
             'username' => env('DB_USERNAME', 'postgres'),
