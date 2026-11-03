@@ -13,10 +13,7 @@ WORKDIR /var/www/html
 
 COPY . .
 
-RUN composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 RUN sed -ri \
     -e 's!/var/www/html!/var/www/html/public!g' \
@@ -24,7 +21,9 @@ RUN sed -ri \
 
 RUN printf '<Directory /var/www/html/public>\nAllowOverride All\nRequire all granted\n</Directory>\n' \
     > /etc/apache2/conf-available/laravel.conf \
-    && a2enconf laravel \
+    && a2enconf laravel
+
+RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
