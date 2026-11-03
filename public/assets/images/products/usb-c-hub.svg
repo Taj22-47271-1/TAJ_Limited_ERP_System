@@ -1,41 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
   <defs>
-    <linearGradient id="bgHub" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="metalGrad" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="hubMetal" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#94a3b8"/>
-      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="35%" stop-color="#cbd5e1"/>
+      <stop offset="70%" stop-color="#94a3b8"/>
       <stop offset="100%" stop-color="#64748b"/>
     </linearGradient>
-    <filter id="shadowHub" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.14"/>
+    <filter id="hubShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.2"/>
     </filter>
   </defs>
-  <rect width="400" height="400" rx="24" fill="url(#bgHub)"/>
-  <ellipse cx="200" cy="300" rx="60" ry="12" fill="#0f172a" opacity="0.12"/>
-  <g filter="url(#shadowHub)">
-    <!-- USB-C Cable -->
-    <path d="M200 110 C200 70, 260 70, 260 110" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
-    <!-- USB-C Connector -->
-    <rect x="252" y="105" width="16" height="24" rx="4" fill="#334155"/>
-    <rect x="256" y="129" width="8" height="12" rx="2" fill="#94a3b8"/>
-    <!-- Hub Body -->
-    <rect x="155" y="105" width="90" height="180" rx="14" fill="url(#metalGrad)" stroke="#64748b" stroke-width="1.5"/>
-    <!-- USB-A Ports (3x blue) -->
-    <rect x="175" y="130" width="50" height="14" rx="3" fill="#0f172a"/>
-    <rect x="180" y="133" width="40" height="8" rx="1.5" fill="#0284c7"/>
-    <rect x="175" y="156" width="50" height="14" rx="3" fill="#0f172a"/>
-    <rect x="180" y="159" width="40" height="8" rx="1.5" fill="#0284c7"/>
-    <rect x="175" y="182" width="50" height="14" rx="3" fill="#0f172a"/>
-    <rect x="180" y="185" width="40" height="8" rx="1.5" fill="#0284c7"/>
+  <!-- Ground Shadow -->
+  <ellipse cx="200" cy="340" rx="90" ry="16" fill="#0f172a" opacity="0.16"/>
+  <g filter="url(#hubShadow)">
+    <!-- USB-C Braided Cable loop from top -->
+    <path d="M200 95 C200 45, 265 45, 265 95" fill="none" stroke="#1e293b" stroke-width="9" stroke-linecap="round"/>
+    <!-- Connector Housing and Tip -->
+    <rect x="256" y="90" width="18" height="26" rx="4" fill="#334155"/>
+    <rect x="260" y="116" width="10" height="15" rx="2.5" fill="#cbd5e1" stroke="#64748b" stroke-width="1"/>
+    <!-- Hub Aluminum Body -->
+    <rect x="145" y="90" width="110" height="240" rx="18" fill="url(#hubMetal)" stroke="#64748b" stroke-width="1.5"/>
+    <!-- 3x SuperSpeed USB-A Ports -->
+    <g fill="#0f172a">
+      <rect x="165" y="120" width="70" height="18" rx="4"/>
+      <rect x="172" y="124" width="56" height="10" rx="2" fill="#0284c7"/>
+      
+      <rect x="165" y="152" width="70" height="18" rx="4"/>
+      <rect x="172" y="156" width="56" height="10" rx="2" fill="#0284c7"/>
+      
+      <rect x="165" y="184" width="70" height="18" rx="4"/>
+      <rect x="172" y="188" width="56" height="10" rx="2" fill="#0284c7"/>
+    </g>
     <!-- SD Card Slot -->
-    <rect x="170" y="212" width="60" height="6" rx="2" fill="#0f172a"/>
-    <!-- Micro SD Slot -->
-    <rect x="180" y="226" width="40" height="4" rx="1.5" fill="#0f172a"/>
-    <!-- Status LED -->
-    <circle cx="200" cy="255" r="4" fill="#10b981"/>
+    <rect x="160" y="222" width="80" height="8" rx="2.5" fill="#0f172a"/>
+    <!-- Micro SD Card Slot -->
+    <rect x="175" y="240" width="50" height="6" rx="2" fill="#0f172a"/>
+    <!-- Type-C PD Port -->
+    <rect x="178" y="260" width="44" height="10" rx="5" fill="#0f172a"/>
+    <rect x="183" y="263" width="34" height="4" rx="2" fill="#64748b"/>
+    <!-- Power / Status LED -->
+    <circle cx="200" cy="298" r="4.5" fill="#10b981"/>
   </g>
-  <text x="200" y="345" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">MULTI-PORT USB-C HUB</text>
 </svg>

@@ -1,34 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
   <defs>
-    <linearGradient id="bgNote" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="coverGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1e293b"/>
+    <linearGradient id="nbCover" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2d3748"/>
+      <stop offset="60%" stop-color="#1a202c"/>
       <stop offset="100%" stop-color="#0f172a"/>
     </linearGradient>
-    <filter id="shadowNote" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.16"/>
+    <linearGradient id="nbRibbon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+    <filter id="nbShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.22"/>
     </filter>
   </defs>
-  <rect width="400" height="400" rx="24" fill="url(#bgNote)"/>
-  <ellipse cx="200" cy="310" rx="80" ry="14" fill="#0f172a" opacity="0.12"/>
-  <g filter="url(#shadowNote)">
+  <!-- Base Ground Shadow -->
+  <ellipse cx="200" cy="335" rx="100" ry="16" fill="#0f172a" opacity="0.16"/>
+  <g filter="url(#nbShadow)">
     <!-- Book Pages Block (edge) -->
-    <rect x="135" y="85" width="145" height="205" rx="10" fill="#fef3c7" stroke="#e2e8f0" stroke-width="1"/>
+    <rect x="110" y="55" width="185" height="260" rx="8" fill="#fef3c7" stroke="#e2e8f0" stroke-width="1"/>
+    <line x1="290" y1="65" x2="290" y2="305" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="2,3"/>
     <!-- Hardcover Book Cover -->
-    <rect x="125" y="80" width="145" height="210" rx="8" fill="url(#coverGrad)" stroke="#334155" stroke-width="1.5"/>
+    <rect x="100" y="50" width="185" height="265" rx="10" fill="url(#nbCover)" stroke="#334155" stroke-width="1.5"/>
     <!-- Spine indents -->
-    <line x1="145" y1="80" x2="145" y2="290" stroke="#0f172a" stroke-width="3"/>
-    <line x1="147" y1="80" x2="147" y2="290" stroke="#475569" stroke-width="1" opacity="0.5"/>
+    <line x1="126" y1="50" x2="126" y2="315" stroke="#0f172a" stroke-width="3"/>
+    <line x1="128" y1="50" x2="128" y2="315" stroke="#64748b" stroke-width="1" opacity="0.6"/>
     <!-- Elastic Closure Band -->
-    <rect x="240" y="80" width="14" height="210" fill="#f59e0b" opacity="0.9"/>
+    <rect x="250" y="50" width="16" height="265" fill="#f59e0b" opacity="0.95"/>
     <!-- Gold Foil Geometric Emblem -->
-    <circle cx="195" cy="180" r="24" fill="none" stroke="#fbbf24" stroke-width="2"/>
-    <polygon points="195,164 207,184 183,184" fill="none" stroke="#fbbf24" stroke-width="1.5"/>
+    <circle cx="190" cy="175" r="28" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+    <polygon points="190,155 205,182 175,182" fill="none" stroke="#fbbf24" stroke-width="2"/>
+    <circle cx="190" cy="175" r="4" fill="#fbbf24"/>
     <!-- Red Bookmark Ribbon sticking out bottom -->
-    <path d="M190 285 L190 315 L195 307 L200 315 L200 285 Z" fill="#ef4444"/>
+    <path d="M185 310 L185 345 L192 336 L199 345 L199 310 Z" fill="url(#nbRibbon)"/>
   </g>
-  <text x="200" y="355" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">PREMIUM HARDCOVER NOTEBOOK</text>
 </svg>

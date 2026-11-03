@@ -1,38 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="wmBody" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#334155"/>
       <stop offset="50%" stop-color="#1e293b"/>
       <stop offset="100%" stop-color="#0f172a"/>
     </linearGradient>
-    <linearGradient id="wheelGrad" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="wmWheel" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#38bdf8"/>
       <stop offset="100%" stop-color="#0284c7"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.15"/>
+    <filter id="wmShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.22"/>
     </filter>
   </defs>
-  <rect width="400" height="400" rx="24" fill="url(#bg)"/>
-  <ellipse cx="200" cy="310" rx="90" ry="14" fill="#0f172a" opacity="0.12"/>
-  <g filter="url(#shadow)">
-    <!-- Mouse body -->
-    <path d="M140 160 C140 90, 170 60, 200 60 C230 60, 260 90, 260 160 C260 250, 245 290, 200 290 C155 290, 140 250, 140 160 Z" fill="url(#bodyGrad)"/>
-    <!-- Mouse ergonomic side accent -->
-    <path d="M142 160 C142 220, 150 260, 180 280 C160 260, 150 220, 150 160 C150 120, 158 90, 170 75 C150 90, 142 120, 142 160 Z" fill="#475569" opacity="0.4"/>
-    <!-- Center seam -->
-    <path d="M200 60 L200 150" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- Scroll Wheel -->
-    <rect x="193" y="90" width="14" height="34" rx="7" fill="url(#wheelGrad)"/>
-    <line x1="193" y1="102" x2="207" y2="102" stroke="#0369a1" stroke-width="1.5"/>
-    <line x1="193" y1="112" x2="207" y2="112" stroke="#0369a1" stroke-width="1.5"/>
-    <!-- Subtle LED logo / mark -->
-    <circle cx="200" cy="225" r="9" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.7"/>
-    <path d="M200 220 L200 230 M195 225 L205 225" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+  <!-- Ground Shadow -->
+  <ellipse cx="200" cy="335" rx="100" ry="16" fill="#0f172a" opacity="0.16"/>
+  <g filter="url(#wmShadow)">
+    <!-- Mouse Ergonomic Body -->
+    <path d="M130 170 C130 90, 165 50, 200 50 C235 50, 270 90, 270 170 C270 270, 250 315, 200 315 C150 315, 130 270, 130 170 Z" fill="url(#wmBody)" stroke="#475569" stroke-width="1.5"/>
+    <!-- Left Thumb Rest Curve -->
+    <path d="M132 170 C132 240, 142 285, 175 305 C152 285, 142 240, 142 170 C142 125, 150 90, 165 72 C142 90, 132 125, 132 170 Z" fill="#475569" opacity="0.45"/>
+    <!-- Center Clicker Split Seam -->
+    <path d="M200 50 L200 155" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Scroll Wheel Housing & Wheel -->
+    <rect x="190" y="85" width="20" height="42" rx="10" fill="#0f172a"/>
+    <rect x="193" y="90" width="14" height="32" rx="7" fill="url(#wmWheel)"/>
+    <line x1="193" y1="100" x2="207" y2="100" stroke="#0369a1" stroke-width="1.5"/>
+    <line x1="193" y1="110" x2="207" y2="110" stroke="#0369a1" stroke-width="1.5"/>
+    <!-- DPI Button -->
+    <rect x="195" y="140" width="10" height="8" rx="2" fill="#64748b"/>
+    <!-- Subtle LED Logo Accent -->
+    <circle cx="200" cy="245" r="10" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.8"/>
+    <path d="M200 239 L200 251 M194 245 L206 245" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
   </g>
-  <text x="200" y="355" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">WIRELESS OPTICAL MOUSE</text>
 </svg>

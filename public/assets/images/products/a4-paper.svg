@@ -1,38 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
   <defs>
-    <linearGradient id="bgPaper" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="reamGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#f8fafc"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
-    </linearGradient>
-    <linearGradient id="wrapperGrad" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="ppWrap" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#2563eb"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e40af"/>
     </linearGradient>
-    <filter id="shadowPaper" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.14"/>
+    <linearGradient id="ppPaper" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <filter id="ppShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#0f172a" flood-opacity="0.2"/>
     </filter>
   </defs>
-  <rect width="400" height="400" rx="24" fill="url(#bgPaper)"/>
-  <ellipse cx="200" cy="305" rx="100" ry="14" fill="#0f172a" opacity="0.12"/>
-  <g filter="url(#shadowPaper)">
-    <!-- Stack base / pages -->
-    <rect x="110" y="145" width="180" height="135" rx="6" fill="#cbd5e1"/>
-    <rect x="110" y="140" width="180" height="135" rx="6" fill="#e2e8f0"/>
-    <rect x="110" y="135" width="180" height="135" rx="6" fill="#f1f5f9"/>
-    <!-- Packaging Wrapper -->
-    <rect x="110" y="130" width="180" height="135" rx="6" fill="url(#reamGrad)" stroke="#cbd5e1" stroke-width="1"/>
-    <!-- Blue Wrapping Band -->
-    <rect x="110" y="165" width="180" height="70" fill="url(#wrapperGrad)"/>
-    <!-- A4 Brand Typography inside Band -->
-    <text x="200" y="200" font-family="'Inter', sans-serif" font-size="28" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="0.05em">A4</text>
-    <text x="200" y="222" font-family="'Inter', sans-serif" font-size="11" font-weight="700" fill="#93c5fd" text-anchor="middle" letter-spacing="0.12em">PREMIUM PAPER • 80 GSM</text>
-    <!-- Seal badge -->
-    <circle cx="265" cy="150" r="14" fill="#fbbf24"/>
-    <text x="265" y="154" font-family="'Inter', sans-serif" font-size="9" font-weight="800" fill="#78350f" text-anchor="middle">500</text>
+  <!-- Ground Shadow -->
+  <ellipse cx="200" cy="335" rx="125" ry="18" fill="#0f172a" opacity="0.16"/>
+  <g filter="url(#ppShadow)">
+    <!-- Stack of Sheets -->
+    <rect x="85" y="115" width="230" height="185" rx="8" fill="#cbd5e1"/>
+    <rect x="85" y="108" width="230" height="185" rx="8" fill="#e2e8f0"/>
+    <rect x="85" y="100" width="230" height="185" rx="8" fill="url(#ppPaper)" stroke="#cbd5e1" stroke-width="1.5"/>
+    <!-- Page Edge Texture -->
+    <line x1="88" y1="285" x2="312" y2="285" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+    <line x1="88" y1="290" x2="312" y2="290" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+    <!-- Royal Blue Wrapper Band -->
+    <rect x="85" y="145" width="230" height="100" fill="url(#ppWrap)"/>
+    <line x1="85" y1="145" x2="315" y2="145" stroke="#60a5fa" stroke-width="2"/>
+    <line x1="85" y1="245" x2="315" y2="245" stroke="#1d4ed8" stroke-width="2"/>
+    <!-- A4 Typography -->
+    <text x="200" y="196" font-family="'Inter', sans-serif" font-size="36" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="0.05em">A4</text>
+    <text x="200" y="222" font-family="'Inter', sans-serif" font-size="11" font-weight="800" fill="#93c5fd" text-anchor="middle" letter-spacing="0.14em">500 SHEETS • 80 GSM</text>
+    <!-- Gold Quality Seal Badge -->
+    <circle cx="280" cy="130" r="18" fill="#f59e0b" stroke="#d97706" stroke-width="1.5"/>
+    <circle cx="280" cy="130" r="14" fill="#fbbf24"/>
+    <text x="280" y="134" font-family="'Inter', sans-serif" font-size="10" font-weight="900" fill="#78350f" text-anchor="middle">HQ</text>
   </g>
-  <text x="200" y="345" font-family="'Inter', sans-serif" font-size="13" font-weight="700" fill="#475569" text-anchor="middle" letter-spacing="0.08em">A4 PAPER REAM (500 SHEETS)</text>
 </svg>
