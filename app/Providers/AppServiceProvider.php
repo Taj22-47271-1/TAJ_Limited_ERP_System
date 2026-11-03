@@ -13,14 +13,19 @@ use Throwable;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        //
+    }
 
     public function boot(): void
     {
+        // Force HTTPS URLs in production (Render)
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
 
+        // Share company settings with all Blade views
         View::composer('*', function ($view): void {
             $fallback = (object) [
                 'company_name' => config('company.name'),
@@ -32,7 +37,11 @@ class AppServiceProvider extends ServiceProvider
 
             try {
                 $settings = Schema::hasTable('settings')
-                    ? Cache::remember('company.settings', 60, fn () => Setting::query()->first() ?? $fallback)
+                    ? Cache::remember(
+                        'company.settings',
+                        60,
+                        fn () => Setting::query()->first() ?? $fallback
+                    )
                     : $fallback;
             } catch (Throwable) {
                 $settings = $fallback;
