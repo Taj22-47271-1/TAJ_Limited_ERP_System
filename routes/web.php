@@ -26,6 +26,30 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+Route::get('/healthz', function () {
+    try {
+        DB::connection()->getPdo();
+        $hasUsers = Schema::hasTable('users');
+        $userCount = $hasUsers ? DB::table('users')->count() : 0;
+        return response()->json([
+            'status' => 'ok',
+            'database' => 'connected',
+            'users_table_exists' => $hasUsers,
+            'users_count' => $userCount,
+        ]);
+    } catch (\Throwable $e) {
+        $cleanMsg = preg_replace('/password=[^; ]+/i', 'password=***', $e->getMessage());
+        return response()->json([
+            'status' => 'error',
+            'database' => 'disconnected',
+            'error' => $cleanMsg,
+        ], 500);
+    }
+});
+
 Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redirect()->route('login'));
 
 Route::middleware('guest')->group(function () {
