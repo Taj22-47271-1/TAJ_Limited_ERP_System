@@ -41,4 +41,41 @@ class RoleFlowTest extends TestCase
         $this->actingAs($cashier)->get('/accounting/journals')->assertForbidden();
         $this->actingAs($cashier)->get('/reports/profit-loss')->assertForbidden();
     }
+
+    public function test_ajax_add_to_cart_and_summary_endpoint(): void
+    {
+        $this->seed();
+        $user = User::where('role', 'customer')->firstOrFail();
+        $product = \App\Models\Product::where('status', true)->firstOrFail();
+
+        $response = $this->actingAs($user)
+            ->postJson("/cart/{$product->id}", [
+                'quantity' => 2,
+            ]);
+
+        $response->assertOk()
+            ->assertJson([
+                'success' => true,
+                'cart_count' => 2,
+            ]);
+
+        $summary = $this->actingAs($user)->getJson('/cart/summary');
+        $summary->assertOk()
+            ->assertJson([
+                'cart_count' => 2,
+            ]);
+    }
+
+    public function test_forgot_password_otp_flow_with_fallback(): void
+    {
+        $this->seed();
+        $user = User::where('email', 'customer@tajlimited.com')->firstOrFail();
+
+        $response = $this->post('/forgot-password', [
+            'email' => $user->email,
+        ]);
+
+        $response->assertRedirect('/forgot-password/verify-otp');
+        $this->assertTrue(session()->has('password_reset_email'));
+    }
 }

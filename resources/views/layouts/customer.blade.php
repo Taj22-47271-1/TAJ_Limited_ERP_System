@@ -34,10 +34,10 @@
         </nav>
 
         <div class="vc-actions">
-            <a class="vc-cart" href="{{ route('cart.index') }}" aria-label="Shopping cart">
+            <a class="vc-cart" href="{{ route('cart.index') }}" id="headerCartBtn" aria-label="Shopping cart">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11l1 11h-13l1-11Zm3 0V6a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
                 @php $cartCount = collect(session('cart', []))->sum(fn($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line); @endphp
-                <span>{{ number_format($cartCount, 0) }}</span>
+                <span class="cart-badge-count">{{ number_format($cartCount, 0) }}</span>
             </a>
             <details class="vc-account">
                 <summary><span>{{ strtoupper(substr(auth()->user()->name,0,1)) }}</span></summary>
@@ -57,6 +57,49 @@
 @if($errors->any())<div class="toast error">{{ $errors->first() }}</div>@endif
 
 <main class="vc-main">@yield('content')</main>
+
+<!-- Floating Bottom Cart Bar (as seen in video frame_38 and frame_77) -->
+<div class="vc-floating-cart-bar" id="vcFloatingCartBar">
+    <div class="vc-floating-cart-inner" id="vcFloatingCartTrigger">
+        <div class="vc-floating-thumbs" id="vcFloatingThumbs"></div>
+        <div class="vc-floating-info">
+            <strong>View cart</strong>
+            <span id="vcFloatingCountText">0 items</span>
+        </div>
+        <div class="vc-floating-right">
+            <strong id="vcFloatingTotalText">{{ $companySettings->currency_symbol }}0.00</strong>
+            <span class="vc-floating-arrow">›</span>
+        </div>
+    </div>
+</div>
+
+<!-- Slide-Up Mini Cart Drawer (as seen in video frame_115) -->
+<div class="vc-mini-cart-overlay" id="vcMiniCartOverlay"></div>
+<div class="vc-mini-cart-drawer" id="vcMiniCartDrawer">
+    <div class="vc-mini-cart-head">
+        <div>
+            <span style="font-size: 20px;">🛒</span>
+            <h3>Your Cart <span id="vcDrawerCountBadge">(0)</span></h3>
+        </div>
+        <button type="button" id="vcMiniCartClose" class="vc-drawer-close-btn" aria-label="Close cart">×</button>
+    </div>
+    <div class="vc-mini-cart-items" id="vcMiniCartItems">
+        <!-- Rendered dynamically -->
+    </div>
+    <div class="vc-mini-cart-footer">
+        <div class="vc-free-shipping-pill">
+            <span>🚚</span> Standard Delivery · Reliable Tracking
+        </div>
+        <div class="vc-drawer-subtotal-row">
+            <span>Subtotal</span>
+            <strong id="vcDrawerSubtotal">{{ $companySettings->currency_symbol }}0.00</strong>
+        </div>
+        <a href="{{ route('checkout') }}" class="vc-drawer-checkout-btn">
+            <span>Proceed to Checkout</span>
+            <strong id="vcDrawerCheckoutTotal">{{ $companySettings->currency_symbol }}0.00 ›</strong>
+        </a>
+    </div>
+</div>
 
 <footer class="vc-footer">
     <div class="vc-footer-inner">

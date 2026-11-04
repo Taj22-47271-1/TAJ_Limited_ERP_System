@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\ImageBackgroundService;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(Request $request, InventoryService $inventory)
+    public function store(Request $request, InventoryService $inventory, ImageBackgroundService $imageService)
     {
         $data = $this->validated($request);
         $openingStock = $request->user()->hasPermission('inventory.manage') ? (float)($data['opening_stock'] ?? 0) : 0;
@@ -45,7 +46,7 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+            $data['image_path'] = $imageService->processAndStore($request->file('image'));
         }
 
         $product = DB::transaction(function () use ($data, $openingStock, $inventory, $request) {
@@ -67,7 +68,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(Request $request, Product $product, ImageBackgroundService $imageService)
     {
         $data = $this->validated($request, $product);
         $data = $this->prepareProductData($request, $data);
@@ -79,10 +80,10 @@ class ProductController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            if ($product->image_path) {
+            if ($product->image_path && !str_starts_with($product->image_path, 'assets/')) {
                 Storage::disk('public')->delete($product->image_path);
             }
-            $data['image_path'] = $request->file('image')->store('products', 'public');
+            $data['image_path'] = $imageService->processAndStore($request->file('image'));
         }
 
         $product->update($data);

@@ -7,7 +7,9 @@ use App\Models\PasswordResetOtp;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class ForgotPasswordController extends Controller
 {
@@ -21,8 +23,23 @@ class ForgotPasswordController extends Controller
         $otp=(string) random_int(100000,999999);
         PasswordResetOtp::where('email',$data['email'])->delete();
         PasswordResetOtp::create(['email'=>$data['email'],'otp_hash'=>Hash::make($otp),'expires_at'=>now()->addMinutes(10),'attempts'=>0]);
-        Mail::to($data['email'])->send(new PasswordResetOtpMail($otp));
+
+        $sent = false;
+        try {
+            Mail::to($data['email'])->send(new PasswordResetOtpMail($otp));
+            $sent = true;
+        } catch (Throwable $e) {
+            Log::error('PasswordReset OTP mail failed: ' . $e->getMessage());
+        }
+
         $request->session()->put('password_reset_email',$data['email']);
+
+        if (! $sent) {
+            $request->session()->flash('demo_otp', $otp);
+            return redirect()->route('password.otp.form')
+                ->with('status', "A 6-digit OTP has been generated! (Notice: SMTP delivery not configured on server. Test OTP: {$otp})");
+        }
+
         return redirect()->route('password.otp.form')->with('status','A 6-digit OTP has been sent to your email.');
     }
 

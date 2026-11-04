@@ -12,6 +12,28 @@ class CartController extends Controller
         return view('shop.cart', $this->cartData($request));
     }
 
+    public function summary(Request $request)
+    {
+        $data = $this->cartData($request);
+        $totalCount = collect(session('cart', []))->sum(fn ($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line);
+
+        return response()->json([
+            'cart_count' => $totalCount,
+            'subtotal' => $data['subtotal'],
+            'total' => $data['total'],
+            'items' => $data['items']->map(fn ($it) => [
+                'key' => $it['key'],
+                'product_id' => $it['product']->id,
+                'name' => $it['product']->name,
+                'size' => $it['size'],
+                'quantity' => $it['quantity'],
+                'selling_price' => (float)$it['product']->selling_price,
+                'line_total' => $it['line_total'],
+                'image' => $it['product']->image_url,
+            ]),
+        ]);
+    }
+
     public function add(Request $request, Product $product)
     {
         $data = $request->validate([
@@ -31,9 +53,11 @@ class CartController extends Controller
             ->sum(fn ($line) => (float)$line['quantity']);
 
         if ($alreadyInCart + $qty > $product->available_stock) {
-            return back()->withErrors([
-                'cart'=>"Only {$product->available_stock} {$product->unit} of {$product->name} are currently available.",
-            ]);
+            $msg = "Only {$product->available_stock} {$product->unit} of {$product->name} are currently available.";
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->withErrors(['cart' => $msg]);
         }
 
         $existing = $cart[$key] ?? [
@@ -47,6 +71,28 @@ class CartController extends Controller
 
         if ($request->boolean('buy_now')) {
             return redirect()->route('checkout');
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            $data = $this->cartData($request);
+            $totalCount = collect($cart)->sum(fn ($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line);
+            return response()->json([
+                'success' => true,
+                'message' => $product->name.($size ? " ({$size})" : '').' added to cart.',
+                'cart_count' => $totalCount,
+                'subtotal' => $data['subtotal'],
+                'total' => $data['total'],
+                'items' => $data['items']->map(fn ($it) => [
+                    'key' => $it['key'],
+                    'product_id' => $it['product']->id,
+                    'name' => $it['product']->name,
+                    'size' => $it['size'],
+                    'quantity' => $it['quantity'],
+                    'selling_price' => (float)$it['product']->selling_price,
+                    'line_total' => $it['line_total'],
+                    'image' => $it['product']->image_url,
+                ]),
+            ]);
         }
 
         return back()->with('status', $product->name.($size ? " ({$size})" : '').' added to cart.');
@@ -73,7 +119,11 @@ class CartController extends Controller
                 ->sum(fn ($line) => (float)$line['quantity']);
 
             if ($otherQty + $qty > $product->available_stock) {
-                return back()->withErrors(['cart'=>"Only {$product->available_stock} available across all sizes."]);
+                $msg = "Only {$product->available_stock} available across all sizes.";
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => $msg], 422);
+                }
+                return back()->withErrors(['cart' => $msg]);
             }
 
             $cart[$key] = [
@@ -84,6 +134,19 @@ class CartController extends Controller
         }
 
         $request->session()->put('cart', $cart);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            $data = $this->cartData($request);
+            $totalCount = collect($cart)->sum(fn ($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line);
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart updated.',
+                'cart_count' => $totalCount,
+                'subtotal' => $data['subtotal'],
+                'total' => $data['total'],
+            ]);
+        }
+
         return back()->with('status','Cart updated.');
     }
 
@@ -94,6 +157,19 @@ class CartController extends Controller
         $cart = $this->normalizeCart($request->session()->get('cart', []));
         unset($cart[$this->cartKey($product->id, $size)]);
         $request->session()->put('cart', $cart);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            $data = $this->cartData($request);
+            $totalCount = collect($cart)->sum(fn ($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line);
+            return response()->json([
+                'success' => true,
+                'message' => 'Product removed from cart.',
+                'cart_count' => $totalCount,
+                'subtotal' => $data['subtotal'],
+                'total' => $data['total'],
+            ]);
+        }
+
         return back()->with('status','Product removed from cart.');
     }
 
