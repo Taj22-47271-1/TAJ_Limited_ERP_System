@@ -1,15 +1,23 @@
 @extends('layouts.app')
-@section('title', '3D Showcase Settings')
+@section('title', '3D Clothing Showcase Management')
+
 @section('content')
 <div class="page-head">
     <div>
-        <span class="muted-title">STOREFRONT & 3D ATELIER</span>
-        <h1>3D Showcase & Hotspot Management</h1>
-        <p class="muted-note">Customize the 3D turntable podium, interactive detail pins, macro fabric loupe, and color swatches.</p>
+        <span class="eyebrow dark">STOREFRONT ATELIER</span>
+        <h1>3D Clothing Showcase & Hotspot Management</h1>
+        <p>Customize the 3D garment stage, 4 interactive hotspot pins, macro fabric loupe, specifications, and variant morph swatches.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ route('dashboard') }}" target="_blank" class="btn ghost">View Storefront ↗</a>
     </div>
 </div>
 
-<form method="POST" action="{{ route('admin.showcase.update') }}" enctype="multipart/form-data" class="stack-form">
+@if(session('status'))
+    <div class="alert success" style="margin-bottom: 20px;">{{ session('status') }}</div>
+@endif
+
+<form method="POST" action="{{ route('admin.showcase.update') }}" enctype="multipart/form-data" class="showcase-form">
     @csrf
     @method('PUT')
 
@@ -17,15 +25,15 @@
         <input type="hidden" name="product_id" value="{{ $selectedProduct->id }}">
     @endif
 
-    <!-- Selector Bar -->
-    <div class="card" style="margin-bottom: 24px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; background: #fafbfc; border: 1px solid #e2e8f0;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 22px;">👗</span>
+    <!-- Target Selector: Global vs Product Specific -->
+    <div class="card" style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; background: #f8fafc; border-left: 4px solid #111;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 24px;">🎯</span>
             <div>
-                <strong>Configuration Target</strong>
-                <small style="display: block; color: #64748b;">
+                <strong style="font-size: 15px; display: block;">Configuration Target</strong>
+                <small class="muted">
                     @if($selectedProduct)
-                        Customizing 3D showcase specifically for <strong>{{ $selectedProduct->name }}</strong>
+                        Configuring custom settings for: <strong style="color: #0f172a;">{{ $selectedProduct->name }}</strong>
                     @else
                         Configuring <strong>Global Showcase Defaults</strong> (applied across storefront)
                     @endif
@@ -48,12 +56,17 @@
     <!-- Section 1: General & Banner Settings -->
     <div class="card" style="margin-bottom: 24px;">
         <h2 style="font-size: 18px; margin: 0 0 16px; display: flex; align-items: center; gap: 8px;">
-            <span>✨</span> General 3D Showcase Settings
+            <span>✨</span> General 3D Showcase & Presentation Settings
         </h2>
         <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px;">
             <label style="grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
                 <input type="checkbox" name="enabled" value="1" @checked($config['enabled'] ?? true)>
                 <span><strong>Enable 3D Clothing Showcase</strong> (Displays luxury turntable stage on customer dashboard and shop)</span>
+            </label>
+
+            <label style="grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <input type="checkbox" name="enable_3d" value="1" @checked($config['enable_3d'] ?? true)>
+                <span><strong>Enable 3D Orbit Stage & Dynamic Tilt</strong> (Optional: When checked, turntable orbit & parallax tilt are active; uncheck for clean 2D studio view)</span>
             </label>
 
             <label style="grid-column: 1 / -1;">
@@ -76,7 +89,7 @@
         </div>
     </div>
 
-    <!-- Section 2: 4 Interactive Hotspot Pins (As shown in Screenshot 1) -->
+    <!-- Section 2: 4 Interactive Hotspot Pins -->
     <div class="card" style="margin-bottom: 24px;">
         <h2 style="font-size: 18px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px;">
             <span>📍</span> 4 Interactive Hotspot Pins (3D Stage Detail Callouts)
@@ -88,27 +101,27 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             @php $hotspots = $config['hotspots'] ?? Setting::defaultShowcaseConfig()['hotspots']; @endphp
             @foreach($hotspots as $i => $spot)
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                    <strong style="color: #0f172a; font-size: 13px;">Hotspot #{{ $i + 1 }}</strong>
-                    <span style="font-size: 11px; color: #64748b; background: #e2e8f0; padding: 2px 8px; border-radius: 999px;">Pin {{ $i + 1 }}</span>
+            <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; background: #fafafa;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <strong style="color: #0f172a; font-size: 14px;">Hotspot Pin #{{ $i + 1 }}</strong>
+                    <span style="font-size: 11px; background: #e2e8f0; padding: 2px 8px; border-radius: 999px; font-weight: 700;">Pin {{ $i + 1 }}</span>
                 </div>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
                     <label>
-                        <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Pin Title</span>
+                        <span style="font-size: 12px; color: #64748b;">Pin Title</span>
                         <input name="hotspots[{{ $i }}][title]" value="{{ old('hotspots.'.$i.'.title', $spot['title']) }}" required>
                     </label>
                     <label>
-                        <span style="font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: 700;">Description</span>
+                        <span style="font-size: 12px; color: #64748b;">Description</span>
                         <textarea name="hotspots[{{ $i }}][desc]" rows="2">{{ old('hotspots.'.$i.'.desc', $spot['desc']) }}</textarea>
                     </label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px;">
                         <label>
-                            <span style="font-size: 11px; color: #64748b;">Top Y (%)</span>
+                            <span style="font-size: 11px; color: #64748b;">Top Position (Y: 0-100%)</span>
                             <input type="number" step="1" min="0" max="100" name="hotspots[{{ $i }}][top]" value="{{ old('hotspots.'.$i.'.top', $spot['top']) }}">
                         </label>
                         <label>
-                            <span style="font-size: 11px; color: #64748b;">Left X (%)</span>
+                            <span style="font-size: 11px; color: #64748b;">Left Position (X: 0-100%)</span>
                             <input type="number" step="1" min="0" max="100" name="hotspots[{{ $i }}][left]" value="{{ old('hotspots.'.$i.'.left', $spot['left']) }}">
                         </label>
                     </div>
@@ -118,34 +131,34 @@
         </div>
     </div>
 
-    <!-- Section 3: Macro Fabric Loupe Magnifier (As shown in Screenshot 2) -->
+    <!-- Section 3: Macro Fabric Loupe (Fabric Texture & Specs) -->
     <div class="card" style="margin-bottom: 24px;">
+        @php $loupe = $config['loupe'] ?? Setting::defaultShowcaseConfig()['loupe']; @endphp
         <h2 style="font-size: 18px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px;">
-            <span>🔍</span> Macro Fabric Loupe & Technical Weave Analysis
+            <span>🔬</span> Macro Fabric Loupe & Technical Specifications
         </h2>
         <p style="font-size: 12px; color: #64748b; margin-bottom: 20px;">
-            Configure the microscopic fabric texture lens and technical specification badges shown in Scene 2.
+            Configure the ultra-high definition fabric inspection circle, texture image, and the 4 specification pills.
         </p>
 
-        @php $loupe = $config['loupe'] ?? Setting::defaultShowcaseConfig()['loupe']; @endphp
         <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px;">
             <label>
-                <span>Section Kicker</span>
+                <span>Loupe Kicker / Section Category</span>
                 <input name="loupe_kicker" value="{{ old('loupe_kicker', $loupe['kicker']) }}" required>
             </label>
             <label>
-                <span>Headline Title</span>
+                <span>Loupe Main Title</span>
                 <input name="loupe_title" value="{{ old('loupe_title', $loupe['title']) }}" required>
             </label>
             <label style="grid-column: 1 / -1;">
-                <span>Detailed Description</span>
+                <span>Detailed Weave & Thread Analysis Description</span>
                 <textarea name="loupe_desc" rows="2">{{ old('loupe_desc', $loupe['desc']) }}</textarea>
             </label>
             <label style="grid-column: 1 / -1;">
-                <span>Fabric Texture Loupe Image</span>
-                <div style="display: flex; align-items: center; gap: 18px; margin-top: 6px;">
-                    <div style="width: 70px; height: 70px; border-radius: 50%; border: 2px solid #d4af37; overflow: hidden; background: #000; flex: 0 0 auto;">
-                        <img src="{{ asset($loupe['image'] ?? 'assets/images/products/saree-fabric-texture.jpg') }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <span>Fabric Loupe Texture Image (Square / Macro photo)</span>
+                <div style="display: flex; align-items: center; gap: 16px; margin-top: 6px;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; border: 2px solid #d4af37; background: #000; flex-shrink: 0;">
+                        <img src="{{ asset($loupe['image'] ?? 'assets/images/products/saree-fabric-texture.jpg') }}" alt="Current Loupe" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <input type="file" name="loupe_image" accept="image/*">
                 </div>
@@ -165,30 +178,83 @@
         </div>
     </div>
 
-    <!-- Section 4: Variant Morph Swatches -->
+    <!-- Section 4: Variant Morph Swatches with Color-Specific Photos -->
     <div class="card" style="margin-bottom: 28px;">
         <h2 style="font-size: 18px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px;">
-            <span>🎨</span> Variant Morph Swatches (Colorways)
+            <span>🎨</span> Variant Morph Swatches (Colorways & Color-Specific Product Photos)
         </h2>
         <p style="font-size: 12px; color: #64748b; margin-bottom: 18px;">
-            Customers can click these swatches in the Variant Morph tab to dynamically change the preview tone and lighting.
+            Assign a specific product image for each colorway. When customers tap that color swatch, the garment view automatically switches to that color's image!
         </p>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
             @php $swatches = $config['swatches'] ?? Setting::defaultShowcaseConfig()['swatches']; @endphp
             @foreach($swatches as $swIdx => $swatch)
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px;">
-                <label style="display: flex; flex-direction: column; gap: 6px;">
-                    <span style="font-size: 11px; color: #64748b; font-weight: 700;">Color Name</span>
-                    <input name="swatches[{{ $swIdx }}][name]" value="{{ old('swatches.'.$swIdx.'.name', $swatch['name']) }}">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 11px; font-weight: 700; color: #1e293b;">Swatch #{{ $swIdx + 1 }}</span>
+                    <input type="color" name="swatches[{{ $swIdx }}][color]" value="{{ old('swatches.'.$swIdx.'.color', $swatch['color']) }}" style="width: 36px; height: 32px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer;">
+                </div>
+
+                <label style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 11px; color: #64748b; font-weight: 600;">Color Name</span>
+                    <input name="swatches[{{ $swIdx }}][name]" value="{{ old('swatches.'.$swIdx.'.name', $swatch['name']) }}" required style="font-size: 12px;">
                 </label>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-                    <input type="color" name="swatches[{{ $swIdx }}][color]" value="{{ old('swatches.'.$swIdx.'.color', $swatch['color']) }}" style="width: 44px; height: 38px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 2px; cursor: pointer;">
-                    <span style="font-size: 12px; color: #64748b; font-family: monospace;">{{ $swatch['color'] }}</span>
+
+                <label style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 11px; color: #64748b; font-weight: 600;">Tone / Tag</span>
+                    <input name="swatches[{{ $swIdx }}][tag]" value="{{ old('swatches.'.$swIdx.'.tag', $swatch['tag'] ?? '') }}" placeholder="e.g. Royal Indigo" style="font-size: 12px;">
+                </label>
+
+                <!-- Color specific image -->
+                <div style="border-top: 1px dashed #cbd5e1; padding-top: 10px; margin-top: 4px;">
+                    <span style="font-size: 11px; color: #475569; font-weight: 600; display: block; margin-bottom: 6px;">Color-Specific Image</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        @php
+                            $swImg = !empty($swatch['image'])
+                                ? (str_starts_with($swatch['image'], 'http') || str_starts_with($swatch['image'], 'assets/') || str_starts_with($swatch['image'], 'storage/') ? asset($swatch['image']) : asset('storage/' . $swatch['image']))
+                                : '';
+                        @endphp
+                        <div style="width: 44px; height: 44px; border-radius: 6px; border: 1px solid #cbd5e1; background: #000; overflow: hidden; display: grid; place-items: center; flex-shrink: 0;">
+                            @if($swImg)
+                                <img src="{{ $swImg }}" alt="Swatch Image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                            @else
+                                <span style="font-size: 10px; color: #94a3b8;">None</span>
+                            @endif
+                        </div>
+                        <input type="hidden" name="swatches[{{ $swIdx }}][existing_image]" value="{{ $swatch['image'] ?? '' }}">
+                        <input type="file" name="swatch_image_{{ $swIdx }}" accept="image/*" style="font-size: 11px; width: 100%;">
+                    </div>
                 </div>
             </div>
             @endforeach
         </div>
+    </div>
+
+    <!-- Section 5: Multiple Lookbook & Gallery Photos -->
+    <div class="card" style="margin-bottom: 28px;">
+        <h2 style="font-size: 18px; margin: 0 0 6px; display: flex; align-items: center; gap: 8px;">
+            <span>📖</span> Lookbook & Multiple Product Angles (Gallery)
+        </h2>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">
+            Upload additional styling photos, angle shots, or model lookbook captures for this garment.
+        </p>
+
+        @php $gallery = $config['gallery'] ?? []; @endphp
+        @if(!empty($gallery))
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+                @foreach($gallery as $gImg)
+                    <div style="width: 90px; height: 90px; border-radius: 8px; border: 1px solid #cbd5e1; overflow: hidden; background: #000;">
+                        <img src="{{ asset($gImg) }}" alt="Lookbook angle" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <label style="display: block;">
+            <span style="font-size: 12px; font-weight: 600; color: #475569;">Upload additional gallery / lookbook images (multiple allowed):</span>
+            <input type="file" name="gallery_images[]" multiple accept="image/*" style="margin-top: 6px; display: block; font-size: 13px;">
+        </label>
     </div>
 
     <!-- Bottom Actions -->

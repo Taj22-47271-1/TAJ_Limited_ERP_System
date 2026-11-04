@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pujaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4a0e17"/>
+      <stop offset="40%" stop-color="#7a1224"/>
+      <stop offset="100%" stop-color="#24050a"/>
+    </linearGradient>
+    <linearGradient id="pujaGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff176"/>
+      <stop offset="50%" stop-color="#ffb300"/>
+      <stop offset="100%" stop-color="#e65100"/>
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#d50000"/>
+      <stop offset="30%" stop-color="#ff6d00"/>
+      <stop offset="70%" stop-color="#ffd600"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="pujaGlow">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#pujaBg)"/>
+
+  <!-- Alpona / Traditional Indian Mandala Lace -->
+  <g opacity="0.12" stroke="url(#pujaGold)" stroke-width="2" fill="none" transform="translate(400, 260)">
+    <circle cx="0" cy="0" r="240"/>
+    <circle cx="0" cy="0" r="190"/>
+    <circle cx="0" cy="0" r="140"/>
+    <circle cx="0" cy="0" r="80"/>
+    <!-- Petals -->
+    <path d="M 0,-190 C 35,-150 35,-90 0,-80 C -35,-90 -35,-150 0,-190 Z"/>
+    <path d="M 0,190 C 35,150 35,90 0,80 C -35,90 -35,150 0,190 Z"/>
+    <path d="M -190,0 C -150,35 -90,35 -80,0 C -90,-35 -150,-35 -190,0 Z"/>
+    <path d="M 190,0 C 150,35 90,35 80,0 C 90,-35 150,-35 190,0 Z"/>
+    <!-- Diagonal petals -->
+    <path d="M 134,-134 C 131,-81 88,-50 56,-56 C 50,-88 81,-131 134,-134 Z"/>
+    <path d="M -134,-134 C -131,-81 -88,-50 -56,-56 C -50,-88 -81,-131 -134,-134 Z"/>
+    <path d="M 134,134 C 131,81 88,50 56,56 C 50,88 81,131 134,134 Z"/>
+    <path d="M -134,134 C -131,81 -88,50 -56,56 C -50,88 -81,131 -134,134 Z"/>
+  </g>
+
+  <!-- Glowing Diya / Oil Lamps -->
+  <!-- Center Main Diya -->
+  <g transform="translate(400, 310)" filter="url(#pujaGlow)">
+    <!-- Base Plate -->
+    <ellipse cx="0" cy="35" rx="100" ry="22" fill="#3e070e" stroke="url(#pujaGold)" stroke-width="3"/>
+    <!-- Brass Lamp Bowl -->
+    <path d="M -75,25 Q 0,65 75,25 Q 0,40 -75,25 Z" fill="url(#pujaGold)"/>
+    <ellipse cx="0" cy="22" rx="72" ry="12" fill="#bf360c"/>
+    <ellipse cx="0" cy="21" rx="60" ry="8" fill="#ffd54f" opacity="0.6"/>
+    <!-- Sacred Divine Flame -->
+    <path d="M 0,-60 Q 22,-10 0,16 Q -22,-10 0,-60 Z" fill="url(#flameGrad)"/>
+    <circle cx="0" cy="-10" r="12" fill="#ffffff" opacity="0.8"/>
+  </g>
+
+  <!-- Left Small Diya -->
+  <g transform="translate(190, 370)" filter="url(#pujaGlow)">
+    <ellipse cx="0" cy="20" rx="55" ry="14" fill="#3e070e" stroke="url(#pujaGold)" stroke-width="2"/>
+    <path d="M -45,15 Q 0,40 45,15 Q 0,25 -45,15 Z" fill="url(#pujaGold)"/>
+    <path d="M 0,-35 Q 14,-5 0,12 Q -14,-5 0,-35 Z" fill="url(#flameGrad)"/>
+  </g>
+
+  <!-- Right Small Diya -->
+  <g transform="translate(610, 370)" filter="url(#pujaGlow)">
+    <ellipse cx="0" cy="20" rx="55" ry="14" fill="#3e070e" stroke="url(#pujaGold)" stroke-width="2"/>
+    <path d="M -45,15 Q 0,40 45,15 Q 0,25 -45,15 Z" fill="url(#pujaGold)"/>
+    <path d="M 0,-35 Q 14,-5 0,12 Q -14,-5 0,-35 Z" fill="url(#flameGrad)"/>
+  </g>
+
+  <!-- Kashful / Autumn Reed grass silhouettes -->
+  <g stroke="url(#pujaGold)" stroke-width="1.8" opacity="0.4" fill="none">
+    <path d="M 60,600 Q 90,440 130,360"/>
+    <path d="M 90,600 Q 110,470 160,400"/>
+    <path d="M 740,600 Q 710,440 670,360"/>
+    <path d="M 710,600 Q 690,470 640,400"/>
+  </g>
+
+  <!-- Silk Saree Golden Zari Border Bottom Accent -->
+  <rect x="0" y="520" width="800" height="80" fill="#280408"/>
+  <line x1="0" y1="520" x2="800" y2="520" stroke="url(#pujaGold)" stroke-width="3"/>
+  <line x1="0" y1="526" x2="800" y2="526" stroke="url(#pujaGold)" stroke-width="1" stroke-dasharray="6,4"/>
+  <line x1="0" y1="595" x2="800" y2="595" stroke="url(#pujaGold)" stroke-width="2"/>
+
+  <!-- Badge Container -->
+  <g transform="translate(400, 500)">
+    <rect x="-190" y="-30" width="380" height="60" rx="30" fill="rgba(42, 6, 12, 0.95)" stroke="url(#pujaGold)" stroke-width="2" filter="url(#pujaGlow)"/>
+    <text x="0" y="7" font-family="'Inter', sans-serif" font-size="20" font-weight="800" fill="#fff59d" text-anchor="middle" letter-spacing="4">
+      DURGA PUJA UTSAV MEGA SALE
+    </text>
+  </g>
+</svg>

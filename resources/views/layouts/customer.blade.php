@@ -16,7 +16,7 @@
 <body class="customer-body vc-body fl-customer-body">
 <header class="vc-header">
     <div class="vc-header-inner">
-        <a href="{{ route('dashboard') }}" class="vc-brand" aria-label="TAJ Limited Online Store">
+        <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="vc-brand" aria-label="TAJ Limited Online Store">
             <span class="vc-brand-mark">T</span>
             <span class="vc-brand-copy"><strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong><small>Online Store</small></span>
         </a>
@@ -27,10 +27,21 @@
         </form>
 
         <nav class="vc-nav" aria-label="Customer navigation">
-            <a class="{{ request()->routeIs('dashboard')?'active':'' }}" href="{{ route('dashboard') }}">Home</a>
+            @if(auth()->check() && auth()->user()->role === 'customer')
+                <a class="{{ request()->routeIs('dashboard')?'active':'' }}" href="{{ route('dashboard') }}">Home</a>
+            @endif
             <a class="{{ request()->routeIs('shop.*')?'active':'' }}" href="{{ route('shop.index') }}">Shop</a>
-            <a class="{{ request()->routeIs('customer.orders*')?'active':'' }}" href="{{ route('customer.orders') }}">Orders</a>
-            <a class="{{ request()->routeIs('customer.profile')?'active':'' }}" href="{{ route('customer.profile') }}">Profile</a>
+            @if(auth()->check())
+                @if(auth()->user()->role === 'customer')
+                    <a class="{{ request()->routeIs('customer.orders*')?'active':'' }}" href="{{ route('customer.orders') }}">Orders</a>
+                    <a class="{{ request()->routeIs('customer.profile')?'active':'' }}" href="{{ route('customer.profile') }}">Profile</a>
+                @elseif(auth()->user()->role === 'admin' || auth()->user()->role === 'cashier')
+                    <a href="{{ route('dashboard') }}" style="color: #2563eb; font-weight: 700;">Admin ERP ↗</a>
+                @endif
+            @else
+                <a href="{{ route('login') }}">Sign In</a>
+                <a href="{{ route('register') }}">Register</a>
+            @endif
         </nav>
 
         <div class="vc-actions">
@@ -39,16 +50,25 @@
                 @php $cartCount = collect(session('cart', []))->sum(fn($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line); @endphp
                 <span class="cart-badge-count">{{ number_format($cartCount, 0) }}</span>
             </a>
-            <details class="vc-account">
-                <summary><span>{{ strtoupper(substr(auth()->user()->name,0,1)) }}</span></summary>
-                <div class="vc-account-menu">
-                    <strong>{{ auth()->user()->name }}</strong>
-                    <small>{{ auth()->user()->email }}</small>
-                    <a href="{{ route('customer.profile') }}">My profile</a>
-                    <a href="{{ route('password.change') }}">Change password</a>
-                    <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Logout</button></form>
-                </div>
-            </details>
+            @if(auth()->check())
+                <details class="vc-account">
+                    <summary><span>{{ strtoupper(substr(auth()->user()->name,0,1)) }}</span></summary>
+                    <div class="vc-account-menu">
+                        <strong>{{ auth()->user()->name }}</strong>
+                        <small>{{ auth()->user()->email }}</small>
+                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'cashier')
+                            <a href="{{ route('dashboard') }}" style="color: #2563eb; font-weight: bold;">← Admin ERP Dashboard</a>
+                        @else
+                            <a href="{{ route('customer.profile') }}">My profile</a>
+                            <a href="{{ route('customer.orders') }}">My orders</a>
+                        @endif
+                        <a href="{{ route('password.change') }}">Change password</a>
+                        <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit">Logout</button></form>
+                    </div>
+                </details>
+            @else
+                <a href="{{ route('login') }}" class="btn primary" style="height: 38px; line-height: 36px; padding: 0 16px; font-size: 13px; text-decoration: none;">Sign In</a>
+            @endif
         </div>
     </div>
 </header>
@@ -58,60 +78,36 @@
 
 <main class="vc-main">@yield('content')</main>
 
-<!-- Floating Bottom Cart Bar (as seen in video frame_38 and frame_77) -->
-<div class="vc-floating-cart-bar" id="vcFloatingCartBar">
-    <div class="vc-floating-cart-inner" id="vcFloatingCartTrigger">
-        <div class="vc-floating-thumbs" id="vcFloatingThumbs"></div>
-        <div class="vc-floating-info">
-            <strong>View cart</strong>
-            <span id="vcFloatingCountText">0 items</span>
-        </div>
-        <div class="vc-floating-right">
-            <strong id="vcFloatingTotalText">{{ $companySettings->currency_symbol }}0.00</strong>
-            <span class="vc-floating-arrow">›</span>
+<div class="vc-drawer-backdrop" id="cartDrawerBackdrop"></div>
+<aside class="vc-drawer" id="cartDrawer" aria-hidden="true">
+    <div class="vc-drawer-head">
+        <div><span class="vc-kicker">SHOPPING CART</span><h3>Your bag</h3></div>
+        <button type="button" class="vc-drawer-close" id="closeCartDrawer" aria-label="Close cart drawer">✕</button>
+    </div>
+    <div class="vc-drawer-body" id="cartDrawerBody">
+        <div class="vc-drawer-empty">Your cart is empty.</div>
+    </div>
+    <div class="vc-drawer-foot" id="cartDrawerFoot">
+        <div class="vc-drawer-subtotal"><span>Subtotal</span><strong id="drawerSubtotal">{{ $companySettings->currency_symbol }}0.00</strong></div>
+        <p class="vc-drawer-note">Taxes & delivery calculated at checkout.</p>
+        <div class="vc-drawer-actions">
+            <a class="vc-drawer-link" href="{{ route('cart.index') }}">View cart</a>
+            <a class="vc-drawer-checkout" href="{{ route('checkout') }}">Checkout</a>
         </div>
     </div>
-</div>
-
-<!-- Slide-Up Mini Cart Drawer (as seen in video frame_115) -->
-<div class="vc-mini-cart-overlay" id="vcMiniCartOverlay"></div>
-<div class="vc-mini-cart-drawer" id="vcMiniCartDrawer">
-    <div class="vc-mini-cart-head">
-        <div>
-            <span style="font-size: 20px;">🛒</span>
-            <h3>Your Cart <span id="vcDrawerCountBadge">(0)</span></h3>
-        </div>
-        <button type="button" id="vcMiniCartClose" class="vc-drawer-close-btn" aria-label="Close cart">×</button>
-    </div>
-    <div class="vc-mini-cart-items" id="vcMiniCartItems">
-        <!-- Rendered dynamically -->
-    </div>
-    <div class="vc-mini-cart-footer">
-        <div class="vc-free-shipping-pill">
-            <span>🚚</span> Standard Delivery · Reliable Tracking
-        </div>
-        <div class="vc-drawer-subtotal-row">
-            <span>Subtotal</span>
-            <strong id="vcDrawerSubtotal">{{ $companySettings->currency_symbol }}0.00</strong>
-        </div>
-        <a href="{{ route('checkout') }}" class="vc-drawer-checkout-btn">
-            <span>Proceed to Checkout</span>
-            <strong id="vcDrawerCheckoutTotal">{{ $companySettings->currency_symbol }}0.00 ›</strong>
-        </a>
-    </div>
-</div>
+</aside>
 
 <footer class="vc-footer">
     <div class="vc-footer-inner">
-        <div class="vc-footer-brand">
-            <a href="{{ route('dashboard') }}" class="vc-brand"><span class="vc-brand-mark">T</span><span class="vc-brand-copy"><strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong><small>Inventory · POS · Online Store</small></span></a>
+        <div>
+            <div class="vc-brand"><span class="vc-brand-mark">T</span><strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong></div>
             <p>Shop products using the same live inventory managed by TAJ Limited ERP.</p>
         </div>
-        <div><strong>Shop</strong><a href="{{ route('shop.index') }}">All products</a><a href="{{ route('cart.index') }}">Cart</a><a href="{{ route('customer.orders') }}">Track orders</a></div>
-        <div><strong>Account</strong><a href="{{ route('customer.profile') }}">Profile</a><a href="{{ route('password.change') }}">Password</a><span>Secure checkout</span></div>
-        <div><strong>Contact</strong><span>{{ $companySettings->company_email ?? 'info@tajlimited.com' }}</span><span>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</span><span>{{ $companySettings->company_address ?? 'Dhaka, Bangladesh' }}</span></div>
+        <div><h4>Categories</h4><a href="{{ route('shop.index') }}">All products</a></div>
+        <div><h4>Company</h4><a href="{{ route('shop.index') }}">Shop online</a><a href="{{ route('login') }}">Staff portal</a></div>
+        <div><h4>Assistance</h4><small>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</small><small>{{ $companySettings->company_email ?? 'support@tajlimited.com' }}</small></div>
     </div>
-    <div class="vc-footer-bottom"><span>© {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}.</span><span>Built for fast, simple commerce.</span></div>
+    <div class="vc-copyright">© {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. Live inventory powered by TAJ ERP.</div>
 </footer>
 <script src="{{ asset('assets/app.js') }}"></script>
 @stack('scripts')

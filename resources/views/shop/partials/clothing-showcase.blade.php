@@ -12,7 +12,7 @@
         </div>
         <div class="atelier-scene-nav" role="tablist">
             <button type="button" class="atelier-tab-btn active" data-scene="turntable">
-                <span class="tab-icon">✨</span> 3D Stage
+                <span class="tab-icon">✨</span> {{ ($globalConfig['enable_3d'] ?? true) ? '3D Stage' : 'Studio Stage' }}
             </button>
             <button type="button" class="atelier-tab-btn" data-scene="loupe">
                 <span class="tab-icon">🔍</span> Fabric Loupe
@@ -31,10 +31,13 @@
         $sizes = $cProduct->normalizedSizes();
         $isFirst = $index === 0;
         $cfg = $cProduct->getEffectiveShowcaseConfig($companySettings);
+        $enable3D = $cfg['enable_3d'] ?? true;
+        $swatches = $cfg['swatches'] ?? [];
+        $firstSwatchImg = !empty($swatches[0]['image']) ? asset($swatches[0]['image']) : $cProduct->image_url;
     @endphp
     <div class="atelier-product-slide {{ $isFirst ? 'active' : '' }}" data-product-index="{{ $index }}" data-product-id="{{ $cProduct->id }}">
         
-        <!-- Scene 1 & 2: 3D Turntable Podium Stage -->
+        <!-- Scene 1: Turntable Stage / Studio Stage -->
         <div class="atelier-scene atelier-scene-turntable active">
             <div class="atelier-layout">
                 <!-- Left Editorial Details -->
@@ -65,7 +68,25 @@
                             </div>
                         </div>
 
-                        <div class="atelier-actions">
+                        <!-- Colorways / Swatches on Main Stage -->
+                        @if(!empty($swatches))
+                        <div class="atelier-stage-swatches" style="margin-top: 14px;">
+                            <label style="font-size: 10px; letter-spacing: 0.12em; font-weight: 800; color: #94a3b8; display: block; margin-bottom: 8px;">SELECT COLORWAY</label>
+                            <div class="atelier-swatches stage-swatches" style="display: flex; gap: 8px; align-items: center;">
+                                @foreach($swatches as $swIdx => $sw)
+                                    @php
+                                        $swImg = !empty($sw['image'])
+                                            ? (str_starts_with($sw['image'], 'http') || str_starts_with($sw['image'], 'assets/') || str_starts_with($sw['image'], 'storage/') ? asset($sw['image']) : asset('storage/' . $sw['image']))
+                                            : '';
+                                    @endphp
+                                    <button type="button" class="swatch-btn {{ $swIdx === 0 ? 'active' : '' }}" data-color="{{ $sw['key'] ?? 'color_'.$swIdx }}" data-title="{{ $sw['name'] }}" data-image="{{ $swImg }}" data-target-product="{{ $cProduct->id }}" style="--swatch-color: {{ $sw['color'] }}; width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.4); cursor: pointer;" title="{{ $sw['name'] }}"></button>
+                                @endforeach
+                                <span class="active-color-name" id="colorLabel-{{ $cProduct->id }}" style="font-size: 11px; color: #cbd5e1; margin-left: 6px;">{{ $swatches[0]['name'] ?? '' }}</span>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="atelier-actions" style="margin-top: 18px;">
                             <button type="submit" class="atelier-add-btn">
                                 <span>Add to Cart</span>
                             </button>
@@ -92,23 +113,26 @@
                     @endif
                 </div>
 
-                <!-- Right 3D Stage with Glowing Halo Ring & Turntable Podium -->
-                <div class="atelier-stage-container" id="stageContainer-{{ $cProduct->id }}">
-                    <div class="atelier-halo-ring"></div>
-                    <div class="atelier-shimmer-particles"></div>
+                <!-- Right Stage -->
+                <div class="atelier-stage-container {{ $enable3D ? '' : 'no-3d-stage' }}" id="stageContainer-{{ $cProduct->id }}" data-enable-3d="{{ $enable3D ? '1' : '0' }}">
+                    @if($enable3D)
+                        <div class="atelier-halo-ring"></div>
+                        <div class="atelier-shimmer-particles"></div>
+                    @endif
                     
-                    <!-- 3D Perspective Turntable Stage -->
                     <div class="atelier-3d-turntable">
-                        <div class="atelier-podium-base">
-                            <div class="atelier-podium-ring"></div>
-                            <div class="atelier-podium-shadow"></div>
-                        </div>
+                        @if($enable3D)
+                            <div class="atelier-podium-base">
+                                <div class="atelier-podium-ring"></div>
+                                <div class="atelier-podium-shadow"></div>
+                            </div>
+                        @endif
                         
                         <!-- Mannequin Garment -->
                         <div class="atelier-garment-wrapper">
-                            <img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}" class="atelier-garment-img" id="garmentImg-{{ $cProduct->id }}">
+                            <img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}" class="atelier-garment-img" id="garmentImg-{{ $cProduct->id }}" style="transition: opacity 0.35s ease, transform 0.4s ease;">
                             
-                            <!-- Interactive Hotspots (Configurable in Admin Panel) -->
+                            <!-- Interactive Hotspots -->
                             @foreach(($cfg['hotspots'] ?? []) as $hIdx => $spot)
                             <div class="atelier-hotspot" style="top: {{ $spot['top'] }}%; left: {{ $spot['left'] }}%;" data-target="card-spot-{{ $cProduct->id }}-{{ $hIdx }}">
                                 <span class="hotspot-pin"></span>
@@ -122,15 +146,16 @@
                         </div>
                     </div>
 
-                    <!-- 3D Stage Hint -->
+                    @if($enable3D)
                     <div class="atelier-stage-hint">
                         <span>✦ Move cursor or drag to rotate 3D view</span>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <!-- Scene 3 & 4: Fabric Texture Loupe (Configurable in Admin Panel) -->
+        <!-- Scene 2: Fabric Texture Loupe -->
         <div class="atelier-scene atelier-scene-loupe">
             <div class="atelier-loupe-view">
                 <div class="atelier-loupe-intro">
@@ -152,7 +177,7 @@
             </div>
         </div>
 
-        <!-- Scene 5 & 6: Editorial Floating Lookbook Cards (as in video frame_06) -->
+        <!-- Scene 3: Lookbook & Multi-Angle Photos -->
         <div class="atelier-scene atelier-scene-lookbook">
             <div class="atelier-lookbook-header">
                 <span class="atelier-kicker">EDITORIAL LOOKBOOK</span>
@@ -160,30 +185,41 @@
                 <p>Styling perspectives and silhouette captures.</p>
             </div>
             <div class="atelier-lookbook-grid">
-                <div class="lookbook-card lookbook-card-1">
-                    <span class="lookbook-num">01</span>
-                    <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}"></div>
-                    <div class="lookbook-caption"><strong>Primary Drape</strong><small>Full Silhouette</small></div>
-                </div>
-                <div class="lookbook-card lookbook-card-2">
-                    <span class="lookbook-num">02</span>
-                    <div class="lookbook-art"><img src="{{ asset($cfg['loupe']['image'] ?? 'assets/images/products/saree-fabric-texture.jpg') }}" alt="Texture"></div>
-                    <div class="lookbook-caption"><strong>Zari Border & Craft</strong><small>Artisan Motif</small></div>
-                </div>
-                <div class="lookbook-card lookbook-card-3">
-                    <span class="lookbook-num">04</span>
-                    <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="Styling" style="filter: brightness(1.08) contrast(1.05);"></div>
-                    <div class="lookbook-caption"><strong>Contemporary Cut</strong><small>Tailored Fall</small></div>
-                </div>
-                <div class="lookbook-card lookbook-card-4">
-                    <span class="lookbook-num">05</span>
-                    <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="Elegance"></div>
-                    <div class="lookbook-caption"><strong>Evening Mood</strong><small>Fluid Movement</small></div>
-                </div>
+                @php $customGallery = $cfg['gallery'] ?? []; @endphp
+                @if(!empty($customGallery))
+                    @foreach($customGallery as $gIdx => $gItem)
+                        <div class="lookbook-card lookbook-card-{{ ($gIdx % 4) + 1 }}">
+                            <span class="lookbook-num">{{ sprintf('%02d', $gIdx + 1) }}</span>
+                            <div class="lookbook-art"><img src="{{ asset($gItem) }}" alt="Lookbook angle {{ $gIdx + 1 }}"></div>
+                            <div class="lookbook-caption"><strong>Perspective #{{ $gIdx + 1 }}</strong><small>Curated Shot</small></div>
+                        </div>
+                    @endforeach
+                @else
+                    <div class="lookbook-card lookbook-card-1">
+                        <span class="lookbook-num">01</span>
+                        <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}"></div>
+                        <div class="lookbook-caption"><strong>Primary Drape</strong><small>Full Silhouette</small></div>
+                    </div>
+                    <div class="lookbook-card lookbook-card-2">
+                        <span class="lookbook-num">02</span>
+                        <div class="lookbook-art"><img src="{{ asset($cfg['loupe']['image'] ?? 'assets/images/products/saree-fabric-texture.jpg') }}" alt="Texture"></div>
+                        <div class="lookbook-caption"><strong>Zari Border & Craft</strong><small>Artisan Motif</small></div>
+                    </div>
+                    <div class="lookbook-card lookbook-card-3">
+                        <span class="lookbook-num">03</span>
+                        <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="Styling" style="filter: brightness(1.08) contrast(1.05);"></div>
+                        <div class="lookbook-caption"><strong>Contemporary Cut</strong><small>Tailored Fall</small></div>
+                    </div>
+                    <div class="lookbook-card lookbook-card-4">
+                        <span class="lookbook-num">04</span>
+                        <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="Elegance"></div>
+                        <div class="lookbook-caption"><strong>Evening Mood</strong><small>Fluid Movement</small></div>
+                    </div>
+                @endif
             </div>
         </div>
 
-        <!-- Scene 7 & 8: Variant Morph (Configurable in Admin Panel) -->
+        <!-- Scene 4: Variant Morph -->
         <div class="atelier-scene atelier-scene-morph">
             <div class="atelier-morph-layout">
                 <div class="atelier-morph-copy">
@@ -193,15 +229,20 @@
                     
                     <div class="atelier-swatches">
                         @foreach(($cfg['swatches'] ?? []) as $swIdx => $sw)
-                        <button type="button" class="swatch-btn {{ $swIdx === 0 ? 'active' : '' }}" data-color="{{ $sw['key'] ?? 'color_'.$swIdx }}" data-title="{{ $sw['name'] }}" style="--swatch-color: {{ $sw['color'] }};"></button>
+                            @php
+                                $swImg = !empty($sw['image'])
+                                    ? (str_starts_with($sw['image'], 'http') || str_starts_with($sw['image'], 'assets/') || str_starts_with($sw['image'], 'storage/') ? asset($sw['image']) : asset('storage/' . $sw['image']))
+                                    : '';
+                            @endphp
+                            <button type="button" class="swatch-btn {{ $swIdx === 0 ? 'active' : '' }}" data-color="{{ $sw['key'] ?? 'color_'.$swIdx }}" data-title="{{ $sw['name'] }}" data-image="{{ $swImg }}" data-target-product="{{ $cProduct->id }}" style="--swatch-color: {{ $sw['color'] }};" title="{{ $sw['name'] }}"></button>
                         @endforeach
                     </div>
-                    <strong class="selected-swatch-name">{{ $cfg['swatches'][0]['name'] ?? 'Champagne Rose' }} (Selected)</strong>
+                    <strong class="selected-swatch-name" id="morphLabel-{{ $cProduct->id }}">{{ $cfg['swatches'][0]['name'] ?? 'Champagne Rose' }} (Selected)</strong>
                 </div>
 
                 <div class="atelier-morph-stage">
                     <div class="atelier-morph-ring"></div>
-                    <img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}" class="atelier-morph-garment">
+                    <img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}" class="atelier-morph-garment" id="morphGarment-{{ $cProduct->id }}" style="transition: opacity 0.35s ease, filter 0.4s ease;">
                 </div>
             </div>
         </div>

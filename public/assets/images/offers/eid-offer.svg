@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="eidBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1b3d"/>
+      <stop offset="50%" stop-color="#142c5f"/>
+      <stop offset="100%" stop-color="#070f24"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe082"/>
+      <stop offset="35%" stop-color="#ffb300"/>
+      <stop offset="70%" stop-color="#ffd54f"/>
+      <stop offset="100%" stop-color="#ff8f00"/>
+    </linearGradient>
+    <linearGradient id="lanternGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff8e1" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#ffca28" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ff8f00" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Deep Night Sky -->
+  <rect width="800" height="600" fill="url(#eidBg)"/>
+
+  <!-- Geometric Islamic Stars Lattice Background -->
+  <g opacity="0.07" stroke="#ffd54f" stroke-width="1.5" fill="none">
+    <circle cx="400" cy="300" r="280"/>
+    <circle cx="400" cy="300" r="210"/>
+    <circle cx="400" cy="300" r="140"/>
+    <polygon points="400,90 470,210 610,210 500,290 540,420 400,340 260,420 300,290 190,210 330,210"/>
+    <polygon points="400,140 450,230 550,230 470,290 500,390 400,330 300,390 330,290 250,230 350,230"/>
+  </g>
+
+  <!-- Floating Golden Stars -->
+  <g fill="url(#goldGrad)" opacity="0.8">
+    <path d="M 680,120 L 684,132 L 696,136 L 684,140 L 680,152 L 676,140 L 664,136 L 676,132 Z"/>
+    <path d="M 120,180 L 123,190 L 133,193 L 123,196 L 120,206 L 117,196 L 107,193 L 117,190 Z" opacity="0.6"/>
+    <path d="M 710,380 L 712,388 L 720,390 L 712,392 L 710,400 L 708,392 L 700,390 L 708,388 Z" opacity="0.5"/>
+    <path d="M 180,440 L 183,448 L 191,450 L 183,452 L 180,460 L 177,452 L 169,450 L 177,448 Z" opacity="0.6"/>
+  </g>
+
+  <!-- Glowing Crescent Moon -->
+  <g filter="url(#glow)">
+    <path d="M 580,130 A 130,130 0 1 0 460,370 A 110,110 0 1 1 580,130 Z" fill="url(#goldGrad)"/>
+    <!-- Small star next to crescent -->
+    <path d="M 460,200 L 467,222 L 490,229 L 467,236 L 460,258 L 453,236 L 430,229 L 453,222 Z" fill="#fff9c4"/>
+  </g>
+
+  <!-- Hanging Decorative Lanterns -->
+  <!-- Left Lantern -->
+  <g transform="translate(180, 0)">
+    <line x1="0" y1="0" x2="0" y2="180" stroke="url(#goldGrad)" stroke-width="2"/>
+    <circle cx="0" cy="180" r="5" fill="url(#goldGrad)"/>
+    <path d="M -22,188 L 22,188 L 16,204 L -16,204 Z" fill="url(#goldGrad)"/>
+    <rect x="-24" y="204" width="48" height="56" rx="6" fill="#1b3260" stroke="url(#goldGrad)" stroke-width="2.5"/>
+    <polygon points="0,210 16,232 -16,232" fill="url(#lanternGlow)"/>
+    <circle cx="0" cy="232" r="9" fill="#fff9c4" filter="url(#glow)"/>
+    <path d="M -16,260 L 16,260 L 0,285 Z" fill="url(#goldGrad)"/>
+    <circle cx="0" cy="292" r="4" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- Center-Right Feature Lantern -->
+  <g transform="translate(620, 0)">
+    <line x1="0" y1="0" x2="0" y2="220" stroke="url(#goldGrad)" stroke-width="2.5"/>
+    <circle cx="0" cy="220" r="6" fill="url(#goldGrad)"/>
+    <path d="M -28,230 L 28,230 L 20,250 L -20,250 Z" fill="url(#goldGrad)"/>
+    <rect x="-30" y="250" width="60" height="74" rx="8" fill="#172e59" stroke="url(#goldGrad)" stroke-width="3"/>
+    <polygon points="0,258 20,288 -20,288" fill="url(#lanternGlow)"/>
+    <circle cx="0" cy="288" r="12" fill="#fffde7" filter="url(#glow)"/>
+    <path d="M -20,324 L 20,324 L 0,356 Z" fill="url(#goldGrad)"/>
+    <circle cx="0" cy="364" r="5" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- Luxurious Drape / Silk Ribbon Silhouette -->
+  <path d="M 0,480 Q 220,410 420,490 T 800,470 L 800,600 L 0,600 Z" fill="#09142e" opacity="0.9"/>
+  <path d="M 0,510 Q 240,440 440,520 T 800,500" fill="none" stroke="url(#goldGrad)" stroke-width="3.5" opacity="0.85"/>
+  <path d="M 0,522 Q 240,452 440,532 T 800,512" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6"/>
+
+  <!-- Central Badge Ribbon -->
+  <g transform="translate(400, 480)">
+    <rect x="-180" y="-30" width="360" height="60" rx="30" fill="rgba(8, 20, 46, 0.9)" stroke="url(#goldGrad)" stroke-width="2" filter="url(#glow)"/>
+    <text x="0" y="7" font-family="'Inter', sans-serif" font-size="20" font-weight="800" fill="#ffe082" text-anchor="middle" letter-spacing="4">
+      EID UL FITR EXCLUSIVE
+    </text>
+  </g>
+</svg>

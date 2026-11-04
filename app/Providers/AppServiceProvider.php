@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
             $pendingCount = 0;
             try {
                 if (Schema::hasTable('online_orders')) {
-                    $pendingCount = OnlineOrder::where('order_status', 'pending')->count();
+                    $pendingCount = Cache::remember('pending_orders_count', 15, fn () => OnlineOrder::where('order_status', 'pending')->count());
                 }
             } catch (Throwable) {
                 $pendingCount = 0;

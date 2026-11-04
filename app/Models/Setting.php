@@ -12,19 +12,66 @@ class Setting extends Model
         'company_address',
         'currency_symbol',
         'showcase_config',
+        'login_offers',
     ];
 
     protected function casts(): array
     {
         return [
             'showcase_config' => 'array',
+            'login_offers' => 'array',
         ];
+    }
+
+    public static function defaultLoginOffers(): array
+    {
+        return [
+            'enabled' => true,
+            'interval_seconds' => 4,
+            'slides' => [
+                [
+                    'id' => 1,
+                    'badge' => '🎉 EID UL FITR EXCLUSIVE',
+                    'discount' => '15% DISCOUNT',
+                    'title' => 'Exclusive Eid Ethnic Luxury Collection',
+                    'subtitle' => 'Handcrafted pure silk sarees, royal festive kurtas & shirts. Claim your celebratory discount today.',
+                    'image' => 'assets/images/offers/eid-offer.svg',
+                    'tag' => 'EID OFFER',
+                ],
+                [
+                    'id' => 2,
+                    'badge' => '✨ DURGA PUJA UTSAV',
+                    'discount' => '20% DISCOUNT',
+                    'title' => 'Traditional Artisanal Weaves & Zari Drapes',
+                    'subtitle' => 'Celebrate the festival of joy with heirloom craftsmanship, shimmering gold borders, and pure heritage.',
+                    'image' => 'assets/images/offers/puja-offer.svg',
+                    'tag' => 'PUJA OFFER',
+                ],
+                [
+                    'id' => 3,
+                    'badge' => '🎄 BORO DIN & NEW YEAR',
+                    'discount' => '10% DISCOUNT',
+                    'title' => 'Winter Festive Specials & Modern Elegance',
+                    'subtitle' => 'Warm festive savings across luxury formal wear, accessories, and seasonal arrivals.',
+                    'image' => 'assets/images/offers/winter-offer.svg',
+                    'tag' => 'BORO DIN OFFER',
+                ],
+            ],
+        ];
+    }
+
+    public function getLoginOffers(): array
+    {
+        $defaults = self::defaultLoginOffers();
+        $stored = $this->login_offers ?? [];
+        return array_replace_recursive($defaults, $stored);
     }
 
     public static function defaultShowcaseConfig(): array
     {
         return [
             'enabled' => true,
+            'enable_3d' => true,
             'tagline' => 'TAJ ATELIER · 3D LUXURY CLOTHING SHOWCASE',
             'features' => [
                 'feature_1' => '🌿 100% Breathable Weave',
@@ -82,12 +129,13 @@ class Setting extends Model
                 ],
             ],
             'swatches' => [
-                ['key' => 'rose', 'name' => 'Champagne Rose', 'color' => '#e5b2a2'],
-                ['key' => 'sapphire', 'name' => 'Royal Sapphire', 'color' => '#2b59c3'],
-                ['key' => 'noir', 'name' => 'Midnight Noir', 'color' => '#1a1a24'],
-                ['key' => 'emerald', 'name' => 'Imperial Emerald', 'color' => '#1a7f53'],
-                ['key' => 'gold', 'name' => 'Regal Gold', 'color' => '#d4af37'],
+                ['key' => 'rose', 'name' => 'Champagne Rose', 'color' => '#e5b2a2', 'image' => 'assets/images/products/designer-saree.png', 'tag' => 'Rose Gold Weave'],
+                ['key' => 'sapphire', 'name' => 'Royal Sapphire', 'color' => '#2b59c3', 'image' => '', 'tag' => 'Deep Navy Indigo'],
+                ['key' => 'noir', 'name' => 'Midnight Noir', 'color' => '#1a1a24', 'image' => '', 'tag' => 'Obsidian Black'],
+                ['key' => 'emerald', 'name' => 'Imperial Emerald', 'color' => '#1a7f53', 'image' => '', 'tag' => 'Royal Forest'],
+                ['key' => 'gold', 'name' => 'Regal Gold', 'color' => '#d4af37', 'image' => '', 'tag' => 'Antique Zari'],
             ],
+            'gallery' => [],
         ];
     }
 

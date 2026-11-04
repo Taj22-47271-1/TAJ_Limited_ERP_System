@@ -10,6 +10,7 @@ use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -25,16 +26,23 @@ class DashboardController extends Controller
             $processingCount = (clone $base)->whereIn('order_status',['approved','processing','packed','shipped','out_for_delivery'])->count();
             $deliveredCount = (clone $base)->where('order_status','delivered')->count();
             $recentOrders = (clone $base)->latest()->limit(6)->get();
-            $featuredProducts = Product::where('status',true)->whereRaw('(stock - reserved_stock) > 0')->latest()->limit(8)->get();
-            $clothingProducts = Product::where('status', true)
-                ->whereRaw('(stock - reserved_stock) > 0')
-                ->where(function ($q) {
-                    $q->where('has_sizes', true)
-                      ->orWhereHas('category', fn ($c) => $c->where('name', 'like', '%cloth%')->orWhere('name', 'like', '%saree%'));
-                })
-                ->with('category')
-                ->latest()
-                ->get();
+
+            $featuredProducts = Cache::remember('storefront_featured_products', 30, function () {
+                return Product::where('status', true)->whereRaw('(stock - reserved_stock) > 0')->latest()->limit(8)->get();
+            });
+
+            $clothingProducts = Cache::remember('storefront_clothing_products', 30, function () {
+                return Product::where('status', true)
+                    ->whereRaw('(stock - reserved_stock) > 0')
+                    ->where(function ($q) {
+                        $q->where('has_sizes', true)
+                          ->orWhereHas('category', fn ($c) => $c->where('name', 'like', '%cloth%')->orWhere('name', 'like', '%saree%'));
+                    })
+                    ->with('category')
+                    ->latest()
+                    ->get();
+            });
+
             return view('dashboards.customer', compact('orderCount','pendingCount','processingCount','deliveredCount','recentOrders','featuredProducts','clothingProducts'));
         }
 
@@ -49,42 +57,49 @@ class DashboardController extends Controller
             return view('dashboards.cashier', compact('mySalesToday','myInvoicesToday','myRecentSales','products','customerCount','pendingOrders','activeOrders'));
         }
 
-        $salesToday = (float) Sale::whereDate('sale_date', $today)->sum('total');
-        $inhouseSalesToday = (float) Sale::whereNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
-        $onlineSalesToday = (float) Sale::whereNotNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
-        $purchasesToday = (float) Purchase::whereDate('purchase_date', $today)->sum('total');
-        $expensesToday = (float) Expense::whereDate('expense_date', $today)->sum('amount');
-        $grossToday = (float) SaleItem::whereHas('sale', fn ($q) => $q->whereDate('sale_date', $today))
-            ->selectRaw('COALESCE(SUM((unit_price-unit_cost)*quantity),0) as p')->value('p');
-        $profitToday = $grossToday - $expensesToday;
-        $grossAll = (float) SaleItem::selectRaw('COALESCE(SUM((unit_price-unit_cost)*quantity),0) as p')->value('p');
-        $totalExpenses = (float) Expense::sum('amount');
-        $totalProfit = $grossAll - $totalExpenses;
-        $stockValue = (float) Product::selectRaw('COALESCE(SUM(stock * purchase_price),0) as v')->value('v');
+        // Cache admin aggregated analytics for 20 seconds to eliminate database round-trip lag
+        $stats = Cache::remember('admin_dashboard_metrics', 20, function () use ($today) {
+            $salesToday = (float) Sale::whereDate('sale_date', $today)->sum('total');
+            $inhouseSalesToday = (float) Sale::whereNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
+            $onlineSalesToday = (float) Sale::whereNotNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
+            $purchasesToday = (float) Purchase::whereDate('purchase_date', $today)->sum('total');
+            $expensesToday = (float) Expense::whereDate('expense_date', $today)->sum('amount');
+            $grossToday = (float) SaleItem::whereHas('sale', fn ($q) => $q->whereDate('sale_date', $today))
+                ->selectRaw('COALESCE(SUM((unit_price-unit_cost)*quantity),0) as p')->value('p');
+            $profitToday = $grossToday - $expensesToday;
+            $grossAll = (float) SaleItem::selectRaw('COALESCE(SUM((unit_price-unit_cost)*quantity),0) as p')->value('p');
+            $totalExpenses = (float) Expense::sum('amount');
+            $totalProfit = $grossAll - $totalExpenses;
+            $stockValue = (float) Product::selectRaw('COALESCE(SUM(stock * purchase_price),0) as v')->value('v');
+            $productCount = Product::count();
+            $customerCount = User::where('role','customer')->count();
+            $cashierCount = User::where('role','cashier')->count();
+            $userCount = User::count();
+            $activeUserCount = User::where('is_active', true)->count();
+
+            $raw = Sale::selectRaw('sale_date as day, SUM(total) as total')
+                ->whereBetween('sale_date', [now()->subDays(6)->toDateString(), $today])
+                ->groupBy('sale_date')->pluck('total','day');
+            $salesChart = collect(range(6,0))->map(function ($i) use ($raw) {
+                $d = now()->subDays($i);
+                return ['label'=>$d->format('D'),'date'=>$d->toDateString(),'total'=>(float)($raw[$d->toDateString()] ?? 0)];
+            });
+            $max = max(1, (float) $salesChart->max('total'));
+            $salesChart = $salesChart->map(fn ($row) => $row + ['height'=>max(8, round(($row['total'] / $max) * 100))]);
+
+            return compact(
+                'salesToday','inhouseSalesToday','onlineSalesToday','purchasesToday','expensesToday',
+                'profitToday','totalProfit','stockValue','salesChart','productCount','customerCount',
+                'cashierCount','userCount','activeUserCount'
+            );
+        });
+
         $lowStock = Product::whereColumn('stock','<=','min_stock')->orderBy('stock')->limit(6)->get();
         $recentSales = Sale::with('customer')->latest('id')->limit(7)->get();
         $recentOrders = OnlineOrder::latest()->limit(6)->get();
         $pendingOrders = OnlineOrder::where('order_status','pending')->count();
-        $productCount = Product::count();
-        $customerCount = User::where('role','customer')->count();
-        $cashierCount = User::where('role','cashier')->count();
-        $userCount = User::count();
-        $activeUserCount = User::where('is_active', true)->count();
         $categories = Category::where('status', true)->orderBy('name')->get();
 
-        $raw = Sale::selectRaw('sale_date as day, SUM(total) as total')
-            ->whereBetween('sale_date', [now()->subDays(6)->toDateString(), $today])
-            ->groupBy('sale_date')->pluck('total','day');
-        $salesChart = collect(range(6,0))->map(function ($i) use ($raw) {
-            $d = now()->subDays($i);
-            return ['label'=>$d->format('D'),'date'=>$d->toDateString(),'total'=>(float)($raw[$d->toDateString()] ?? 0)];
-        });
-        $max = max(1, (float) $salesChart->max('total'));
-        $salesChart = $salesChart->map(fn ($row) => $row + ['height'=>max(8, round(($row['total'] / $max) * 100))]);
-
-        return view('dashboards.admin', compact(
-            'salesToday','inhouseSalesToday','onlineSalesToday','purchasesToday','expensesToday','profitToday','totalProfit','stockValue',
-            'lowStock','recentSales','recentOrders','pendingOrders','salesChart','productCount','customerCount','cashierCount','userCount','activeUserCount','categories'
-        ));
+        return view('dashboards.admin', array_merge($stats, compact('lowStock','recentSales','recentOrders','pendingOrders','categories')));
     }
 }

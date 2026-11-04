@@ -148,3 +148,266 @@
   .fl-orders-btn{display:inline-flex!important}
   .fl-topbar-right{gap:8px}
 }
+
+/* ==========================================================================
+   Dynamic Login Page Promotional Offer Slider & Mobile Ticker
+   ========================================================================== */
+.fl-auth-promo-visual {
+  position: relative;
+  overflow: hidden;
+  background: #070d19;
+  min-height: 720px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  user-select: none;
+}
+
+.fl-promo-slider-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 720px;
+}
+
+.fl-promo-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 60px clamp(32px, 5vw, 75px) 90px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: scale(0.96) translateY(12px);
+  z-index: 1;
+  cursor: pointer;
+}
+
+.fl-promo-slide.active {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1) translateY(0);
+  z-index: 2;
+}
+
+.fl-promo-slide-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 7s ease-out;
+  z-index: 1;
+}
+
+.fl-promo-slide.active .fl-promo-slide-bg {
+  transform: scale(1.06);
+}
+
+.fl-promo-slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 13, 25, 0.2) 0%, rgba(7, 13, 25, 0.6) 55%, rgba(7, 13, 25, 0.95) 100%);
+  z-index: 2;
+}
+
+.fl-promo-content {
+  position: relative;
+  z-index: 3;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fl-promo-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.fl-promo-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.fl-promo-discount {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+}
+
+.fl-promo-content h3 {
+  margin: 0;
+  font-size: clamp(24px, 3.2vw, 40px);
+  font-weight: 700;
+  line-height: 1.16;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.fl-promo-content p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 500px;
+}
+
+.fl-promo-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  width: max-content;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  border: 0;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s, background 0.2s, color 0.2s;
+}
+
+.fl-promo-action-btn:hover {
+  transform: translateY(-2px);
+  background: #fbbf24;
+  color: #000;
+}
+
+.fl-promo-controls {
+  position: absolute;
+  left: clamp(32px, 5vw, 75px);
+  right: clamp(32px, 5vw, 75px);
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 5;
+}
+
+.fl-promo-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.fl-promo-dot {
+  width: 26px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: width 0.3s, background 0.3s;
+}
+
+.fl-promo-dot.active {
+  width: 48px;
+  background: #fbbf24;
+}
+
+.fl-promo-nav-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.fl-promo-nav-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.fl-promo-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+/* Mobile Offer Ticker Bar */
+.fl-mobile-offer-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.fl-mob-tag {
+  background: #f59e0b;
+  color: #fff;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+
+.fl-mob-text {
+  color: #92400e;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.fl-mob-arrow {
+  color: #b45309;
+  font-weight: 800;
+}
+
+@media(max-width: 900px) {
+  .fl-auth-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .fl-auth-promo-visual {
+    min-height: 440px;
+    order: 2;
+  }
+  .fl-promo-slide {
+    padding: 30px 24px 60px;
+  }
+  .fl-promo-controls {
+    left: 24px;
+    right: 24px;
+    bottom: 18px;
+  }
+  .fl-mobile-offer-bar {
+    display: flex;
+  }
+}

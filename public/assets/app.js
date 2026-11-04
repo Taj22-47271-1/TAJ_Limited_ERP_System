@@ -515,6 +515,7 @@ window.initLuxuryClothingShowcase = function() {
     let startX = 0, currentRotY = 0;
 
     const onMove = (clientX, clientY) => {
+      if (container.dataset.enable3d === '0') return;
       const rect = container.getBoundingClientRect();
       const xRatio = ((clientX - rect.left) / rect.width) - 0.5;
       const yRatio = ((clientY - rect.top) / rect.height) - 0.5;
@@ -582,37 +583,59 @@ window.initLuxuryClothingShowcase = function() {
     section.querySelectorAll('.atelier-hotspot').forEach(h => h.classList.remove('is-open'));
   });
 
-  // Variant morph swatches
-  section.querySelectorAll('.atelier-swatches').forEach(swatches => {
-    const parent = swatches.closest('.atelier-morph-layout');
-    const garment = parent?.querySelector('.atelier-morph-garment');
-    const ring = parent?.querySelector('.atelier-morph-ring');
-    const label = parent?.querySelector('.selected-swatch-name');
+  // Variant morph swatches & color-specific image switching
+  const filterMap = {
+    rose: { filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(245, 208, 126, 0.7)', shadow: '0 0 50px rgba(245, 208, 126, 0.35)' },
+    sapphire: { filter: 'hue-rotate(185deg) saturate(1.4) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(43, 89, 195, 0.85)', shadow: '0 0 50px rgba(43, 89, 195, 0.5)' },
+    noir: { filter: 'grayscale(1) brightness(0.68) contrast(1.25) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.85))', ring: 'rgba(161, 161, 170, 0.6)', shadow: '0 0 40px rgba(0, 0, 0, 0.8)' },
+    emerald: { filter: 'hue-rotate(95deg) saturate(1.35) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(26, 127, 83, 0.85)', shadow: '0 0 50px rgba(26, 127, 83, 0.45)' },
+    gold: { filter: 'hue-rotate(32deg) saturate(1.85) brightness(1.1) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(212, 175, 55, 0.9)', shadow: '0 0 55px rgba(212, 175, 55, 0.5)' }
+  };
 
-    const filterMap = {
-      rose: { filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(245, 208, 126, 0.7)', shadow: '0 0 50px rgba(245, 208, 126, 0.35)' },
-      sapphire: { filter: 'hue-rotate(185deg) saturate(1.4) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(43, 89, 195, 0.85)', shadow: '0 0 50px rgba(43, 89, 195, 0.5)' },
-      noir: { filter: 'grayscale(1) brightness(0.68) contrast(1.25) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.85))', ring: 'rgba(161, 161, 170, 0.6)', shadow: '0 0 40px rgba(0, 0, 0, 0.8)' },
-      emerald: { filter: 'hue-rotate(95deg) saturate(1.35) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(26, 127, 83, 0.85)', shadow: '0 0 50px rgba(26, 127, 83, 0.45)' },
-      gold: { filter: 'hue-rotate(32deg) saturate(1.85) brightness(1.1) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(212, 175, 55, 0.9)', shadow: '0 0 55px rgba(212, 175, 55, 0.5)' }
-    };
+  section.querySelectorAll('.swatch-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const colorKey = this.dataset.color;
+      const title = this.dataset.title || colorKey;
+      const customImg = this.dataset.image;
+      const productId = this.dataset.targetProduct;
 
-    swatches.querySelectorAll('.swatch-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        swatches.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
+      const slide = this.closest('.atelier-product-slide');
+      if (!slide) return;
 
-        const colorKey = this.dataset.color;
-        const title = this.dataset.title || colorKey;
-        if (label) label.textContent = `${title} (Selected)`;
+      // Sync active state across all swatch pickers in this slide
+      slide.querySelectorAll('.swatch-btn[data-color="' + colorKey + '"]').forEach(b => b.classList.add('active'));
+      slide.querySelectorAll('.swatch-btn:not([data-color="' + colorKey + '"])').forEach(b => b.classList.remove('active'));
 
-        const cfg = filterMap[colorKey] || filterMap.rose;
-        if (garment) garment.style.filter = cfg.filter;
-        if (ring) {
-          ring.style.borderColor = cfg.ring;
-          ring.style.boxShadow = cfg.shadow;
-        }
-      });
+      const colorLabel = slide.querySelector('#colorLabel-' + productId);
+      if (colorLabel) colorLabel.textContent = title;
+      const morphLabel = slide.querySelector('#morphLabel-' + productId);
+      if (morphLabel) morphLabel.textContent = title + ' (Selected)';
+
+      const garmentImg = slide.querySelector('#garmentImg-' + productId);
+      const morphGarment = slide.querySelector('#morphGarment-' + productId);
+      const ring = slide.querySelector('.atelier-morph-ring');
+      const cfg = filterMap[colorKey] || filterMap.rose;
+
+      if (customImg && customImg.trim() !== '') {
+        [garmentImg, morphGarment].forEach(img => {
+          if (!img) return;
+          img.style.opacity = '0.2';
+          setTimeout(() => {
+            img.src = customImg;
+            img.style.filter = 'none';
+            img.style.opacity = '1';
+          }, 150);
+        });
+      } else {
+        if (garmentImg) garmentImg.style.filter = cfg.filter;
+        if (morphGarment) morphGarment.style.filter = cfg.filter;
+      }
+
+      if (ring) {
+        ring.style.borderColor = cfg.ring;
+        ring.style.boxShadow = cfg.shadow;
+      }
     });
   });
 };

@@ -10,10 +10,17 @@ use App\Services\AccountingService;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class OnlineOrderController extends Controller
 {
+    private function clearOrderCaches(): void
+    {
+        Cache::forget('pending_orders_count');
+        Cache::forget('admin_dashboard_metrics');
+    }
+
     public function store(Request $request, InventoryService $inventory)
     {
         $data = $request->validate([
@@ -107,6 +114,7 @@ class OnlineOrderController extends Controller
 
             return $order;
         });
+        $this->clearOrderCaches();
 
         $request->session()->forget('cart');
         if ($order->payment_method === 'online') {
@@ -160,6 +168,7 @@ class OnlineOrderController extends Controller
             ]);
         });
 
+        $this->clearOrderCaches();
         return redirect()->route('customer.orders')->with('status','Order cancelled and reserved stock released.');
     }
 

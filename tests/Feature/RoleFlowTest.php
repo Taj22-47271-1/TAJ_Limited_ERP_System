@@ -107,4 +107,54 @@ class RoleFlowTest extends TestCase
         $setting = \App\Models\Setting::first();
         $this->assertSame('CUSTOM SHOWCASE TITLE', $setting->getShowcaseSettings()['tagline']);
     }
+
+    public function test_login_page_renders_offer_slider_and_guest_can_access_shop(): void
+    {
+        $this->seed();
+
+        // 1. Login page displays dynamic offer slider
+        $res = $this->get('/login');
+        $res->assertOk();
+        $res->assertSee('fl-auth-promo-visual');
+        $res->assertSee('EID UL FITR');
+        $res->assertSee('DURGA PUJA');
+
+        // 2. Guest can browse storefront
+        $shopRes = $this->get('/shop');
+        $shopRes->assertOk();
+    }
+
+    public function test_admin_can_update_login_offers(): void
+    {
+        $this->seed();
+        $admin = User::where('email', 'admin@tajlimited.com')->firstOrFail();
+        $cashier = User::where('email', 'cashier@tajlimited.com')->firstOrFail();
+
+        // Admin can access
+        $this->actingAs($admin)->get('/admin/login-offers')->assertOk();
+
+        // Cashier forbidden
+        $this->actingAs($cashier)->get('/admin/login-offers')->assertForbidden();
+
+        // Update login offers
+        $res = $this->actingAs($admin)->put('/admin/login-offers', [
+            'enabled' => '1',
+            'interval_seconds' => '5',
+            'slides' => [
+                [
+                    'badge' => 'SPECIAL DISCOUNT',
+                    'discount' => '25% DISCOUNT',
+                    'title' => 'Updated Offer Title',
+                    'subtitle' => 'Updated Offer Subtitle',
+                    'tag' => 'DISCOUNT OFFER',
+                ],
+            ],
+        ]);
+
+        $res->assertRedirect()->assertSessionHas('status');
+        $setting = \App\Models\Setting::first();
+        $offers = $setting->getLoginOffers();
+        $this->assertSame(5, $offers['interval_seconds']);
+        $this->assertSame('Updated Offer Title', $offers['slides'][0]['title']);
+    }
 }

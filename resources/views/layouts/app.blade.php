@@ -70,6 +70,7 @@
             <div class="fl-nav-section">
                 <span class="fl-nav-title">ADMINISTRATION</span>
                 @if($user->hasPermission('showcase.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.showcase*') ? 'active' : '' }}" href="{{ route('admin.showcase') }}"><span class="fl-nav-icon">✨</span><span>3D Showcase</span></a>@endif
+                @if($user->hasPermission('showcase.manage') || $user->hasPermission('settings.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.login-offers*') ? 'active' : '' }}" href="{{ route('admin.login-offers') }}"><span class="fl-nav-icon">🎉</span><span>Login Offers</span></a>@endif
                 @if($user->hasPermission('users.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('admin.users') }}"><span class="fl-nav-icon">♟</span><span>Users</span></a>@endif
                 @if($user->hasPermission('roles.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}" href="{{ route('admin.roles.index') }}"><span class="fl-nav-icon">◆</span><span>Roles & Permissions</span></a>@endif
                 @if($user->hasPermission('settings.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}"><span class="fl-nav-icon">⚙</span><span>Settings</span></a>@endif
@@ -128,6 +129,18 @@
     </section>
 </div>
 <script src="{{ asset('assets/app.js') }}"></script>
+<script>
+// Instant link prefetching on hover to make ERP & Storefront navigation zero-lag
+document.addEventListener('mouseover', function(e) {
+    const a = e.target.closest('a');
+    if (!a || !a.href || a.origin !== location.origin || a.target === '_blank' || a.dataset.prefetched) return;
+    a.dataset.prefetched = 'true';
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = a.href;
+    document.head.appendChild(link);
+}, { passive: true });
+</script>
 @stack('scripts')
 </body>
 </html>

@@ -1293,3 +1293,36 @@
     flex-direction: column;
   }
 }
+
+/* ==========================================================================
+   Optional 2D Studio Stage Mode (When 3D Orbit is disabled)
+   ========================================================================== */
+.atelier-stage-container.no-3d-stage .atelier-halo-ring,
+.atelier-stage-container.no-3d-stage .atelier-shimmer-particles,
+.atelier-stage-container.no-3d-stage .atelier-podium-base,
+.atelier-stage-container.no-3d-stage .atelier-stage-hint {
+  display: none !important;
+}
+
+.atelier-stage-container.no-3d-stage .atelier-3d-turntable {
+  transform: none !important;
+  perspective: none !important;
+}
+
+.atelier-stage-container.no-3d-stage .atelier-garment-img {
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45));
+}
+
+.stage-swatches .swatch-btn {
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.stage-swatches .swatch-btn:hover {
+  transform: scale(1.15);
+}
+
+.stage-swatches .swatch-btn.active {
+  box-shadow: 0 0 0 2px #d4af37, 0 0 12px rgba(212, 175, 55, 0.6);
+  border-color: #fff !important;
+  transform: scale(1.2);
+}

@@ -40,6 +40,7 @@ class ShowcaseController extends Controller
         $data = $request->validate([
             'product_id' => ['nullable', 'exists:products,id'],
             'enabled' => ['nullable', 'boolean'],
+            'enable_3d' => ['nullable', 'boolean'],
             'tagline' => ['required', 'string', 'max:255'],
             'feature_1' => ['nullable', 'string', 'max:120'],
             'feature_2' => ['nullable', 'string', 'max:120'],
@@ -59,6 +60,9 @@ class ShowcaseController extends Controller
             'swatches' => ['nullable', 'array'],
             'swatches.*.name' => ['nullable', 'string', 'max:50'],
             'swatches.*.color' => ['nullable', 'string', 'max:30'],
+            'swatches.*.tag' => ['nullable', 'string', 'max:50'],
+            'swatches.*.existing_image' => ['nullable', 'string'],
+            'gallery_images.*' => ['nullable', 'image', 'max:4096'],
         ]);
 
         $settings = Setting::firstOrCreate(['id' => 1]);
@@ -105,15 +109,23 @@ class ShowcaseController extends Controller
             $hotspots = $currentConfig['hotspots'];
         }
 
-        // Format Swatches
+        // Format Swatches (with uploaded variant product photos)
         $swatches = [];
         if (! empty($data['swatches'])) {
             $defaultSwatches = Setting::defaultShowcaseConfig()['swatches'];
             foreach ($data['swatches'] as $i => $sw) {
+                $swatchImg = $sw['existing_image'] ?? ($currentConfig['swatches'][$i]['image'] ?? '');
+                if ($request->hasFile("swatch_image_{$i}")) {
+                    $savedPath = $request->file("swatch_image_{$i}")->store('showcase/swatches', 'public');
+                    $swatchImg = 'storage/' . $savedPath;
+                }
+
                 $swatches[] = [
                     'key' => $defaultSwatches[$i]['key'] ?? 'color_'.$i,
                     'name' => trim($sw['name'] ?? ($defaultSwatches[$i]['name'] ?? 'Color')),
                     'color' => trim($sw['color'] ?? ($defaultSwatches[$i]['color'] ?? '#d4af37')),
+                    'tag' => trim($sw['tag'] ?? ($defaultSwatches[$i]['tag'] ?? '')),
+                    'image' => $swatchImg,
                 ];
             }
         }
@@ -121,8 +133,18 @@ class ShowcaseController extends Controller
             $swatches = $currentConfig['swatches'];
         }
 
+        // Handle multiple lookbook / gallery photos
+        $gallery = $currentConfig['gallery'] ?? [];
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $file) {
+                $path = $file->store('showcase/gallery', 'public');
+                $gallery[] = 'storage/' . $path;
+            }
+        }
+
         $newConfig = [
             'enabled' => $request->boolean('enabled'),
+            'enable_3d' => $request->boolean('enable_3d'),
             'tagline' => $data['tagline'],
             'features' => [
                 'feature_1' => $data['feature_1'] ?? '🌿 100% Breathable Weave',
@@ -138,6 +160,7 @@ class ShowcaseController extends Controller
             ],
             'hotspots' => $hotspots,
             'swatches' => $swatches,
+            'gallery' => $gallery,
         ];
 
         if (! empty($data['product_id'])) {
