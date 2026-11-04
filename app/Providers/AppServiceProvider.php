@@ -27,12 +27,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Share company settings with all Blade views
         View::composer('*', function ($view): void {
-             = new class {
-                public  = 'TAJ Limited';
-                public  = 'info@tajlimited.com';
-                public  = '+880 1XXXXXXXXX';
-                public  = 'Dhaka, Bangladesh';
-                public  = '৳';
+            $fallback = new class {
+                public string $company_name = 'TAJ Limited';
+                public string $company_email = 'info@tajlimited.com';
+                public string $company_phone = '+880 1XXXXXXXXX';
+                public string $company_address = 'Dhaka, Bangladesh';
+                public string $currency_symbol = '৳';
                 public function getShowcaseSettings(): array { return \App\Models\Setting::defaultShowcaseConfig(); }
                 public function getLoginOffers(): array { return \App\Models\Setting::defaultLoginOffers(); }
             };
