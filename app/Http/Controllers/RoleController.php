@@ -26,6 +26,9 @@ class RoleController extends Controller
             'Accounting & Reports' => [
                 'accounting.view'=>'View accounting journals','accounting.manage'=>'Manage expenses/accounting','reports.view'=>'View financial reports and total profit',
             ],
+            'Storefront & 3D Atelier' => [
+                'showcase.manage'=>'Manage 3D Clothing Showcase, Hotspots & Fabric Loupe',
+            ],
             'Administration' => [
                 'users.manage'=>'Create/deactivate staff and customers','roles.manage'=>'Manage roles and permissions','settings.manage'=>'Manage company settings',
             ],

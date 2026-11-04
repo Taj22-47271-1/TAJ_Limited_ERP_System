@@ -13,7 +13,7 @@ class Product extends Model
     protected $fillable = [
         'category_id','name','sku','barcode','unit','purchase_price','selling_price',
         'stock','reserved_stock','min_stock','image_path','has_sizes','size_options',
-        'status','description'
+        'status','description','showcase_config'
     ];
 
     protected $appends = ['available_stock','image_url'];
@@ -29,7 +29,15 @@ class Product extends Model
             'has_sizes'=>'boolean',
             'size_options'=>'array',
             'status'=>'boolean',
+            'showcase_config'=>'array',
         ];
+    }
+
+    public function getEffectiveShowcaseConfig(?Setting $settings = null): array
+    {
+        $global = $settings ? $settings->getShowcaseSettings() : Setting::defaultShowcaseConfig();
+        $custom = $this->showcase_config ?? [];
+        return array_replace_recursive($global, $custom);
     }
 
     public function category(): BelongsTo

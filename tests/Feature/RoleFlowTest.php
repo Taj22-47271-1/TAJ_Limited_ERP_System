@@ -78,4 +78,33 @@ class RoleFlowTest extends TestCase
         $response->assertRedirect('/forgot-password/verify-otp');
         $this->assertTrue(session()->has('password_reset_email'));
     }
+
+    public function test_showcase_management_role_permissions(): void
+    {
+        $this->seed();
+        $admin = User::where('email', 'admin@tajlimited.com')->firstOrFail();
+        $cashier = User::where('email', 'cashier@tajlimited.com')->firstOrFail();
+
+        // Admin can access showcase settings
+        $this->actingAs($admin)->get('/admin/showcase')->assertOk();
+
+        // Cashier without permission is forbidden (403)
+        $this->actingAs($cashier)->get('/admin/showcase')->assertForbidden();
+
+        // Update settings via admin
+        $response = $this->actingAs($admin)->put('/admin/showcase', [
+            'enabled' => '1',
+            'tagline' => 'CUSTOM SHOWCASE TITLE',
+            'loupe_kicker' => 'FABRIC TEST',
+            'loupe_title' => 'WEAVE TITLE',
+            'loupe_desc' => 'TEST DESC',
+            'feature_1' => 'Feature One',
+            'feature_2' => 'Feature Two',
+            'feature_3' => 'Feature Three',
+        ]);
+        $response->assertRedirect()->assertSessionHas('status');
+
+        $setting = \App\Models\Setting::first();
+        $this->assertSame('CUSTOM SHOWCASE TITLE', $setting->getShowcaseSettings()['tagline']);
+    }
 }

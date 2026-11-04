@@ -1,13 +1,14 @@
 @php
     $showcaseItems = ($clothingProducts ?? collect([$product ?? null]))->filter()->values();
+    $globalConfig = $companySettings?->getShowcaseSettings() ?? \App\Models\Setting::defaultShowcaseConfig();
 @endphp
 
-@if($showcaseItems->isNotEmpty())
+@if($showcaseItems->isNotEmpty() && ($globalConfig['enabled'] ?? true))
 <section class="atelier-luxury-section" id="clothingShowcaseSection">
     <div class="atelier-header">
         <div class="atelier-brand-tag">
             <span class="atelier-gold-dot"></span>
-            <span>TAJ ATELIER · 3D LUXURY CLOTHING SHOWCASE</span>
+            <span>{{ $globalConfig['tagline'] ?? 'TAJ ATELIER · 3D LUXURY CLOTHING SHOWCASE' }}</span>
         </div>
         <div class="atelier-scene-nav" role="tablist">
             <button type="button" class="atelier-tab-btn active" data-scene="turntable">
@@ -29,6 +30,7 @@
     @php
         $sizes = $cProduct->normalizedSizes();
         $isFirst = $index === 0;
+        $cfg = $cProduct->getEffectiveShowcaseConfig($companySettings);
     @endphp
     <div class="atelier-product-slide {{ $isFirst ? 'active' : '' }}" data-product-index="{{ $index }}" data-product-id="{{ $cProduct->id }}">
         
@@ -75,9 +77,9 @@
 
                     <!-- Features bullets -->
                     <div class="atelier-features">
-                        <div><span>🌿</span> 100% Breathable Weave</div>
-                        <div><span>✨</span> Golden Zari & Fine Stitching</div>
-                        <div><span>🚚</span> Express Secure Delivery</div>
+                        <div><span>🌿</span> {{ $cfg['features']['feature_1'] ?? '100% Breathable Weave' }}</div>
+                        <div><span>✨</span> {{ $cfg['features']['feature_2'] ?? 'Golden Zari & Fine Stitching' }}</div>
+                        <div><span>🚚</span> {{ $cfg['features']['feature_3'] ?? 'Express Secure Delivery' }}</div>
                     </div>
 
                     <!-- Carousel Controls -->
@@ -106,42 +108,17 @@
                         <div class="atelier-garment-wrapper">
                             <img src="{{ $cProduct->image_url }}" alt="{{ $cProduct->name }}" class="atelier-garment-img" id="garmentImg-{{ $cProduct->id }}">
                             
-                            <!-- Interactive Hotspots (as in video frame_00 & frame_05) -->
-                            <div class="atelier-hotspot" style="top: 24%; left: 36%;" data-target="card-fabric-{{ $cProduct->id }}">
+                            <!-- Interactive Hotspots (Configurable in Admin Panel) -->
+                            @foreach(($cfg['hotspots'] ?? []) as $hIdx => $spot)
+                            <div class="atelier-hotspot" style="top: {{ $spot['top'] }}%; left: {{ $spot['left'] }}%;" data-target="card-spot-{{ $cProduct->id }}-{{ $hIdx }}">
                                 <span class="hotspot-pin"></span>
                                 <span class="hotspot-ripple"></span>
                             </div>
-                            <div class="atelier-hotspot-card" id="card-fabric-{{ $cProduct->id }}" style="top: 14%; left: 4%; width: 230px;">
-                                <strong>Mulberry Silk & Weave</strong>
-                                <small>Handwoven 4-ply organic silk with exquisite fluid drape and breathable featherlight softness.</small>
+                            <div class="atelier-hotspot-card" id="card-spot-{{ $cProduct->id }}-{{ $hIdx }}" style="top: {{ max(4, min(80, $spot['top'] - 8)) }}%; {{ $spot['left'] > 50 ? 'right: 4%;' : 'left: 4%;' }} width: 230px;">
+                                <strong>{{ $spot['title'] }}</strong>
+                                <small>{{ $spot['desc'] }}</small>
                             </div>
-
-                            <div class="atelier-hotspot" style="top: 50%; left: 56%;" data-target="card-zari-{{ $cProduct->id }}">
-                                <span class="hotspot-pin"></span>
-                                <span class="hotspot-ripple"></span>
-                            </div>
-                            <div class="atelier-hotspot-card" id="card-zari-{{ $cProduct->id }}" style="top: 40%; right: 4%; width: 230px;">
-                                <strong>Artisan Zari Embroidery</strong>
-                                <small>Intricate gold-thread woven border crafted by master artisans with heirloom royal finish.</small>
-                            </div>
-
-                            <div class="atelier-hotspot" style="top: 74%; left: 32%;" data-target="card-silhouette-{{ $cProduct->id }}">
-                                <span class="hotspot-pin"></span>
-                                <span class="hotspot-ripple"></span>
-                            </div>
-                            <div class="atelier-hotspot-card" id="card-silhouette-{{ $cProduct->id }}" style="top: 66%; left: 2%; width: 220px;">
-                                <strong>Regal Fall & Silhouette</strong>
-                                <small>Precision pleating engineered for effortless modern movement and timeless elegance.</small>
-                            </div>
-
-                            <div class="atelier-hotspot" style="top: 86%; left: 62%;" data-target="card-care-{{ $cProduct->id }}">
-                                <span class="hotspot-pin"></span>
-                                <span class="hotspot-ripple"></span>
-                            </div>
-                            <div class="atelier-hotspot-card" id="card-care-{{ $cProduct->id }}" style="top: 76%; right: 2%; width: 210px;">
-                                <strong>Heritage Longevity</strong>
-                                <small>Colorfast natural dyes · Pre-shrunk weave · Designed to last across generations.</small>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -153,24 +130,23 @@
             </div>
         </div>
 
-        <!-- Scene 3 & 4: Fabric Texture Loupe (as in video frame_04) -->
+        <!-- Scene 3 & 4: Fabric Texture Loupe (Configurable in Admin Panel) -->
         <div class="atelier-scene atelier-scene-loupe">
             <div class="atelier-loupe-view">
                 <div class="atelier-loupe-intro">
-                    <span class="atelier-kicker">MACRO FABRIC INSPECTION</span>
-                    <h3>Microscopic Weave & Thread Analysis</h3>
-                    <p>Examine the fine zari threads, warp-and-weft silk density, and seam precision under ultra-high definition zoom.</p>
+                    <span class="atelier-kicker">{{ $cfg['loupe']['kicker'] ?? 'MACRO FABRIC INSPECTION' }}</span>
+                    <h3>{{ $cfg['loupe']['title'] ?? 'Microscopic Weave & Thread Analysis' }}</h3>
+                    <p>{{ $cfg['loupe']['desc'] ?? 'Examine the fine zari threads, warp-and-weft silk density, and seam precision under ultra-high definition zoom.' }}</p>
                 </div>
                 <div class="atelier-loupe-stage">
                     <div class="atelier-loupe-lens">
-                        <img src="{{ asset('assets/images/products/saree-fabric-texture.jpg') }}" alt="Fabric Weave Texture" class="atelier-loupe-texture">
+                        <img src="{{ asset($cfg['loupe']['image'] ?? 'assets/images/products/saree-fabric-texture.jpg') }}" alt="Fabric Weave Texture" class="atelier-loupe-texture">
                         <div class="loupe-reticle"></div>
                     </div>
                     <div class="atelier-loupe-specs">
-                        <div class="spec-pill"><strong>Weave Density:</strong> 320 Threads/Inch</div>
-                        <div class="spec-pill"><strong>Zari Type:</strong> Golden Dipped Zari</div>
-                        <div class="spec-pill"><strong>Fiber:</strong> 100% Pure Mulberry Silk</div>
-                        <div class="spec-pill"><strong>Finish:</strong> Hand-Polished Soft Lustre</div>
+                        @foreach(($cfg['loupe']['specs'] ?? []) as $spec)
+                        <div class="spec-pill"><strong>{{ $spec['label'] }}:</strong> {{ $spec['value'] }}</div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -191,13 +167,13 @@
                 </div>
                 <div class="lookbook-card lookbook-card-2">
                     <span class="lookbook-num">02</span>
-                    <div class="lookbook-art"><img src="{{ asset('assets/images/products/saree-fabric-texture.jpg') }}" alt="Texture"></div>
-                    <div class="lookbook-caption"><strong>Zari Border</strong><small>Heirloom Motif</small></div>
+                    <div class="lookbook-art"><img src="{{ asset($cfg['loupe']['image'] ?? 'assets/images/products/saree-fabric-texture.jpg') }}" alt="Texture"></div>
+                    <div class="lookbook-caption"><strong>Zari Border & Craft</strong><small>Artisan Motif</small></div>
                 </div>
                 <div class="lookbook-card lookbook-card-3">
                     <span class="lookbook-num">04</span>
                     <div class="lookbook-art"><img src="{{ $cProduct->image_url }}" alt="Styling" style="filter: brightness(1.08) contrast(1.05);"></div>
-                    <div class="lookbook-caption"><strong>Contemporary Cut</strong><small>Royal Fall</small></div>
+                    <div class="lookbook-caption"><strong>Contemporary Cut</strong><small>Tailored Fall</small></div>
                 </div>
                 <div class="lookbook-card lookbook-card-4">
                     <span class="lookbook-num">05</span>
@@ -207,7 +183,7 @@
             </div>
         </div>
 
-        <!-- Scene 7 & 8: Variant Morph (as in video frame_07, frame_08) -->
+        <!-- Scene 7 & 8: Variant Morph (Configurable in Admin Panel) -->
         <div class="atelier-scene atelier-scene-morph">
             <div class="atelier-morph-layout">
                 <div class="atelier-morph-copy">
@@ -216,13 +192,11 @@
                     <p>Select any signature shade below. The garment and background lighting adapt dynamically in real-time.</p>
                     
                     <div class="atelier-swatches">
-                        <button type="button" class="swatch-btn active" data-color="rose" data-title="Champagne Rose" style="--swatch-color: #e5b2a2;"></button>
-                        <button type="button" class="swatch-btn" data-color="sapphire" data-title="Royal Sapphire" style="--swatch-color: #2b59c3;"></button>
-                        <button type="button" class="swatch-btn" data-color="noir" data-title="Midnight Noir" style="--swatch-color: #1a1a24;"></button>
-                        <button type="button" class="swatch-btn" data-color="emerald" data-title="Imperial Emerald" style="--swatch-color: #1a7f53;"></button>
-                        <button type="button" class="swatch-btn" data-color="gold" data-title="Regal Gold" style="--swatch-color: #d4af37;"></button>
+                        @foreach(($cfg['swatches'] ?? []) as $swIdx => $sw)
+                        <button type="button" class="swatch-btn {{ $swIdx === 0 ? 'active' : '' }}" data-color="{{ $sw['key'] ?? 'color_'.$swIdx }}" data-title="{{ $sw['name'] }}" style="--swatch-color: {{ $sw['color'] }};"></button>
+                        @endforeach
                     </div>
-                    <strong class="selected-swatch-name">Champagne Rose (Selected)</strong>
+                    <strong class="selected-swatch-name">{{ $cfg['swatches'][0]['name'] ?? 'Champagne Rose' }} (Selected)</strong>
                 </div>
 
                 <div class="atelier-morph-stage">

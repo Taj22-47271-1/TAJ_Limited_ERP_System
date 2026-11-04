@@ -20,6 +20,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ShowcaseController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
@@ -151,5 +152,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:settings.manage')->group(function () {
         Route::get('/admin/settings', [SettingsController::class, 'edit'])->name('admin.settings');
         Route::put('/admin/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
+    });
+    Route::middleware('permission:showcase.manage')->group(function () {
+        Route::get('/admin/showcase', [ShowcaseController::class, 'edit'])->name('admin.showcase');
+        Route::put('/admin/showcase', [ShowcaseController::class, 'update'])->name('admin.showcase.update');
     });
 });

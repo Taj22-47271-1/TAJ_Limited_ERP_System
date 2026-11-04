@@ -30,7 +30,7 @@ class ShopController extends Controller
             ->where('id', '!=', $product->id)
             ->where(function ($q) {
                 $q->where('has_sizes', true)
-                  ->orWhereHas('category', fn ($c) => $c->where('name', 'ilike', '%cloth%')->orWhere('name', 'ilike', '%saree%'));
+                  ->orWhereHas('category', fn ($c) => $c->where('name', 'like', '%cloth%')->orWhere('name', 'like', '%saree%'));
             })
             ->latest()
             ->limit(4)

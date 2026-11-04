@@ -66,9 +66,10 @@
             </div>
             @endif
 
-            @if($user->hasPermission('users.manage') || $user->hasPermission('roles.manage') || $user->hasPermission('settings.manage'))
+            @if($user->hasPermission('showcase.manage') || $user->hasPermission('users.manage') || $user->hasPermission('roles.manage') || $user->hasPermission('settings.manage'))
             <div class="fl-nav-section">
                 <span class="fl-nav-title">ADMINISTRATION</span>
+                @if($user->hasPermission('showcase.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.showcase*') ? 'active' : '' }}" href="{{ route('admin.showcase') }}"><span class="fl-nav-icon">✨</span><span>3D Showcase</span></a>@endif
                 @if($user->hasPermission('users.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.users') ? 'active' : '' }}" href="{{ route('admin.users') }}"><span class="fl-nav-icon">♟</span><span>Users</span></a>@endif
                 @if($user->hasPermission('roles.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}" href="{{ route('admin.roles.index') }}"><span class="fl-nav-icon">◆</span><span>Roles & Permissions</span></a>@endif
                 @if($user->hasPermission('settings.manage'))<a class="fl-nav-item {{ request()->routeIs('admin.settings') ? 'active' : '' }}" href="{{ route('admin.settings') }}"><span class="fl-nav-icon">⚙</span><span>Settings</span></a>@endif
