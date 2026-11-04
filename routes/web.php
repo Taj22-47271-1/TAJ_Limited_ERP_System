@@ -27,6 +27,30 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+// Render health check
+Route::get('/healthz', function () {
+    try {
+        DB::connection()->getPdo();
+        $hasUsers = Schema::hasTable('users');
+        $userCount = $hasUsers ? DB::table('users')->count() : 0;
+        return response()->json([
+            'status' => 'ok',
+            'database' => 'connected',
+            'users_table_exists' => $hasUsers,
+            'users_count' => $userCount,
+        ]);
+    } catch (\Throwable $e) {
+        $cleanMsg = preg_replace('/password=[^; ]+/i', 'password=***', $e->getMessage());
+        return response()->json([
+            'status' => 'error',
+            'database' => 'disconnected',
+            'error' => $cleanMsg,
+        ], 500);
+    }
+});
 
 // Root redirect
 Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redirect()->route('shop.index'));
@@ -42,15 +66,18 @@ Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.
 
 // Guest authentication and password reset routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-    Route::get('/register', [RegisterController::class, 'create'])->name('register');
-    Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+    Route::get('/login', [LoginController::class, 'show'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.store');
 
-    Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->name('password.request');
+    Route::get('/register', [RegisterController::class, 'show'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register'])->name('register.store');
+
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgot'])->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
-    Route::get('/reset-password', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+    Route::get('/forgot-password/verify-otp', [ForgotPasswordController::class, 'showVerify'])->name('password.otp.form');
+    Route::post('/forgot-password/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.otp.verify');
+    Route::get('/forgot-password/reset', [ForgotPasswordController::class, 'showReset'])->name('password.reset.form');
+    Route::post('/forgot-password/reset', [ForgotPasswordController::class, 'reset'])->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {

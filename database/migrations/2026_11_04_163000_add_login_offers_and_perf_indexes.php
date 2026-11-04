@@ -14,19 +14,23 @@ return new class extends Migration {
             });
         }
 
-        // 2. Performance indexes on high-frequency tables
-        if (Schema::hasTable('sales')) {
-            Schema::table('sales', function (Blueprint $table) {
-                // Check and add indexes safely
-                $table->index('sale_date');
-                $table->index('created_by');
-            });
+        // 2. Safe performance indexes
+        try {
+            if (Schema::hasTable('sales')) {
+                Schema::table('sales', function (Blueprint $table) {
+                    $table->index('sale_date');
+                });
+            }
+        } catch (\Throwable $e) {
         }
 
-        if (Schema::hasTable('expenses')) {
-            Schema::table('expenses', function (Blueprint $table) {
-                $table->index('expense_date');
-            });
+        try {
+            if (Schema::hasTable('expenses')) {
+                Schema::table('expenses', function (Blueprint $table) {
+                    $table->index('expense_date');
+                });
+            }
+        } catch (\Throwable $e) {
         }
     }
 
@@ -35,19 +39,6 @@ return new class extends Migration {
         if (Schema::hasTable('settings') && Schema::hasColumn('settings', 'login_offers')) {
             Schema::table('settings', function (Blueprint $table) {
                 $table->dropColumn('login_offers');
-            });
-        }
-
-        if (Schema::hasTable('sales')) {
-            Schema::table('sales', function (Blueprint $table) {
-                $table->dropIndex(['sale_date']);
-                $table->dropIndex(['created_by']);
-            });
-        }
-
-        if (Schema::hasTable('expenses')) {
-            Schema::table('expenses', function (Blueprint $table) {
-                $table->dropIndex(['expense_date']);
             });
         }
     }
