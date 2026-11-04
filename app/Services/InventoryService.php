@@ -48,11 +48,12 @@ class InventoryService
     public function commitReserved(Product $product, float $quantity, float $unitCost, string $type, ?int $referenceId, ?int $userId, ?string $note = null): void
     {
         $product->refresh();
-        if ((float) $product->reserved_stock < $quantity || (float) $product->stock < $quantity) {
-            throw ValidationException::withMessages(['stock' => "Reserved stock is not available for {$product->name}."]);
+        $reserved = (float) $product->reserved_stock;
+        $toRelease = min($reserved, $quantity);
+        if ($toRelease > 0) {
+            $product->decrement('reserved_stock', $toRelease);
         }
         $product->decrement('stock', $quantity);
-        $product->decrement('reserved_stock', $quantity);
         $product->refresh();
         $this->movement($product, $type, $referenceId, 0, $quantity, $unitCost, $userId, $note);
     }
@@ -88,7 +89,8 @@ class InventoryService
     {
         StockMovement::create([
             'product_id'=>$product->id,'movement_type'=>$type,'reference_type'=>$type,'reference_id'=>$referenceId,
-            'quantity_in'=>$in,'quantity_out'=>$out,'balance_after'=>$product->stock,'unit_cost'=>$unitCost,'note'=>$note,'created_by'=>$userId,
+            'quantity_in'=>$in,'quantity_out'=>$out,'balance_after'=>$product->stock,'unit_cost'=>$unitCost,
+            'note'=>$note,'created_by'=>$userId,
         ]);
     }
 }

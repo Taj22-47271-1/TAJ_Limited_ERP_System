@@ -16,10 +16,10 @@ class RoleController extends Controller
                 'products.view'=>'Browse products','products.manage'=>'Add and edit products','pos.use'=>'Use in-house POS','sales.view'=>'View sales/invoices',
             ],
             'Online Orders' => [
-                'orders.view'=>'View online orders','orders.approve'=>'Approve online orders','orders.progress'=>'Update approved order progress',
+                'orders.view'=>'View online orders & pending badge','orders.approve'=>'Approve online orders','orders.progress'=>'Update approved order progress',
             ],
             'Inventory & Purchasing' => [
-                'inventory.view'=>'View stock ledger','inventory.manage'=>'Adjust stock/delete products','purchases.manage'=>'Manage purchases','suppliers.manage'=>'Manage suppliers',
+                'inventory.view'=>'View stock ledger','inventory.manage'=>'Adjust stock & delete products','purchases.manage'=>'Manage purchases','suppliers.manage'=>'Manage suppliers',
             ],
             'Customers' => ['customers.manage'=>'Manage customer records'],
             'Customer Self-Service' => ['shop.use'=>'Browse customer shop','orders.own'=>'Place and track own online orders'],

@@ -92,21 +92,17 @@ class ProductController extends Controller
     public function destroy(Request $request, Product $product)
     {
         abort_unless($request->user()->hasPermission('inventory.manage'), 403);
-        $used = DB::table('sale_items')->where('product_id',$product->id)->exists()
-            || DB::table('purchase_items')->where('product_id',$product->id)->exists()
-            || DB::table('online_order_items')->where('product_id',$product->id)->exists()
-            || DB::table('stock_movements')->where('product_id',$product->id)->exists();
 
-        if ($used) {
-            $product->update(['status'=>false]);
-            return back()->with('status','Product has transaction history, so it was deactivated instead of deleted.');
-        }
-
-        if ($product->image_path) {
-            Storage::disk('public')->delete($product->image_path);
-        }
+        $productName = $product->name;
+        // Release unique SKU/barcode so they can be reused if needed
+        $product->update([
+            'sku' => $product->sku . '-del-' . $product->id,
+            'barcode' => $product->barcode ? ($product->barcode . '-del-' . $product->id) : null,
+            'status' => false,
+        ]);
         $product->delete();
-        return back()->with('status','Product deleted.');
+
+        return redirect()->route('products.index')->with('status', "Product '{$productName}' deleted successfully.");
     }
 
     private function validated(Request $request, ?Product $product = null): array
@@ -115,8 +111,8 @@ class ProductController extends Controller
         $rules = [
             'category_id'=>['nullable','exists:categories,id'],
             'name'=>['required','string','max:150'],
-            'sku'=>['required','max:80', Rule::unique('products','sku')->ignore($id)],
-            'barcode'=>['nullable','max:100', Rule::unique('products','barcode')->ignore($id)],
+            'sku'=>['required','max:80', Rule::unique('products','sku')->ignore($id)->whereNull('deleted_at')],
+            'barcode'=>['nullable','max:100', Rule::unique('products','barcode')->ignore($id)->whereNull('deleted_at')],
             'unit'=>['required','max:30'],
             'selling_price'=>['required','numeric','min:0'],
             'min_stock'=>['required','numeric','min:0'],

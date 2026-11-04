@@ -33,7 +33,17 @@
                 <span class="fl-nav-title">APP</span>
                 <a class="fl-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}"><span class="fl-nav-icon">▦</span><span>Dashboard</span></a>
                 @if($user->hasPermission('pos.use'))<a class="fl-nav-item {{ request()->routeIs('pos') ? 'active' : '' }}" href="{{ route('pos') }}"><span class="fl-nav-icon">▣</span><span>In-house POS</span></a>@endif
-                @if($user->hasPermission('orders.view'))<a class="fl-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.index') }}"><span class="fl-nav-icon">◎</span><span>Online Orders</span><span class="fl-nav-dot"></span></a>@endif
+                @if($user->hasPermission('orders.view'))
+                    <a class="fl-nav-item {{ request()->routeIs('orders.*') ? 'active' : '' }}" href="{{ route('orders.index') }}">
+                        <span class="fl-nav-icon">◎</span>
+                        <span>Online Orders</span>
+                        @if(($pendingOrdersCount ?? 0) > 0)
+                            <span class="fl-sidebar-badge">{{ $pendingOrdersCount }}</span>
+                        @else
+                            <span class="fl-nav-dot"></span>
+                        @endif
+                    </a>
+                @endif
                 @if($user->hasPermission('sales.view'))<a class="fl-nav-item {{ request()->routeIs('sales.*') ? 'active' : '' }}" href="{{ route('sales.index') }}"><span class="fl-nav-icon">↗</span><span>{{ $isCashier ? 'My Sales' : 'Sales' }}</span></a>@endif
             </div>
 
@@ -87,7 +97,14 @@
                     <span>⌕</span><input name="q" value="{{ request()->routeIs('products.*') ? request('q') : '' }}" placeholder="Search products...">
                 </form>
                 @endif
-                @if($user->hasPermission('orders.view'))<a href="{{ route('orders.index',['status'=>'pending']) }}" class="fl-icon-button" title="Pending orders">◉</a>@endif
+                @if($user->hasPermission('orders.view'))
+                <a href="{{ route('orders.index',['status'=>'pending']) }}" class="fl-orders-btn" title="Pending Online Orders: {{ $pendingOrdersCount ?? 0 }}" aria-label="Pending online orders">
+                    <span class="fl-orders-icon">📦</span>
+                    @if(($pendingOrdersCount ?? 0) > 0)
+                        <span class="fl-order-counter-badge">{{ $pendingOrdersCount }}</span>
+                    @endif
+                </a>
+                @endif
                 <a href="{{ route('password.change') }}" class="fl-top-user">
                     <span class="fl-top-avatar">{{ strtoupper(substr($user->name,0,1)) }}</span>
                     <span><strong>{{ $user->name }}</strong><small>{{ $roleName }}</small></span>

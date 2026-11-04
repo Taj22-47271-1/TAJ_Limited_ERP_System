@@ -191,8 +191,14 @@ class OnlineOrderController extends Controller
             if ($locked->order_status !== 'pending') {
                 throw ValidationException::withMessages(['order'=>'Only pending orders can be approved.']);
             }
+
+            // If payment was online and not yet paid, mark paid on staff approval
             if ($locked->payment_method === 'online' && $locked->payment_status !== 'paid') {
-                throw ValidationException::withMessages(['payment'=>'Online payment must be completed before approval.']);
+                $locked->payment_status = 'paid';
+                if (! $locked->payment_reference) {
+                    $locked->payment_reference = 'VERIFIED-BY-'.strtoupper($request->user()->name ?? 'STAFF');
+                }
+                $locked->save();
             }
 
             $locked->load('items');

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\OnlineOrder;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -47,6 +48,19 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $view->with('companySettings', $settings);
+        });
+
+        // Share pending online orders count with application layouts and dashboards
+        View::composer(['layouts.app', 'layouts.admin', 'layouts.cashier', 'dashboards.*'], function ($view): void {
+            $pendingCount = 0;
+            try {
+                if (Schema::hasTable('online_orders')) {
+                    $pendingCount = OnlineOrder::where('order_status', 'pending')->count();
+                }
+            } catch (Throwable) {
+                $pendingCount = 0;
+            }
+            $view->with('pendingOrdersCount', $pendingCount);
         });
     }
 }
