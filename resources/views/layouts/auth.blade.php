@@ -13,7 +13,9 @@
 </head>
 <body class="auth-body fl-auth-body">
 @php
-    $loginOffers = $companySettings->getLoginOffers();
+    $loginOffers = method_exists($companySettings, 'getLoginOffers')
+        ? $companySettings->getLoginOffers()
+        : \App\Models\Setting::defaultLoginOffers();
     $offerSlides = $loginOffers['slides'] ?? \App\Models\Setting::defaultLoginOffers()['slides'];
     $slideInterval = max(2, (int)($loginOffers['interval_seconds'] ?? 4)) * 1000;
 @endphp
