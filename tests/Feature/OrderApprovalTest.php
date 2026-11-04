@@ -18,7 +18,7 @@ class OrderApprovalTest extends TestCase
 
         $customer = User::where('email', 'customer@tajlimited.com')->firstOrFail();
         $admin = User::where('email', 'admin@tajlimited.com')->firstOrFail();
-        $product = Product::where('status', true)->where('stock', '>', 5)->firstOrFail();
+        $product = Product::where('status', true)->where('stock', '>', 5)->where('has_sizes', false)->firstOrFail();
 
         // 1. Customer adds to cart
         $this->actingAs($customer)->post(route('cart.add', $product), [
@@ -57,7 +57,7 @@ class OrderApprovalTest extends TestCase
 
         $customer = User::where('email', 'customer@tajlimited.com')->firstOrFail();
         $admin = User::where('email', 'admin@tajlimited.com')->firstOrFail();
-        $product = Product::where('status', true)->where('stock', '>', 5)->firstOrFail();
+        $product = Product::where('status', true)->where('stock', '>', 5)->where('has_sizes', false)->firstOrFail();
 
         // 1. Customer adds to cart
         $this->actingAs($customer)->post(route('cart.add', $product), [

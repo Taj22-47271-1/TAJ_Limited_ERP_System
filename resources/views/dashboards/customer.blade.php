@@ -30,6 +30,8 @@
 </section>
 @endif
 
+@include('shop.partials.clothing-showcase')
+
 <section class="vc-section-head">
     <div><span class="vc-kicker">NEW ARRIVALS</span><h2>Available products</h2></div>
     <a href="{{ route('shop.index') }}">Shop all <span>→</span></a>

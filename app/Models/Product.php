@@ -65,12 +65,14 @@ class Product extends Model
             return [];
         }
 
-        return collect($this->size_options ?? [])
+        $options = collect($this->size_options ?? [])
             ->map(fn ($size) => trim((string) $size))
             ->filter()
             ->unique(fn ($size) => mb_strtolower($size))
             ->values()
             ->all();
+
+        return ! empty($options) ? $options : ['S', 'M', 'L', 'XL', 'XXL'];
     }
 
     public function hasSize(?string $size): bool

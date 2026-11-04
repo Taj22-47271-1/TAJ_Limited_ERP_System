@@ -26,6 +26,15 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         abort_unless($product->status, 404);
-        return view('shop.show', compact('product'));
+        $relatedClothing = Product::where('status', true)
+            ->where('id', '!=', $product->id)
+            ->where(function ($q) {
+                $q->where('has_sizes', true)
+                  ->orWhereHas('category', fn ($c) => $c->where('name', 'ilike', '%cloth%')->orWhere('name', 'ilike', '%saree%'));
+            })
+            ->latest()
+            ->limit(4)
+            ->get();
+        return view('shop.show', compact('product', 'relatedClothing'));
     }
 }

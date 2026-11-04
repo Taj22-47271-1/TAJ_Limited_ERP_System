@@ -26,7 +26,16 @@ class DashboardController extends Controller
             $deliveredCount = (clone $base)->where('order_status','delivered')->count();
             $recentOrders = (clone $base)->latest()->limit(6)->get();
             $featuredProducts = Product::where('status',true)->whereRaw('(stock - reserved_stock) > 0')->latest()->limit(8)->get();
-            return view('dashboards.customer', compact('orderCount','pendingCount','processingCount','deliveredCount','recentOrders','featuredProducts'));
+            $clothingProducts = Product::where('status', true)
+                ->whereRaw('(stock - reserved_stock) > 0')
+                ->where(function ($q) {
+                    $q->where('has_sizes', true)
+                      ->orWhereHas('category', fn ($c) => $c->where('name', 'ilike', '%cloth%')->orWhere('name', 'ilike', '%saree%'));
+                })
+                ->with('category')
+                ->latest()
+                ->get();
+            return view('dashboards.customer', compact('orderCount','pendingCount','processingCount','deliveredCount','recentOrders','featuredProducts','clothingProducts'));
         }
 
         if ($user->role !== 'admin' && $user->role !== 'customer') {

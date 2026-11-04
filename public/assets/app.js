@@ -450,3 +450,173 @@ document.addEventListener('DOMContentLoaded', () => {
   window.initProductMagnifier();
   window.initStorefrontCart();
 });
+
+
+/* ==========================================================================
+   TAJ Atelier: Luxury 3D Clothing & Haute Couture Interactive Controls
+   ========================================================================== */
+window.initLuxuryClothingShowcase = function() {
+  const section = document.getElementById('clothingShowcaseSection');
+  if (!section) return;
+
+  // Scene tab switcher
+  section.querySelectorAll('.atelier-tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const sceneName = this.dataset.scene;
+      const nav = this.closest('.atelier-scene-nav');
+      nav.querySelectorAll('.atelier-tab-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+
+      const activeSlide = section.querySelector('.atelier-product-slide.active') || section.querySelector('.atelier-product-slide');
+      if (activeSlide) {
+        activeSlide.querySelectorAll('.atelier-scene').forEach(sc => sc.classList.remove('active'));
+        const targetScene = activeSlide.querySelector(`.atelier-scene-${sceneName}`);
+        if (targetScene) targetScene.classList.add('active');
+      }
+    });
+  });
+
+  // Product carousel navigation
+  const slides = Array.from(section.querySelectorAll('.atelier-product-slide'));
+  let currentSlideIdx = 0;
+
+  function showSlide(index) {
+    if (!slides.length) return;
+    currentSlideIdx = (index + slides.length) % slides.length;
+    slides.forEach((sl, idx) => {
+      sl.classList.toggle('active', idx === currentSlideIdx);
+    });
+
+    // Sync active scene
+    const activeNavTab = section.querySelector('.atelier-tab-btn.active');
+    const sceneName = activeNavTab ? activeNavTab.dataset.scene : 'turntable';
+    const currSlide = slides[currentSlideIdx];
+    if (currSlide) {
+      currSlide.querySelectorAll('.atelier-scene').forEach(sc => sc.classList.remove('active'));
+      const sc = currSlide.querySelector(`.atelier-scene-${sceneName}`) || currSlide.querySelector('.atelier-scene-turntable');
+      if (sc) sc.classList.add('active');
+    }
+  }
+
+  section.querySelectorAll('.atelier-prev-btn').forEach(btn => {
+    btn.addEventListener('click', () => showSlide(currentSlideIdx - 1));
+  });
+  section.querySelectorAll('.atelier-next-btn').forEach(btn => {
+    btn.addEventListener('click', () => showSlide(currentSlideIdx + 1));
+  });
+
+  // Interactive 3D Turntable Parallax (PC & Touch)
+  section.querySelectorAll('.atelier-stage-container').forEach(container => {
+    const turntable = container.querySelector('.atelier-3d-turntable');
+    const halo = container.querySelector('.atelier-halo-ring');
+    if (!turntable) return;
+
+    let isInteracting = false;
+    let startX = 0, currentRotY = 0;
+
+    const onMove = (clientX, clientY) => {
+      const rect = container.getBoundingClientRect();
+      const xRatio = ((clientX - rect.left) / rect.width) - 0.5;
+      const yRatio = ((clientY - rect.top) / rect.height) - 0.5;
+
+      const rotY = xRatio * 26;
+      const rotX = -yRatio * 14;
+
+      turntable.style.transform = `perspective(1100px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+      if (halo) {
+        halo.style.transform = `translate(${-xRatio * 16}px, ${-yRatio * 12}px) scale(${1 + Math.abs(xRatio) * 0.05})`;
+      }
+    };
+
+    container.addEventListener('pointermove', e => {
+      onMove(e.clientX, e.clientY);
+    });
+
+    container.addEventListener('pointerleave', () => {
+      turntable.style.transform = 'perspective(1100px) rotateY(0deg) rotateX(0deg)';
+      if (halo) halo.style.transform = 'translate(0px, 0px) scale(1)';
+    });
+
+    // Touch drag for mobile
+    container.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        isInteracting = true;
+        startX = e.touches[0].clientX;
+      }
+    }, { passive: true });
+
+    container.addEventListener('touchmove', e => {
+      if (!isInteracting || e.touches.length !== 1) return;
+      const diff = e.touches[0].clientX - startX;
+      currentRotY = Math.max(-30, Math.min(30, diff * 0.35));
+      turntable.style.transform = `perspective(1100px) rotateY(${currentRotY}deg) rotateX(0deg)`;
+    }, { passive: true });
+
+    container.addEventListener('touchend', () => {
+      isInteracting = false;
+      turntable.style.transform = 'perspective(1100px) rotateY(0deg) rotateX(0deg)';
+    });
+  });
+
+  // Hotspots click/tap toggle
+  section.querySelectorAll('.atelier-hotspot').forEach(hotspot => {
+    hotspot.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const targetId = this.dataset.target;
+      const card = document.getElementById(targetId);
+      const isVisible = card?.classList.contains('is-visible');
+
+      // Close all cards
+      section.querySelectorAll('.atelier-hotspot-card').forEach(c => c.classList.remove('is-visible'));
+      section.querySelectorAll('.atelier-hotspot').forEach(h => h.classList.remove('is-open'));
+
+      if (!isVisible && card) {
+        card.classList.add('is-visible');
+        this.classList.add('is-open');
+      }
+    });
+  });
+
+  document.addEventListener('click', () => {
+    section.querySelectorAll('.atelier-hotspot-card').forEach(c => c.classList.remove('is-visible'));
+    section.querySelectorAll('.atelier-hotspot').forEach(h => h.classList.remove('is-open'));
+  });
+
+  // Variant morph swatches
+  section.querySelectorAll('.atelier-swatches').forEach(swatches => {
+    const parent = swatches.closest('.atelier-morph-layout');
+    const garment = parent?.querySelector('.atelier-morph-garment');
+    const ring = parent?.querySelector('.atelier-morph-ring');
+    const label = parent?.querySelector('.selected-swatch-name');
+
+    const filterMap = {
+      rose: { filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(245, 208, 126, 0.7)', shadow: '0 0 50px rgba(245, 208, 126, 0.35)' },
+      sapphire: { filter: 'hue-rotate(185deg) saturate(1.4) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(43, 89, 195, 0.85)', shadow: '0 0 50px rgba(43, 89, 195, 0.5)' },
+      noir: { filter: 'grayscale(1) brightness(0.68) contrast(1.25) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.85))', ring: 'rgba(161, 161, 170, 0.6)', shadow: '0 0 40px rgba(0, 0, 0, 0.8)' },
+      emerald: { filter: 'hue-rotate(95deg) saturate(1.35) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(26, 127, 83, 0.85)', shadow: '0 0 50px rgba(26, 127, 83, 0.45)' },
+      gold: { filter: 'hue-rotate(32deg) saturate(1.85) brightness(1.1) drop-shadow(0 20px 30px rgba(0, 0, 0, 0.7))', ring: 'rgba(212, 175, 55, 0.9)', shadow: '0 0 55px rgba(212, 175, 55, 0.5)' }
+    };
+
+    swatches.querySelectorAll('.swatch-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        swatches.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const colorKey = this.dataset.color;
+        const title = this.dataset.title || colorKey;
+        if (label) label.textContent = `${title} (Selected)`;
+
+        const cfg = filterMap[colorKey] || filterMap.rose;
+        if (garment) garment.style.filter = cfg.filter;
+        if (ring) {
+          ring.style.borderColor = cfg.ring;
+          ring.style.boxShadow = cfg.shadow;
+        }
+      });
+    });
+  });
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.initLuxuryClothingShowcase();
+});

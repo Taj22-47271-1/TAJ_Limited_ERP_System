@@ -46,7 +46,7 @@ class RoleFlowTest extends TestCase
     {
         $this->seed();
         $user = User::where('role', 'customer')->firstOrFail();
-        $product = \App\Models\Product::where('status', true)->firstOrFail();
+        $product = \App\Models\Product::where('status', true)->where('has_sizes', false)->firstOrFail();
 
         $response = $this->actingAs($user)
             ->postJson("/cart/{$product->id}", [

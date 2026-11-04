@@ -4,7 +4,12 @@
 @php
     $isLowStock = $product->available_stock <= $product->min_stock;
     $sizes = $product->normalizedSizes();
+    $isClothing = $product->has_sizes || ($product->category && stripos($product->category->name, 'cloth') !== false);
 @endphp
+
+@if($isClothing)
+    @include('shop.partials.clothing-showcase', ['clothingProducts' => collect([$product])->merge($relatedClothing ?? [])])
+@endif
 
 <div class="fashion-product-detail">
     <section class="fashion-product-media">
