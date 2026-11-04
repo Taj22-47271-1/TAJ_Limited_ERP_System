@@ -72,25 +72,44 @@
 
                     <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(220px,.8fr);gap:20px;">
                         <div style="display:flex;flex-direction:column;gap:12px;">
+                            <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
+                                Featured Catalog Product (Optional - Links Real Pricing & Live Image)
+                                <select name="slides[{{ $index }}][product_id]" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" onchange="autoFillProduct(this, {{ $index }})">
+                                    <option value="">-- Custom Banner / General Promotion --</option>
+                                    @foreach($products as $p)
+                                        <option value="{{ $p->id }}" 
+                                                data-name="{{ $p->name }}"
+                                                data-price="{{ $p->selling_price }}"
+                                                data-disc-price="{{ $p->effective_price }}"
+                                                data-disc-percent="{{ $p->discount_percent_calculated }}"
+                                                data-desc="{{ $p->description }}"
+                                                data-img="{{ $p->image_url }}"
+                                                @selected(($slide['product_id'] ?? null) == $p->id)>
+                                            {{ $p->name }} ({{ $companySettings->currency_symbol }}{{ number_format($p->effective_price, 2) }} @if($p->has_discount) · {{ $p->discount_percent_calculated }}% OFF @endif)
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </label>
+
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                                     Festival / Offer Badge
-                                    <input name="slides[{{ $index }}][badge]" value="{{ $slide['badge'] ?? '' }}" placeholder="e.g. 🎉 EID UL FITR EXCLUSIVE" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
+                                    <input name="slides[{{ $index }}][badge]" id="slideBadge_{{ $index }}" value="{{ $slide['badge'] ?? '' }}" placeholder="e.g. 🎉 EID UL FITR EXCLUSIVE" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
                                 </label>
                                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                                     Discount Tag
-                                    <input name="slides[{{ $index }}][discount]" value="{{ $slide['discount'] ?? '' }}" placeholder="e.g. 15% DISCOUNT" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
+                                    <input name="slides[{{ $index }}][discount]" id="slideDiscount_{{ $index }}" value="{{ $slide['discount'] ?? '' }}" placeholder="e.g. 15% DISCOUNT" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
                                 </label>
                             </div>
 
                             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                                 Main Offer Title
-                                <input name="slides[{{ $index }}][title]" value="{{ $slide['title'] ?? '' }}" placeholder="e.g. Exclusive Eid Ethnic Luxury Collection" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
+                                <input name="slides[{{ $index }}][title]" id="slideTitle_{{ $index }}" value="{{ $slide['title'] ?? '' }}" placeholder="e.g. Exclusive Eid Ethnic Luxury Collection" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
                             </label>
 
                             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                                 Subtitle / Description
-                                <textarea name="slides[{{ $index }}][subtitle]" rows="2" placeholder="e.g. Handcrafted pure silk sarees, royal festive shirts & celebratory discounts." style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">{{ $slide['subtitle'] ?? '' }}</textarea>
+                                <textarea name="slides[{{ $index }}][subtitle]" id="slideSubtitle_{{ $index }}" rows="2" placeholder="e.g. Handcrafted pure silk sarees, royal festive shirts & celebratory discounts." style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">{{ $slide['subtitle'] ?? '' }}</textarea>
                             </label>
 
                             <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
@@ -101,16 +120,16 @@
 
                         <!-- Image Upload / Preview -->
                         <div style="display:flex;flex-direction:column;gap:8px;">
-                            <span style="font-size:12px;font-weight:600;">Slide Graphic / Banner</span>
-                            <div style="height:150px;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;background:#0f172a;display:grid;place-items:center;">
+                            <span style="font-size:12px;font-weight:600;">Product / Slide Graphic</span>
+                            <div style="height:170px;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;background:#0f172a;display:grid;place-items:center;padding:12px;">
                                 @php
                                     $imgUrl = !empty($slide['image'])
                                         ? (str_starts_with($slide['image'], 'http') || str_starts_with($slide['image'], 'storage/') || str_starts_with($slide['image'], 'assets/') ? asset($slide['image']) : asset('storage/' . $slide['image']))
                                         : asset('assets/images/offers/eid-offer.svg');
                                 @endphp
-                                <img src="{{ $imgUrl }}" alt="Offer preview" style="max-height:100%;max-width:100%;object-fit:contain;">
+                                <img src="{{ $imgUrl }}" id="slideImgPreview_{{ $index }}" alt="Offer preview" style="max-height:100%;max-width:100%;object-fit:contain;">
                             </div>
-                            <input type="hidden" name="slides[{{ $index }}][existing_image]" value="{{ $slide['image'] ?? '' }}">
+                            <input type="hidden" name="slides[{{ $index }}][existing_image]" id="slideExistingImg_{{ $index }}" value="{{ $slide['image'] ?? '' }}">
                             <label style="font-size:12px;color:#4b5563;cursor:pointer;">
                                 <span>Upload new image / banner:</span>
                                 <input type="file" name="slide_image_{{ $index }}" accept="image/*" style="font-size:12px;margin-top:4px;display:block;">
@@ -122,81 +141,153 @@
         </div>
     </div>
 
-    <div style="position:sticky;bottom:20px;background:#fff;padding:16px 20px;border-radius:12px;border:1px solid #e5e7eb;box-shadow:0 10px 25px rgba(0,0,0,0.08);display:flex;justify-content:flex-end;gap:12px;z-index:20;">
-        <a href="{{ route('admin.login-offers') }}" class="btn ghost">Discard Changes</a>
-        <button type="submit" class="btn primary">Save Login Offers</button>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:40px;">
+        <button type="submit" class="btn primary" style="padding:12px 28px;font-size:14px;">Save Login Offer Slider</button>
     </div>
 </form>
 
-<script>
-let slideCounter = {{ count($slides) }};
-
-document.getElementById('addSlideBtn').onclick = function() {
-    const idx = slideCounter++;
-    const container = document.getElementById('slidesContainer');
-    const newCard = document.createElement('div');
-    newCard.className = 'card slide-item-card';
-    newCard.style = 'background:#fafafa;border:1px solid #e5e7eb;border-radius:12px;padding:20px;position:relative;';
-    newCard.innerHTML = `
+<template id="slideTemplate">
+    <div class="card slide-item-card" data-index="__INDEX__" style="background:#fafafa;border:1px solid #e5e7eb;border-radius:12px;padding:20px;position:relative;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
             <span style="font-weight:700;font-size:14px;color:#1e3a8a;display:flex;align-items:center;gap:6px;">
-                <span style="display:inline-block;width:24px;height:24px;border-radius:50%;background:#1e3a8a;color:#fff;text-align:center;line-height:24px;font-size:12px;">${idx + 1}</span>
-                Slide #<span class="slide-num">${idx + 1}</span>
+                <span style="display:inline-block;width:24px;height:24px;border-radius:50%;background:#1e3a8a;color:#fff;text-align:center;line-height:24px;font-size:12px;">__NUM__</span>
+                Slide #<span class="slide-num">__NUM__</span>
             </span>
             <button type="button" class="btn danger-outline remove-slide-btn" style="padding:4px 10px;font-size:12px;" onclick="removeSlide(this)">Remove</button>
         </div>
+
         <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(220px,.8fr);gap:20px;">
             <div style="display:flex;flex-direction:column;gap:12px;">
+                <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
+                    Featured Catalog Product (Optional)
+                    <select name="slides[__INDEX__][product_id]" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" onchange="autoFillProduct(this, __INDEX__)">
+                        <option value="">-- Custom Banner / General Promotion --</option>
+                        @foreach($products as $p)
+                            <option value="{{ $p->id }}" 
+                                    data-name="{{ $p->name }}"
+                                    data-price="{{ $p->selling_price }}"
+                                    data-disc-price="{{ $p->effective_price }}"
+                                    data-disc-percent="{{ $p->discount_percent_calculated }}"
+                                    data-desc="{{ $p->description }}"
+                                    data-img="{{ $p->image_url }}">
+                                {{ $p->name }} ({{ $companySettings->currency_symbol }}{{ number_format($p->effective_price, 2) }})
+                            </option>
+                        @endforeach
+                    </select>
+                </label>
+
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                         Festival / Offer Badge
-                        <input name="slides[${idx}][badge]" value="🔥 SPECIAL FESTIVE OFFER" placeholder="e.g. 🎉 EID UL FITR EXCLUSIVE" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
+                        <input name="slides[__INDEX__][badge]" id="slideBadge___INDEX__" value="🎉 SPECIAL OFFER" placeholder="e.g. 🎉 EID UL FITR EXCLUSIVE" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
                     </label>
                     <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                         Discount Tag
-                        <input name="slides[${idx}][discount]" value="10% DISCOUNT" placeholder="e.g. 15% DISCOUNT" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
+                        <input name="slides[__INDEX__][discount]" id="slideDiscount___INDEX__" value="10% DISCOUNT" placeholder="e.g. 15% DISCOUNT" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
                     </label>
                 </div>
+
                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                     Main Offer Title
-                    <input name="slides[${idx}][title]" value="Seasonal Celebration Offer" placeholder="e.g. Exclusive Eid Ethnic Luxury Collection" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
+                    <input name="slides[__INDEX__][title]" id="slideTitle___INDEX__" value="New Festive Luxury Offer" placeholder="e.g. Exclusive Eid Ethnic Luxury Collection" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;" required>
                 </label>
+
                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                     Subtitle / Description
-                    <textarea name="slides[${idx}][subtitle]" rows="2" placeholder="e.g. Special limited-time discount on top products." style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">Enjoy extra savings on luxury items this season.</textarea>
+                    <textarea name="slides[__INDEX__][subtitle]" id="slideSubtitle___INDEX__" rows="2" placeholder="e.g. Handcrafted festive apparel and seasonal collections." style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">Special promotional offer available for a limited time.</textarea>
                 </label>
+
                 <label style="font-size:12px;font-weight:600;display:flex;flex-direction:column;gap:4px;">
                     Offer Ribbon Tag
-                    <input name="slides[${idx}][tag]" value="FESTIVE SPECIAL" placeholder="e.g. EID OFFER, PUJA MEGA OFFER" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
+                    <input name="slides[__INDEX__][tag]" value="FESTIVE SPECIAL" placeholder="e.g. EID OFFER, PUJA MEGA OFFER" style="padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;">
                 </label>
             </div>
+
             <div style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:12px;font-weight:600;">Slide Graphic / Banner</span>
-                <div style="height:150px;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;background:#0f172a;display:grid;place-items:center;">
-                    <img src="{{ asset('assets/images/offers/eid-offer.svg') }}" alt="Offer preview" style="max-height:100%;max-width:100%;object-fit:contain;">
+                <span style="font-size:12px;font-weight:600;">Product / Slide Graphic</span>
+                <div style="height:170px;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;background:#0f172a;display:grid;place-items:center;padding:12px;">
+                    <img src="{{ asset('assets/images/offers/eid-offer.svg') }}" id="slideImgPreview___INDEX__" alt="Offer preview" style="max-height:100%;max-width:100%;object-fit:contain;">
                 </div>
-                <input type="hidden" name="slides[${idx}][existing_image]" value="assets/images/offers/eid-offer.svg">
+                <input type="hidden" name="slides[__INDEX__][existing_image]" id="slideExistingImg___INDEX__" value="assets/images/offers/eid-offer.svg">
                 <label style="font-size:12px;color:#4b5563;cursor:pointer;">
                     <span>Upload new image / banner:</span>
-                    <input type="file" name="slide_image_${idx}" accept="image/*" style="font-size:12px;margin-top:4px;display:block;">
+                    <input type="file" name="slide_image___INDEX__" accept="image/*" style="font-size:12px;margin-top:4px;display:block;">
                 </label>
             </div>
         </div>
-    `;
-    container.appendChild(newCard);
+    </div>
+</template>
+
+<script>
+let slideIndexCounter = {{ count($slides) }};
+
+document.getElementById('addSlideBtn').addEventListener('click', function() {
+    const container = document.getElementById('slidesContainer');
+    const template = document.getElementById('slideTemplate').innerHTML;
+    const newNum = container.querySelectorAll('.slide-item-card').length + 1;
+    
+    let rendered = template.replace(/__INDEX__/g, slideIndexCounter);
+    rendered = rendered.replace(/__NUM__/g, newNum);
+    
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = rendered;
+    container.appendChild(wrapper.firstElementChild);
+    
+    slideIndexCounter++;
+    updateRemoveButtons();
+});
+
+window.removeSlide = function(btn) {
+    const container = document.getElementById('slidesContainer');
+    const cards = container.querySelectorAll('.slide-item-card');
+    if (cards.length <= 1) {
+        alert('You must keep at least one promotional slide!');
+        return;
+    }
+    
+    const card = btn.closest('.slide-item-card');
+    card.remove();
+    
+    // Re-index displayed slide numbers
+    container.querySelectorAll('.slide-item-card').forEach((c, idx) => {
+        c.querySelector('.slide-num').textContent = idx + 1;
+    });
+    updateRemoveButtons();
 };
 
-function removeSlide(btn) {
-    const card = btn.closest('.slide-item-card');
-    if (document.querySelectorAll('.slide-item-card').length > 1) {
-        card.remove();
-        // Renumber slides
-        document.querySelectorAll('.slide-item-card').forEach((c, i) => {
-            c.querySelector('.slide-num').textContent = (i + 1);
-        });
-    } else {
-        alert('You must have at least one slide.');
-    }
+function updateRemoveButtons() {
+    const container = document.getElementById('slidesContainer');
+    const cards = container.querySelectorAll('.slide-item-card');
+    cards.forEach(card => {
+        const removeBtn = card.querySelector('.remove-slide-btn');
+        if (removeBtn) {
+            removeBtn.style.display = cards.length > 1 ? 'inline-block' : 'none';
+        }
+    });
 }
+
+window.autoFillProduct = function(select, index) {
+    const selectedOpt = select.options[select.selectedIndex];
+    if (!selectedOpt.value) return;
+
+    const name = selectedOpt.dataset.name;
+    const discPercent = selectedOpt.dataset.discPercent;
+    const desc = selectedOpt.dataset.desc;
+    const img = selectedOpt.dataset.img;
+
+    const titleInput = document.getElementById('slideTitle_' + index);
+    if (titleInput) titleInput.value = name;
+
+    const subtitleInput = document.getElementById('slideSubtitle_' + index);
+    if (subtitleInput && desc) subtitleInput.value = desc;
+
+    const discountInput = document.getElementById('slideDiscount_' + index);
+    if (discountInput && discPercent) discountInput.value = discPercent + '% DISCOUNT';
+
+    const previewImg = document.getElementById('slideImgPreview_' + index);
+    const existingImg = document.getElementById('slideExistingImg_' + index);
+    if (previewImg && img) previewImg.src = img;
+    if (existingImg && img) existingImg.value = img;
+};
 </script>
 @endsection

@@ -7,16 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SaleItem extends Model
 {
     protected $fillable = [
-        'sale_id','product_id','selected_size','quantity','unit_price','unit_cost','line_total'
+        'sale_id', 'product_id', 'selected_size', 'selected_color', 'quantity',
+        'unit_price', 'unit_cost', 'line_total',
     ];
 
     protected function casts(): array
     {
         return [
-            'quantity'=>'decimal:2',
-            'unit_price'=>'decimal:2',
-            'unit_cost'=>'decimal:2',
-            'line_total'=>'decimal:2',
+            'quantity' => 'decimal:2',
+            'unit_price' => 'decimal:2',
+            'unit_cost' => 'decimal:2',
+            'line_total' => 'decimal:2',
         ];
     }
 

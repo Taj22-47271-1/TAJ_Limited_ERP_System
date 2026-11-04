@@ -116,6 +116,8 @@ class ProductController extends Controller
             'barcode'=>['nullable','max:100', Rule::unique('products','barcode')->ignore($id)->whereNull('deleted_at')],
             'unit'=>['required','max:30'],
             'selling_price'=>['required','numeric','min:0'],
+            'discount_price'=>['nullable','numeric','min:0'],
+            'discount_percent'=>['nullable','numeric','min:0','max:100'],
             'min_stock'=>['required','numeric','min:0'],
             'description'=>['nullable','string','max:3000'],
             'status'=>['nullable','boolean'],

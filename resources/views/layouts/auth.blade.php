@@ -54,23 +54,63 @@
                         $slideImg = !empty($slide['image'])
                             ? (str_starts_with($slide['image'], 'http') || str_starts_with($slide['image'], 'storage/') || str_starts_with($slide['image'], 'assets/') ? asset($slide['image']) : asset('storage/' . $slide['image']))
                             : asset('assets/images/offers/eid-offer.svg');
+
+                        $origPrice = (float)($slide['original_price'] ?? 0);
+                        $finalPrice = (float)($slide['discount_price'] ?? 0);
+                        $hasDiscount = !empty($slide['has_discount']) || ($origPrice > 0 && $finalPrice > 0 && $finalPrice < $origPrice);
+                        $discountPercent = $slide['discount_percent'] ?? ($origPrice > 0 ? round((($origPrice - $finalPrice) / $origPrice) * 100) : 10);
+                        $productName = $slide['product_name'] ?? '';
                     @endphp
                     <article class="fl-promo-slide {{ $idx === 0 ? 'active' : '' }}" data-slide="{{ $idx }}" onclick="focusLoginForm()">
-                        <div class="fl-promo-slide-bg" style="background-image: url('{{ $slideImg }}');"></div>
-                        <div class="fl-promo-slide-overlay"></div>
-                        <div class="fl-promo-content">
-                            <div class="fl-promo-badge-row">
-                                <span class="fl-promo-badge">{{ $slide['badge'] ?? 'FESTIVE OFFER' }}</span>
-                                <span class="fl-promo-discount">{{ $slide['discount'] ?? '10% DISCOUNT' }}</span>
+                        <!-- Subtle ambient lighting backdrop -->
+                        <div class="fl-promo-ambient-glow"></div>
+                        <div class="fl-promo-backdrop-pattern"></div>
+
+                        <!-- Full Product Showcase Card (Framed, Never Cropped) -->
+                        <div class="fl-promo-stage-card">
+                            <div class="fl-promo-product-stage">
+                                <img src="{{ $slideImg }}" alt="{{ $productName ?: $slide['title'] }}" class="fl-promo-product-image" loading="{{ $idx === 0 ? 'eager' : 'lazy' }}">
+                                @if($hasDiscount)
+                                    <span class="fl-promo-floating-tag">-{{ $discountPercent }}% OFF</span>
+                                @endif
                             </div>
-                            <h3>{{ $slide['title'] }}</h3>
-                            @if(!empty($slide['subtitle']))
-                                <p>{{ $slide['subtitle'] }}</p>
-                            @endif
-                            <button type="button" class="fl-promo-action-btn" onclick="event.stopPropagation(); focusLoginForm();">
-                                <span>⚡ Claim Offer · Sign In Now</span>
-                                <span>→</span>
-                            </button>
+
+                            <div class="fl-promo-content">
+                                <div class="fl-promo-badge-row">
+                                    <span class="fl-promo-badge">{{ $slide['badge'] ?? 'FESTIVE OFFER' }}</span>
+                                    @if($hasDiscount)
+                                        <span class="fl-promo-discount">{{ $discountPercent }}% DISCOUNT</span>
+                                    @endif
+                                </div>
+
+                                @if(!empty($productName))
+                                    <div class="fl-promo-item-kicker">{{ $productName }}</div>
+                                @endif
+
+                                <h3>{{ $slide['title'] }}</h3>
+
+                                <!-- Real Product Pricing Display -->
+                                @if($origPrice > 0 && $finalPrice > 0)
+                                    <div class="fl-promo-pricing-row">
+                                        @if($hasDiscount)
+                                            <del class="fl-promo-orig-price">{{ $companySettings->currency_symbol }}{{ number_format($origPrice, 2) }}</del>
+                                            <strong class="fl-promo-final-price">{{ $companySettings->currency_symbol }}{{ number_format($finalPrice, 2) }}</strong>
+                                            <span class="fl-promo-savings-chip">Save {{ $companySettings->currency_symbol }}{{ number_format($origPrice - $finalPrice, 2) }}</span>
+                                        @else
+                                            <strong class="fl-promo-final-price">{{ $companySettings->currency_symbol }}{{ number_format($origPrice, 2) }}</strong>
+                                        @endif
+                                    </div>
+                                @endif
+
+                                @if(!empty($slide['subtitle']))
+                                    <p>{{ $slide['subtitle'] }}</p>
+                                @endif
+
+                                <button type="button" class="fl-promo-action-btn" onclick="event.stopPropagation(); focusLoginForm();">
+                                    <span>⚡ Claim Offer · Sign In Now</span>
+                                    <span>→</span>
+                                </button>
+                            </div>
                         </div>
                     </article>
                 @endforeach

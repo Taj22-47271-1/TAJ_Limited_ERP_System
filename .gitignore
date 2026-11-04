@@ -22,6 +22,7 @@ yarn-error.log
 /storage/framework/testing/*
 /storage/framework/views/*
 /storage/logs/*
+scratch/
 !/storage/framework/cache/data/.gitkeep
 !/storage/framework/sessions/.gitkeep
 !/storage/framework/testing/.gitkeep

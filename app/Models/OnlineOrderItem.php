@@ -7,17 +7,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OnlineOrderItem extends Model
 {
     protected $fillable = [
-        'online_order_id','product_id','product_name','selected_size','quantity',
-        'unit_price','unit_cost','line_total'
+        'online_order_id', 'product_id', 'product_name', 'selected_size', 'selected_color',
+        'quantity', 'unit_price', 'unit_cost', 'line_total',
     ];
 
     protected function casts(): array
     {
         return [
-            'quantity'=>'decimal:2',
-            'unit_price'=>'decimal:2',
-            'unit_cost'=>'decimal:2',
-            'line_total'=>'decimal:2',
+            'quantity' => 'decimal:2',
+            'unit_price' => 'decimal:2',
+            'unit_cost' => 'decimal:2',
+            'line_total' => 'decimal:2',
         ];
     }
 

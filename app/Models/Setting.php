@@ -31,30 +31,59 @@ class Setting extends Model
             'slides' => [
                 [
                     'id' => 1,
+                    'product_sku' => 'SAREE-009',
+                    'product_name' => 'Designer Silk Saree (Luxury Atelier)',
+                    'original_price' => 4500.00,
+                    'discount_price' => 3825.00,
+                    'discount_percent' => 15,
                     'badge' => '🎉 EID UL FITR EXCLUSIVE',
-                    'discount' => '15% DISCOUNT',
+                    'discount' => '15% OFF',
                     'title' => 'Exclusive Eid Ethnic Luxury Collection',
-                    'subtitle' => 'Handcrafted pure silk sarees, royal festive kurtas & shirts. Claim your celebratory discount today.',
-                    'image' => 'assets/images/offers/eid-offer.svg',
+                    'subtitle' => 'Handcrafted pure silk sarees with royal zari drapes. Claim your festive 15% discount today.',
+                    'image' => 'assets/images/products/designer-saree-rose.png',
                     'tag' => 'EID OFFER',
                 ],
                 [
                     'id' => 2,
+                    'product_sku' => 'KB-002',
+                    'product_name' => 'Pro Tactile Mechanical Keyboard',
+                    'original_price' => 2400.00,
+                    'discount_price' => 1920.00,
+                    'discount_percent' => 20,
                     'badge' => '✨ DURGA PUJA UTSAV',
-                    'discount' => '20% DISCOUNT',
-                    'title' => 'Traditional Artisanal Weaves & Zari Drapes',
-                    'subtitle' => 'Celebrate the festival of joy with heirloom craftsmanship, shimmering gold borders, and pure heritage.',
-                    'image' => 'assets/images/offers/puja-offer.svg',
+                    'discount' => '20% OFF',
+                    'title' => 'High-Performance Workspace Essentials',
+                    'subtitle' => 'Precision mechanical switches, aircraft aluminum top plate, and dynamic backlight.',
+                    'image' => 'assets/images/products/mechanical-keyboard.svg',
                     'tag' => 'PUJA OFFER',
                 ],
                 [
                     'id' => 3,
-                    'badge' => '🎄 BORO DIN & NEW YEAR',
-                    'discount' => '10% DISCOUNT',
+                    'product_sku' => 'HUB-003',
+                    'product_name' => 'Ultra-Fast 7-in-1 USB-C Power Hub',
+                    'original_price' => 1750.00,
+                    'discount_price' => 1487.50,
+                    'discount_percent' => 15,
+                    'badge' => '🎄 BORO DIN & WINTER SPECIAL',
+                    'discount' => '15% OFF',
                     'title' => 'Winter Festive Specials & Modern Elegance',
-                    'subtitle' => 'Warm festive savings across luxury formal wear, accessories, and seasonal arrivals.',
-                    'image' => 'assets/images/offers/winter-offer.svg',
+                    'subtitle' => 'Fast 4K HDMI 60Hz, 100W Power Delivery, and multi-display productivity hub.',
+                    'image' => 'assets/images/products/usb-c-hub.svg',
                     'tag' => 'BORO DIN OFFER',
+                ],
+                [
+                    'id' => 4,
+                    'product_sku' => 'WM-001',
+                    'product_name' => 'Ergonomic Precision Wireless Mouse',
+                    'original_price' => 650.00,
+                    'discount_price' => 585.00,
+                    'discount_percent' => 10,
+                    'badge' => '⚡ FLASH SALE',
+                    'discount' => '10% OFF',
+                    'title' => 'Whisper-Quiet Ergonomic Wireless Mouse',
+                    'subtitle' => 'Dual Bluetooth + 2.4GHz wireless connectivity with 18-month battery life.',
+                    'image' => 'assets/images/products/wireless-mouse.svg',
+                    'tag' => 'FLASH SALE',
                 ],
             ],
         ];
@@ -64,7 +93,41 @@ class Setting extends Model
     {
         $defaults = self::defaultLoginOffers();
         $stored = $this->login_offers ?? [];
-        return array_replace_recursive($defaults, $stored);
+        $merged = array_replace_recursive($defaults, $stored);
+
+        // Enrich slides with live product pricing if available
+        if (! empty($merged['slides']) && is_array($merged['slides'])) {
+            try {
+                $productsBySku = Product::where('status', true)->get()->keyBy('sku');
+                $productsById = $productsBySku->keyBy('id');
+
+                foreach ($merged['slides'] as &$slide) {
+                    $p = null;
+                    if (! empty($slide['product_id'])) {
+                        $p = $productsById->get((int)$slide['product_id']);
+                    } elseif (! empty($slide['product_sku'])) {
+                        $p = $productsBySku->get($slide['product_sku']);
+                    }
+
+                    if ($p) {
+                        $slide['product_id'] = $p->id;
+                        $slide['product_name'] = $p->name;
+                        $slide['original_price'] = (float)$p->selling_price;
+                        $slide['discount_price'] = (float)$p->effective_price;
+                        $slide['discount_percent'] = $p->discount_percent_calculated ?? ($slide['discount_percent'] ?? 10);
+                        $slide['has_discount'] = $p->has_discount;
+                        if (empty($slide['image']) || $slide['image'] === 'assets/images/products/default.svg') {
+                            $slide['image'] = $p->image_url;
+                        }
+                    }
+                }
+                unset($slide);
+            } catch (\Throwable) {
+                // Return gracefully if products table isn't migrated yet
+            }
+        }
+
+        return $merged;
     }
 
     public static function defaultShowcaseConfig(): array
@@ -129,11 +192,11 @@ class Setting extends Model
                 ],
             ],
             'swatches' => [
-                ['key' => 'rose', 'name' => 'Champagne Rose', 'color' => '#e5b2a2', 'image' => 'assets/images/products/designer-saree.png', 'tag' => 'Rose Gold Weave'],
-                ['key' => 'sapphire', 'name' => 'Royal Sapphire', 'color' => '#2b59c3', 'image' => '', 'tag' => 'Deep Navy Indigo'],
-                ['key' => 'noir', 'name' => 'Midnight Noir', 'color' => '#1a1a24', 'image' => '', 'tag' => 'Obsidian Black'],
-                ['key' => 'emerald', 'name' => 'Imperial Emerald', 'color' => '#1a7f53', 'image' => '', 'tag' => 'Royal Forest'],
-                ['key' => 'gold', 'name' => 'Regal Gold', 'color' => '#d4af37', 'image' => '', 'tag' => 'Antique Zari'],
+                ['key' => 'rose', 'name' => 'Champagne Rose', 'color' => '#e5b2a2', 'image' => 'assets/images/products/designer-saree-rose.png', 'tag' => 'Rose Gold Weave'],
+                ['key' => 'sapphire', 'name' => 'Royal Sapphire', 'color' => '#1e3a8a', 'image' => 'assets/images/products/designer-saree-sapphire.png', 'tag' => 'Deep Navy Indigo'],
+                ['key' => 'noir', 'name' => 'Midnight Noir', 'color' => '#18181b', 'image' => 'assets/images/products/designer-saree-noir.png', 'tag' => 'Obsidian Black'],
+                ['key' => 'emerald', 'name' => 'Imperial Emerald', 'color' => '#065f46', 'image' => 'assets/images/products/designer-saree-emerald.png', 'tag' => 'Royal Forest'],
+                ['key' => 'gold', 'name' => 'Regal Gold', 'color' => '#d97706', 'image' => 'assets/images/products/designer-saree-gold.png', 'tag' => 'Antique Zari'],
             ],
             'gallery' => [],
         ];

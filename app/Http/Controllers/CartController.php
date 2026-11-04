@@ -26,10 +26,15 @@ class CartController extends Controller
                 'product_id' => $it['product']->id,
                 'name' => $it['product']->name,
                 'size' => $it['size'],
+                'color' => $it['color'],
+                'colorway' => $it['colorway'],
                 'quantity' => $it['quantity'],
-                'selling_price' => (float)$it['product']->selling_price,
+                'selling_price' => (float)$it['product']->effective_price,
+                'original_price' => (float)$it['product']->selling_price,
+                'has_discount' => $it['product']->has_discount,
+                'discount_percent' => $it['product']->discount_percent_calculated,
                 'line_total' => $it['line_total'],
-                'image' => $it['product']->image_url,
+                'image' => $it['image'],
             ]),
         ]);
     }
@@ -37,16 +42,18 @@ class CartController extends Controller
     public function add(Request $request, Product $product)
     {
         $data = $request->validate([
-            'quantity'=>['nullable','numeric','min:1'],
-            'size'=>['nullable','string','max:30'],
-            'buy_now'=>['nullable','boolean'],
+            'quantity' => ['nullable', 'numeric', 'min:1'],
+            'size' => ['nullable', 'string', 'max:30'],
+            'color' => ['nullable', 'string', 'max:60'],
+            'buy_now' => ['nullable', 'boolean'],
         ]);
 
         abort_unless($product->status, 404);
         $size = $this->validatedSize($product, $data['size'] ?? null);
+        $color = $this->validatedColor($product, $data['color'] ?? null);
         $qty = (float)($data['quantity'] ?? 1);
         $cart = $this->normalizeCart($request->session()->get('cart', []));
-        $key = $this->cartKey($product->id, $size);
+        $key = $this->cartKey($product->id, $size, $color);
 
         $alreadyInCart = collect($cart)
             ->where('product_id', $product->id)
@@ -61,9 +68,10 @@ class CartController extends Controller
         }
 
         $existing = $cart[$key] ?? [
-            'product_id'=>$product->id,
-            'size'=>$size,
-            'quantity'=>0,
+            'product_id' => $product->id,
+            'size' => $size,
+            'color' => $color,
+            'quantity' => 0,
         ];
         $existing['quantity'] = (float)$existing['quantity'] + $qty;
         $cart[$key] = $existing;
@@ -73,12 +81,20 @@ class CartController extends Controller
             return redirect()->route('checkout');
         }
 
+        $label = $product->name;
+        $variants = [];
+        if ($color) $variants[] = "Color: {$color}";
+        if ($size) $variants[] = "Size: {$size}";
+        if (! empty($variants)) {
+            $label .= ' (' . implode(', ', $variants) . ')';
+        }
+
         if ($request->wantsJson() || $request->ajax()) {
             $data = $this->cartData($request);
             $totalCount = collect($cart)->sum(fn ($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line);
             return response()->json([
                 'success' => true,
-                'message' => $product->name.($size ? " ({$size})" : '').' added to cart.',
+                'message' => $label . ' added to cart.',
                 'cart_count' => $totalCount,
                 'subtotal' => $data['subtotal'],
                 'total' => $data['total'],
@@ -87,27 +103,34 @@ class CartController extends Controller
                     'product_id' => $it['product']->id,
                     'name' => $it['product']->name,
                     'size' => $it['size'],
+                    'color' => $it['color'],
+                    'colorway' => $it['colorway'],
                     'quantity' => $it['quantity'],
-                    'selling_price' => (float)$it['product']->selling_price,
+                    'selling_price' => (float)$it['product']->effective_price,
+                    'original_price' => (float)$it['product']->selling_price,
+                    'has_discount' => $it['product']->has_discount,
+                    'discount_percent' => $it['product']->discount_percent_calculated,
                     'line_total' => $it['line_total'],
-                    'image' => $it['product']->image_url,
+                    'image' => $it['image'],
                 ]),
             ]);
         }
 
-        return back()->with('status', $product->name.($size ? " ({$size})" : '').' added to cart.');
+        return back()->with('status', $label . ' added to cart.');
     }
 
     public function update(Request $request, Product $product)
     {
         $data = $request->validate([
-            'quantity'=>['required','numeric','min:0'],
-            'size'=>['nullable','string','max:30'],
+            'quantity' => ['required', 'numeric', 'min:0'],
+            'size' => ['nullable', 'string', 'max:30'],
+            'color' => ['nullable', 'string', 'max:60'],
         ]);
 
         $size = $this->validatedSize($product, $data['size'] ?? null);
+        $color = $this->validatedColor($product, $data['color'] ?? null);
         $cart = $this->normalizeCart($request->session()->get('cart', []));
-        $key = $this->cartKey($product->id, $size);
+        $key = $this->cartKey($product->id, $size, $color);
         $qty = (float)$data['quantity'];
 
         if ($qty <= 0) {
@@ -119,7 +142,7 @@ class CartController extends Controller
                 ->sum(fn ($line) => (float)$line['quantity']);
 
             if ($otherQty + $qty > $product->available_stock) {
-                $msg = "Only {$product->available_stock} available across all sizes.";
+                $msg = "Only {$product->available_stock} available across all variants.";
                 if ($request->wantsJson() || $request->ajax()) {
                     return response()->json(['success' => false, 'message' => $msg], 422);
                 }
@@ -127,9 +150,10 @@ class CartController extends Controller
             }
 
             $cart[$key] = [
-                'product_id'=>$product->id,
-                'size'=>$size,
-                'quantity'=>$qty,
+                'product_id' => $product->id,
+                'size' => $size,
+                'color' => $color,
+                'quantity' => $qty,
             ];
         }
 
@@ -147,15 +171,19 @@ class CartController extends Controller
             ]);
         }
 
-        return back()->with('status','Cart updated.');
+        return back()->with('status', 'Cart updated.');
     }
 
     public function remove(Request $request, Product $product)
     {
-        $data = $request->validate(['size'=>['nullable','string','max:30']]);
+        $data = $request->validate([
+            'size' => ['nullable', 'string', 'max:30'],
+            'color' => ['nullable', 'string', 'max:60'],
+        ]);
         $size = $this->normalizedSize($data['size'] ?? null);
+        $color = $this->normalizedColor($data['color'] ?? null);
         $cart = $this->normalizeCart($request->session()->get('cart', []));
-        unset($cart[$this->cartKey($product->id, $size)]);
+        unset($cart[$this->cartKey($product->id, $size, $color)]);
         $request->session()->put('cart', $cart);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -170,14 +198,14 @@ class CartController extends Controller
             ]);
         }
 
-        return back()->with('status','Product removed from cart.');
+        return back()->with('status', 'Product removed from cart.');
     }
 
     public function checkout(Request $request)
     {
         $data = $this->cartData($request);
         if ($data['items']->isEmpty()) {
-            return redirect()->route('shop.index')->withErrors(['cart'=>'Your cart is empty.']);
+            return redirect()->route('shop.index')->withErrors(['cart' => 'Your cart is empty.']);
         }
         return view('shop.checkout', $data);
     }
@@ -188,7 +216,7 @@ class CartController extends Controller
         $request->session()->put('cart', $cart);
 
         $productIds = collect($cart)->pluck('product_id')->unique()->values()->all();
-        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        $products = Product::with('category')->whereIn('id', $productIds)->get()->keyBy('id');
 
         $items = collect($cart)->map(function ($line, $key) use ($products) {
             $product = $products->get((int)$line['product_id']);
@@ -201,20 +229,33 @@ class CartController extends Controller
                 return null;
             }
 
+            $color = $line['color'] ?? null;
+            $colorway = $product->findColorway($color);
+            $image = (! empty($colorway['image_url'])) ? $colorway['image_url'] : $product->image_url;
+
             $quantity = (float)$line['quantity'];
+            $effectivePrice = (float)$product->effective_price;
+
             return [
-                'key'=>$key,
-                'product'=>$product,
-                'size'=>$size,
-                'quantity'=>$quantity,
-                'line_total'=>$quantity*(float)$product->selling_price,
+                'key' => $key,
+                'product' => $product,
+                'size' => $size,
+                'color' => $colorway['name'] ?? $color,
+                'colorway' => $colorway,
+                'image' => $image,
+                'quantity' => $quantity,
+                'unit_price' => $effectivePrice,
+                'original_price' => (float)$product->selling_price,
+                'has_discount' => $product->has_discount,
+                'discount_percent' => $product->discount_percent_calculated,
+                'line_total' => $quantity * $effectivePrice,
             ];
         })->filter()->values();
 
         $subtotal = (float)$items->sum('line_total');
         $deliveryFee = $subtotal > 0 ? 80.00 : 0;
 
-        return compact('items','subtotal','deliveryFee') + ['total'=>$subtotal+$deliveryFee];
+        return compact('items', 'subtotal', 'deliveryFee') + ['total' => $subtotal + $deliveryFee];
     }
 
     private function normalizedSize(?string $size): ?string
@@ -232,8 +273,13 @@ class CartController extends Controller
         }
 
         if (! $product->hasSize($size)) {
+            // Default to first size if not provided
+            $availableSizes = $product->normalizedSizes();
+            if (! empty($availableSizes)) {
+                return $availableSizes[0];
+            }
             throw ValidationException::withMessages([
-                'size'=>'Please select a valid size for '.$product->name.'.',
+                'size' => 'Please select a valid size for ' . $product->name . '.',
             ]);
         }
 
@@ -242,9 +288,35 @@ class CartController extends Controller
         );
     }
 
-    private function cartKey(int $productId, ?string $size): string
+    private function normalizedColor(?string $color): ?string
     {
-        return $productId.':'.mb_strtolower($size ?: '_');
+        $color = trim((string)$color);
+        return $color === '' ? null : $color;
+    }
+
+    private function validatedColor(Product $product, ?string $color): ?string
+    {
+        $color = $this->normalizedColor($color);
+        $colorways = $product->available_colorways;
+
+        if (empty($colorways)) {
+            return null;
+        }
+
+        if (! empty($color)) {
+            $match = $product->findColorway($color);
+            if ($match) {
+                return $match['name'];
+            }
+        }
+
+        // Default to first colorway
+        return $colorways[0]['name'] ?? null;
+    }
+
+    private function cartKey(int $productId, ?string $size, ?string $color = null): string
+    {
+        return $productId . ':' . mb_strtolower($size ?: '_') . ':' . mb_strtolower($color ?: '_');
     }
 
     private function normalizeCart(array $cart): array
@@ -256,24 +328,27 @@ class CartController extends Controller
                 $productId = (int)($value['product_id'] ?? 0);
                 $quantity = (float)($value['quantity'] ?? 0);
                 $size = $this->normalizedSize($value['size'] ?? null);
+                $color = $this->normalizedColor($value['color'] ?? null);
             } else {
                 $productId = (int)$key;
                 $quantity = (float)$value;
                 $size = null;
+                $color = null;
             }
 
             if ($productId <= 0 || $quantity <= 0) {
                 continue;
             }
 
-            $lineKey = $this->cartKey($productId, $size);
+            $lineKey = $this->cartKey($productId, $size, $color);
             if (isset($normalized[$lineKey])) {
                 $normalized[$lineKey]['quantity'] += $quantity;
             } else {
                 $normalized[$lineKey] = [
-                    'product_id'=>$productId,
-                    'size'=>$size,
-                    'quantity'=>$quantity,
+                    'product_id' => $productId,
+                    'size' => $size,
+                    'color' => $color,
+                    'quantity' => $quantity,
                 ];
             }
         }

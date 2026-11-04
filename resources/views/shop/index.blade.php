@@ -19,14 +19,42 @@
     @forelse($products as $product)
         <article class="vc-product-card">
             <a class="vc-product-media" href="{{ route('shop.show',$product) }}">
-                @if($product->image_url)<img src="{{ $product->image_url }}" alt="{{ $product->name }}">@else<span class="vc-product-letter">{{ strtoupper(substr($product->name,0,1)) }}</span>@endif
+                @if($product->has_discount)
+                    <span class="vc-discount-tag">-{{ $product->discount_percent_calculated }}%</span>
+                @endif
+                @if($product->image_url)
+                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy" decoding="async">
+                @else
+                    <span class="vc-product-letter">{{ strtoupper(substr($product->name,0,1)) }}</span>
+                @endif
                 <span class="vc-stock-chip">In stock · {{ number_format($product->available_stock,0) }}</span>
             </a>
-            <div class="vc-product-row"><div><a href="{{ route('shop.show',$product) }}">{{ $product->name }}</a><small>{{ $product->category?->name ?? 'Product' }}@if($product->has_sizes) · Sizes {{ implode('/', $product->normalizedSizes()) }}@endif</small></div><strong>{{ $companySettings->currency_symbol }}{{ number_format($product->selling_price,2) }}</strong></div>
-            @if($product->has_sizes)
-                <a class="vc-add-button vc-add-link" href="{{ route('shop.show',$product) }}">Choose size</a>
+            <div class="vc-product-row">
+                <div>
+                    <a href="{{ route('shop.show',$product) }}">{{ $product->name }}</a>
+                    <small>
+                        {{ $product->category?->name ?? 'Product' }}
+                        @if($product->has_sizes) · Sizes {{ implode('/', $product->normalizedSizes()) }}@endif
+                        @if(!empty($product->available_colorways)) · {{ count($product->available_colorways) }} Colors @endif
+                    </small>
+                </div>
+                <div class="vc-product-price-col">
+                    @if($product->has_discount)
+                        <span class="vc-orig-price-tag">{{ $companySettings->currency_symbol }}{{ number_format($product->selling_price,2) }}</span>
+                        <strong class="vc-disc-price-tag">{{ $companySettings->currency_symbol }}{{ number_format($product->effective_price,2) }}</strong>
+                    @else
+                        <strong>{{ $companySettings->currency_symbol }}{{ number_format($product->selling_price,2) }}</strong>
+                    @endif
+                </div>
+            </div>
+            @if($product->has_sizes || !empty($product->available_colorways))
+                <a class="vc-add-button vc-add-link" href="{{ route('shop.show',$product) }}">Choose options</a>
             @else
-                <form method="POST" action="{{ route('cart.add',$product) }}">@csrf<input type="hidden" name="quantity" value="1"><button class="vc-add-button" type="submit">Add to cart</button></form>
+                <form method="POST" action="{{ route('cart.add',$product) }}">
+                    @csrf
+                    <input type="hidden" name="quantity" value="1">
+                    <button class="vc-add-button" type="submit">Add to cart</button>
+                </form>
             @endif
         </article>
     @empty
