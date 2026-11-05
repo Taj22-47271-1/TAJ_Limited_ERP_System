@@ -135,8 +135,30 @@ class Product extends Model
             || str_contains($cat, 'luxury');
     }
 
+    public function isPerfume(): bool
+    {
+        $cat = mb_strtolower($this->category?->name ?? '');
+        $name = mb_strtolower($this->name);
+        return str_contains($cat, 'perfume')
+            || str_contains($cat, 'fragrance')
+            || str_contains($cat, 'scent')
+            || str_contains($name, 'eau de parfum')
+            || str_contains($name, 'perfume')
+            || str_contains($name, 'oud');
+    }
+
     public function getCategoryOptionsAttribute(): array
     {
+        if ($this->isPerfume()) {
+            return [
+                'type' => 'perfume',
+                'label' => 'Size (ml)',
+                'options' => !empty($this->size_options) ? $this->size_options : ['50ml', '100ml'],
+                'colorways' => [],
+                'has_size_guide' => false,
+            ];
+        }
+
         if ($this->isClothing()) {
             return [
                 'type' => 'clothing',

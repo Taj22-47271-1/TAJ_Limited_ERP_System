@@ -23,12 +23,13 @@
 <link rel="stylesheet" href="{{ asset('assets/storefront.css') }}">
 
 <link rel="stylesheet" href="{{ asset('assets/flatlogic-one.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/behance-luxury.css') }}">
 
 @stack('head')
 
 </head>
 
-<body class="customer-body vc-body fl-customer-body">
+<body class="customer-body vc-body fl-customer-body behance-luxury-body">
 
 <div class="taj-announcement-strip">
     <span>✨ FREE DELIVERY ON ORDERS OVER ৳3,000 · USE PROMO CODE <strong>FESTIVE10</strong> FOR 10% OFF</span>
@@ -42,12 +43,8 @@
 
     <div class="vc-header-inner">
 
-        <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="vc-brand" aria-label="TAJ Limited Online Store">
-
-            <span class="vc-brand-mark">T</span>
-
-            <span class="vc-brand-copy"><strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong><small>Online Store</small></span>
-
+        <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="lux-brand" aria-label="taj.">
+            taj<span class="brand-dot">.</span>
         </a>
 
 

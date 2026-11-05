@@ -1,0 +1,1348 @@
+/* ==========================================================================
+   TAJ LUXURY E-COMMERCE DESIGN SYSTEM
+   Inspired by "perf. — Luxury Perfume Store" (Behance Master Artboard Concept)
+   ========================================================================== */
+
+:root {
+  --lux-bg: #ffffff;
+  --lux-surface: #f9f9f9;
+  --lux-surface-hover: #f3f3f3;
+  --lux-border: #eeeeee;
+  --lux-border-dark: #e0e0e0;
+  --lux-text: #0a0a0a;
+  --lux-text-muted: #737373;
+  --lux-text-light: #a3a3a3;
+  --lux-black: #000000;
+  --lux-accent-gold: #c5a880;
+  --lux-accent-amber: #d97706;
+  --lux-danger: #e11d48;
+  --lux-radius-sm: 8px;
+  --lux-radius-md: 14px;
+  --lux-radius-lg: 20px;
+  --lux-radius-full: 9999px;
+  --lux-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --lux-shadow-soft: 0 10px 30px rgba(0,0,0,0.04);
+  --lux-shadow-hover: 0 16px 40px rgba(0,0,0,0.08);
+}
+
+/* --------------------------------------------------------------------------
+   BASE & RESET ENHANCEMENTS
+   -------------------------------------------------------------------------- */
+body.behance-luxury-body {
+  font-family: var(--lux-font-sans);
+  background: var(--lux-bg);
+  color: var(--lux-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* --------------------------------------------------------------------------
+   ANNOUNCEMENT STRIP
+   -------------------------------------------------------------------------- */
+.lux-announcement-strip {
+  background: #0a0a0a;
+  color: #f5f5f5;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 16px;
+  text-align: center;
+}
+.lux-announcement-strip a {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   MINIMALIST HEADER
+   -------------------------------------------------------------------------- */
+.lux-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--lux-border);
+  transition: all 0.25s ease;
+}
+.lux-header-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+/* Logo "taj." matching "perf." in Behance mockup */
+.lux-brand {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: var(--lux-black);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+}
+.lux-brand .brand-dot {
+  color: var(--lux-accent-gold);
+  font-size: 30px;
+  line-height: 0;
+  margin-left: 1px;
+}
+
+/* Center Nav */
+.lux-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.lux-nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--lux-text);
+  text-decoration: none;
+  position: relative;
+  padding: 6px 0;
+  transition: color 0.2s ease;
+}
+.lux-nav-link:hover,
+.lux-nav-link.active {
+  color: var(--lux-black);
+  font-weight: 600;
+}
+.lux-nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--lux-black);
+  border-radius: 2px;
+}
+
+/* Actions Right */
+.lux-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.lux-action-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lux-text);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--lux-radius-full);
+  transition: background 0.2s ease;
+}
+.lux-action-btn:hover {
+  background: var(--lux-surface);
+}
+.lux-action-btn .badge-bracket {
+  font-weight: 700;
+  color: var(--lux-text-muted);
+}
+.lux-btn-black {
+  background: var(--lux-black);
+  color: #ffffff !important;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: var(--lux-radius-full);
+  text-decoration: none;
+  border: 1px solid var(--lux-black);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.lux-btn-black:hover {
+  background: #262626;
+  border-color: #262626;
+  transform: translateY(-1px);
+}
+
+/* --------------------------------------------------------------------------
+   HOMEPAGE: NEW ARRIVALS FLOATING SHELF
+   -------------------------------------------------------------------------- */
+.lux-shelf-section {
+  max-width: 1360px;
+  margin: 28px auto 48px;
+  padding: 0 32px;
+}
+.lux-shelf-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.lux-shelf-title {
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--lux-text-muted);
+}
+.lux-shelf-scroll {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #e5e5e5 transparent;
+}
+.lux-shelf-item {
+  flex: 0 0 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease;
+}
+.lux-shelf-item:hover {
+  transform: translateY(-4px);
+}
+.lux-shelf-stage {
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle at center, #ffffff 40%, #f7f7f7 100%);
+  border: 1px solid var(--lux-border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  padding: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.03);
+}
+.lux-shelf-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.08));
+}
+.lux-shelf-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lux-text);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.lux-shelf-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--lux-text);
+}
+
+/* --------------------------------------------------------------------------
+   HOMEPAGE: SPECIAL OFFER SPLIT HERO BANNER (img_35)
+   -------------------------------------------------------------------------- */
+.lux-split-hero {
+  max-width: 1360px;
+  margin: 0 auto 64px;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.lux-hero-card {
+  position: relative;
+  border-radius: var(--lux-radius-lg);
+  overflow: hidden;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 44px;
+  text-decoration: none;
+  color: inherit;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--lux-border);
+  box-shadow: var(--lux-shadow-soft);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.lux-hero-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--lux-shadow-hover);
+}
+.lux-hero-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 20%, rgba(0,0,0,0.75) 100%);
+  z-index: 1;
+}
+.lux-hero-card-content {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+}
+.lux-hero-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 5px 12px;
+  border-radius: var(--lux-radius-full);
+  margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+.lux-hero-headline {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+.lux-hero-subtext {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.88);
+  margin: 0 0 20px;
+  max-width: 420px;
+}
+.lux-hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: var(--lux-radius-full);
+  transition: all 0.2s ease;
+}
+.lux-hero-cta:hover {
+  background: #f0f0f0;
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   HOMEPAGE: BESTSELLERS SECTION (img_42)
+   -------------------------------------------------------------------------- */
+.lux-bestsellers-section {
+  max-width: 1360px;
+  margin: 0 auto 72px;
+  padding: 0 32px;
+}
+.lux-section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--lux-border);
+  padding-bottom: 16px;
+}
+.lux-section-header h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: var(--lux-black);
+}
+.lux-section-header p {
+  color: var(--lux-text-muted);
+  font-size: 14px;
+  margin: 6px 0 0;
+}
+.lux-section-header a {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lux-black);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Bestseller Split Stage: Hero spotlight on left, carousel on right */
+.lux-bestseller-stage-wrap {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  gap: 32px;
+}
+.lux-spotlight-card {
+  background: var(--lux-surface);
+  border-radius: var(--lux-radius-lg);
+  border: 1px solid var(--lux-border);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.lux-spotlight-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.lux-spotlight-img-wrap img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+  filter: drop-shadow(0 14px 24px rgba(0,0,0,0.1));
+}
+.lux-spotlight-card:hover .lux-spotlight-img-wrap img {
+  transform: scale(1.05);
+}
+.lux-spotlight-info h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+.lux-spotlight-info p {
+  font-size: 13px;
+  color: var(--lux-text-muted);
+  line-height: 1.5;
+  margin: 0 0 18px;
+}
+.lux-spotlight-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lux-spotlight-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--lux-black);
+}
+
+/* Carousel on the right */
+.lux-carousel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* --------------------------------------------------------------------------
+   LUXURY PRODUCT CARD (img_42 & img_46)
+   Clean 4-column minimal card with Wishlist Heart, uncropped image, price
+   -------------------------------------------------------------------------- */
+.lux-card {
+  background: var(--lux-bg);
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  color: inherit;
+}
+.lux-card:hover {
+  border-color: var(--lux-border-dark);
+  box-shadow: var(--lux-shadow-hover);
+  transform: translateY(-3px);
+}
+.lux-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+  background: #fafafa;
+  border-radius: var(--lux-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.lux-card-media img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.06));
+}
+.lux-card:hover .lux-card-media img {
+  transform: scale(1.06);
+}
+.lux-badge-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--lux-black);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--lux-radius-full);
+  letter-spacing: 0.04em;
+  z-index: 2;
+}
+.lux-wishlist-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #737373;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 3;
+}
+.lux-wishlist-toggle:hover,
+.lux-wishlist-toggle.active {
+  background: #ffffff;
+  color: var(--lux-danger);
+  transform: scale(1.1);
+}
+.lux-card-category {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lux-text-light);
+  margin-bottom: 4px;
+}
+.lux-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--lux-text);
+  line-height: 1.35;
+  margin: 0 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lux-card-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: auto;
+}
+.lux-card-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--lux-black);
+}
+.lux-card-original-price {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--lux-text-light);
+  text-decoration: line-through;
+}
+
+/* --------------------------------------------------------------------------
+   ABOUT US SECTION (img_35)
+   -------------------------------------------------------------------------- */
+.lux-about-section {
+  max-width: 1360px;
+  margin: 0 auto 80px;
+  padding: 0 32px;
+}
+.lux-about-grid {
+  background: var(--lux-surface);
+  border-radius: var(--lux-radius-lg);
+  border: 1px solid var(--lux-border);
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  overflow: hidden;
+}
+.lux-about-content {
+  padding: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.lux-about-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lux-accent-gold);
+  margin-bottom: 12px;
+}
+.lux-about-content h2 {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin: 0 0 18px;
+}
+.lux-about-content p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--lux-text-muted);
+  margin: 0 0 28px;
+  max-width: 580px;
+}
+.lux-about-portrait {
+  background-size: cover;
+  background-position: center;
+  min-height: 380px;
+}
+
+/* --------------------------------------------------------------------------
+   PRODUCT DETAILS PAGE (img_46 COSMIC INTENSE CONCEPT)
+   -------------------------------------------------------------------------- */
+.lux-details-layout {
+  max-width: 1360px;
+  margin: 20px auto 80px;
+  padding: 0 32px;
+}
+.lux-breadcrumbs {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--lux-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.lux-breadcrumbs a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.lux-breadcrumbs a:hover {
+  color: var(--lux-black);
+}
+.lux-breadcrumbs span.sep {
+  color: var(--lux-text-light);
+}
+
+.lux-product-hero-stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+  margin-bottom: 72px;
+}
+
+/* Left Info Column */
+.lux-product-info {
+  display: flex;
+  flex-direction: column;
+}
+.lux-product-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lux-text-muted);
+  margin-bottom: 8px;
+}
+.lux-product-title {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--lux-black);
+  margin: 0 0 12px;
+}
+.lux-product-tagline {
+  font-size: 14px;
+  color: var(--lux-text-muted);
+  line-height: 1.5;
+  margin: 0 0 24px;
+}
+
+/* Fragrance / Scent Notes Visual Row */
+.lux-scent-notes-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--lux-surface);
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-md);
+  margin-bottom: 24px;
+}
+.lux-scent-note-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lux-text);
+}
+.lux-scent-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* Bullet Points */
+.lux-bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lux-bullet-list li {
+  font-size: 13px;
+  color: var(--lux-text-muted);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  line-height: 1.4;
+}
+.lux-bullet-list li strong {
+  color: var(--lux-text);
+  font-weight: 700;
+}
+.lux-bullet-list li::before {
+  content: '—';
+  color: var(--lux-accent-gold);
+  font-weight: 800;
+}
+
+/* Description Accordion */
+.lux-accordion {
+  border-top: 1px solid var(--lux-border);
+  border-bottom: 1px solid var(--lux-border);
+  margin-bottom: 28px;
+}
+.lux-accordion details summary {
+  padding: 16px 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lux-black);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+}
+.lux-accordion details summary::-webkit-details-marker {
+  display: none;
+}
+.lux-accordion details[open] summary {
+  color: var(--lux-black);
+}
+.lux-accordion-content {
+  padding: 0 0 16px;
+  font-size: 13px;
+  color: var(--lux-text-muted);
+  line-height: 1.6;
+}
+
+/* Size / Option Selectors */
+.lux-options-block {
+  margin-bottom: 28px;
+}
+.lux-options-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--lux-text);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lux-size-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.lux-size-pill {
+  min-width: 68px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: var(--lux-radius-sm);
+  border: 1px solid var(--lux-border-dark);
+  background: #ffffff;
+  color: var(--lux-text);
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.lux-size-pill:hover {
+  border-color: var(--lux-black);
+}
+.lux-size-pill.active {
+  background: var(--lux-black);
+  color: #ffffff;
+  border-color: var(--lux-black);
+}
+
+/* Colorway swatches */
+.lux-colorways-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.lux-colorway-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.lux-colorway-thumb.active {
+  border-color: var(--lux-black);
+  transform: scale(1.08);
+}
+.lux-colorway-thumb img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Actions Row: Wishlist + Add to Cart */
+.lux-actions-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.lux-wishlist-big-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--lux-radius-sm);
+  border: 1px solid var(--lux-border-dark);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--lux-text-muted);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.lux-wishlist-big-btn:hover,
+.lux-wishlist-big-btn.active {
+  border-color: var(--lux-danger);
+  color: var(--lux-danger);
+}
+.lux-add-to-cart-btn {
+  flex: 1;
+  height: 54px;
+  background: var(--lux-black);
+  color: #ffffff;
+  border: 0;
+  border-radius: var(--lux-radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+.lux-add-to-cart-btn:hover {
+  background: #262626;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Right Media Stage */
+.lux-stage-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.lux-stage-main {
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  background: radial-gradient(circle at center, #ffffff 30%, #f6f6f6 100%);
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  box-shadow: var(--lux-shadow-soft);
+}
+.lux-stage-main img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 32px rgba(0,0,0,0.12));
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lux-stage-angles {
+  display: flex;
+  gap: 14px;
+  margin-top: 18px;
+}
+.lux-angle-thumb {
+  width: 72px;
+  height: 72px;
+  background: #ffffff;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-sm);
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.lux-angle-thumb:hover,
+.lux-angle-thumb.active {
+  border-color: var(--lux-black);
+  transform: translateY(-2px);
+}
+.lux-angle-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* --------------------------------------------------------------------------
+   [CUSTOMERS SAY] REVIEWS & RATING BLOCK (img_46)
+   -------------------------------------------------------------------------- */
+.lux-reviews-section {
+  border-top: 1px solid var(--lux-border);
+  padding-top: 56px;
+  margin-bottom: 72px;
+}
+.lux-reviews-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lux-text-muted);
+  margin-bottom: 24px;
+}
+.lux-reviews-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 48px;
+}
+.lux-score-box {
+  display: flex;
+  flex-direction: column;
+}
+.lux-big-rating {
+  font-size: 64px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  color: var(--lux-black);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.lux-stars {
+  color: #f59e0b;
+  font-size: 18px;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+.lux-rating-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.lux-rating-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lux-text-muted);
+}
+.lux-bar-track {
+  flex: 1;
+  height: 5px;
+  background: #f0f0f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lux-bar-fill {
+  height: 100%;
+  background: var(--lux-black);
+  border-radius: 999px;
+}
+
+/* Customer cards on right */
+.lux-customer-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.lux-review-card {
+  background: var(--lux-surface);
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-md);
+  padding: 24px;
+}
+.lux-review-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.lux-review-author {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--lux-text);
+}
+.lux-review-stars {
+  color: #f59e0b;
+  font-size: 12px;
+}
+.lux-review-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--lux-text-muted);
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   SIMILAR PRODUCTS SECTION (img_46)
+   -------------------------------------------------------------------------- */
+.lux-similar-section {
+  margin-bottom: 80px;
+}
+.lux-similar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+/* --------------------------------------------------------------------------
+   CART & CHECKOUT (img_56)
+   -------------------------------------------------------------------------- */
+.lux-cart-page {
+  max-width: 1040px;
+  margin: 32px auto 80px;
+  padding: 0 24px;
+}
+.lux-cart-item-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto auto;
+  gap: 24px;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--lux-border);
+}
+.lux-cart-thumb {
+  width: 90px;
+  height: 90px;
+  background: #fafafa;
+  border-radius: var(--lux-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+.lux-cart-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.lux-cart-article {
+  font-size: 11px;
+  color: var(--lux-text-light);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+.lux-cart-qty-ctrl {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--lux-border-dark);
+  border-radius: var(--lux-radius-sm);
+  overflow: hidden;
+}
+.lux-cart-qty-ctrl button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--lux-text);
+}
+.lux-cart-qty-ctrl span {
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   ANIMATED ORDER TRUCK CONFIRMATION BUTTON (input_file_1.png)
+   -------------------------------------------------------------------------- */
+.lux-order-truck-btn {
+  --btn-bg: #000000;
+  --truck-color: #ffffff;
+  --truck-front: #d4d4d8;
+  --window-color: #60a5fa;
+  --finish-bg: #10b981;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 56px;
+  border: 0;
+  border-radius: 28px;
+  background: var(--btn-bg);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  transition: transform 0.2s ease, background 0.4s ease, box-shadow 0.2s ease;
+  user-select: none;
+  margin-top: 20px;
+}
+.lux-order-truck-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+}
+.lux-order-truck-btn:active {
+  transform: scale(0.96);
+}
+.lux-order-truck-btn span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.lux-order-truck-btn span.default {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lux-order-truck-btn span.success {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.lux-order-truck-btn span.success svg {
+  width: 16px;
+  height: 14px;
+  stroke: #ffffff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+  transition: stroke-dashoffset 0.3s ease 0.15s;
+}
+
+/* Road lines inside button */
+.lux-order-truck-btn .lines {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  margin-top: -1px;
+  background: repeating-linear-gradient(90deg, #ffffff 0, #ffffff 10px, transparent 10px, transparent 20px);
+  opacity: 0;
+  transform: scaleX(0);
+  transition: opacity 0.3s, transform 0.5s;
+}
+
+/* Delivery Truck */
+.lux-order-truck-btn .truck {
+  position: absolute;
+  left: -70px;
+  top: 50%;
+  width: 60px;
+  height: 32px;
+  margin-top: -16px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.lux-order-truck-btn .truck .back {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 36px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--truck-color);
+}
+.lux-order-truck-btn .truck .front {
+  position: absolute;
+  left: 36px;
+  bottom: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px 8px 3px 2px;
+  background: var(--truck-front);
+}
+.lux-order-truck-btn .truck .front .window {
+  position: absolute;
+  left: 3px;
+  top: 2px;
+  width: 10px;
+  height: 7px;
+  border-radius: 1px 4px 1px 1px;
+  background: var(--window-color);
+}
+.lux-order-truck-btn .truck .light {
+  position: absolute;
+  right: -24px;
+  top: 10px;
+  width: 24px;
+  height: 12px;
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.9), transparent);
+  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
+  opacity: 0;
+}
+
+/* Animated State */
+.lux-order-truck-btn.animate {
+  pointer-events: none;
+}
+.lux-order-truck-btn.animate span.default {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+.lux-order-truck-btn.animate .lines {
+  opacity: 0.6;
+  transform: scaleX(1);
+  animation: luxRoadLines 0.6s linear infinite;
+}
+.lux-order-truck-btn.animate .truck {
+  opacity: 1;
+  animation: luxTruckDrive 2.2s cubic-bezier(.4, 0, .2, 1) forwards;
+}
+.lux-order-truck-btn.animate .truck .light {
+  opacity: 1;
+}
+.lux-order-truck-btn.animate.done {
+  background: var(--finish-bg);
+}
+.lux-order-truck-btn.animate.done span.success {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lux-order-truck-btn.animate.done span.success svg {
+  stroke-dashoffset: 0;
+}
+
+@keyframes luxRoadLines {
+  from { background-position: 0 0; }
+  to { background-position: -20px 0; }
+}
+@keyframes luxTruckDrive {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(130px); }
+  65% { transform: translateX(200px); }
+  100% { transform: translateX(360px); }
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE DESIGN (img_56 Mobile View)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .lux-split-hero {
+    grid-template-columns: 1fr;
+  }
+  .lux-bestseller-stage-wrap {
+    grid-template-columns: 1fr;
+  }
+  .lux-product-hero-stage {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .lux-reviews-grid {
+    grid-template-columns: 1fr;
+  }
+  .lux-similar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lux-about-grid {
+    grid-template-columns: 1fr;
+  }
+  .lux-about-portrait {
+    height: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .lux-header-inner {
+    padding: 0 18px;
+    height: 64px;
+  }
+  .lux-nav {
+    display: none;
+  }
+  .lux-shelf-section,
+  .lux-split-hero,
+  .lux-bestsellers-section,
+  .lux-details-layout,
+  .lux-about-section {
+    padding: 0 18px;
+  }
+  .lux-carousel-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .lux-customer-cards {
+    grid-template-columns: 1fr;
+  }
+  .lux-product-title {
+    font-size: 32px;
+  }
+  .lux-hero-headline {
+    font-size: 26px;
+  }
+}

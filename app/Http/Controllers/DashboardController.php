@@ -28,7 +28,19 @@ class DashboardController extends Controller
             $recentOrders = (clone $base)->latest()->limit(6)->get();
 
             $featuredProducts = Cache::remember('storefront_featured_products', 30, function () {
-                return Product::where('status', true)->whereRaw('(stock - reserved_stock) > 0')->latest()->limit(8)->get();
+                return Product::where('status', true)->whereRaw('(stock - reserved_stock) > 0')->with('category')->latest()->limit(24)->get();
+            });
+
+            $perfumeProducts = Cache::remember('storefront_perfume_products', 30, function () {
+                return Product::where('status', true)
+                    ->whereRaw('(stock - reserved_stock) > 0')
+                    ->where(function ($q) {
+                        $q->whereHas('category', fn ($c) => $c->where('name', 'like', '%perfume%')->orWhere('name', 'like', '%fragrance%'))
+                          ->orWhere('sku', 'like', 'PERF-%');
+                    })
+                    ->with('category')
+                    ->latest()
+                    ->get();
             });
 
             $clothingProducts = Cache::remember('storefront_clothing_products', 30, function () {
@@ -43,7 +55,7 @@ class DashboardController extends Controller
                     ->get();
             });
 
-            return view('dashboards.customer', compact('orderCount','pendingCount','processingCount','deliveredCount','recentOrders','featuredProducts','clothingProducts'));
+            return view('dashboards.customer', compact('orderCount','pendingCount','processingCount','deliveredCount','recentOrders','featuredProducts','perfumeProducts','clothingProducts'));
         }
 
         if ($user->role !== 'admin' && $user->role !== 'customer') {
