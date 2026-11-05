@@ -6,7 +6,16 @@
 <div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>SKU</th>@if(auth()->user()->hasPermission('inventory.manage'))<th>Cost</th>@endif<th>Sell</th><th>Available</th><th>Reserved</th><th></th></tr></thead><tbody>
 @forelse($products as $p)<tr>
 <td><div class="product-cell"><span class="product-thumb tiny">@if($p->image_url)<img src="{{ $p->image_url }}" alt="{{ $p->name }}">@else{{ strtoupper(substr($p->name,0,1)) }}@endif</span><div><strong>{{ $p->name }}</strong><small class="block">{{ $p->barcode ?: 'No barcode' }}</small>@if($p->has_sizes)<small class="block product-size-summary">Sizes: {{ implode(' · ', $p->normalizedSizes()) }}</small>@endif</div></div></td>
-<td>{{ $p->category?->name ?? '—' }}</td><td>{{ $p->sku }}</td>@if(auth()->user()->hasPermission('inventory.manage'))<td>{{ $companySettings->currency_symbol }}{{ number_format($p->purchase_price,2) }}</td>@endif<td><strong>{{ $companySettings->currency_symbol }}{{ number_format($p->selling_price,2) }}</strong></td>
+<td>{{ $p->category?->name ?? '—' }}</td><td>{{ $p->sku }}</td>@if(auth()->user()->hasPermission('inventory.manage'))<td>{{ $companySettings->currency_symbol }}{{ number_format($p->purchase_price,2) }}</td>@endif
+<td>
+    @if($p->has_discount)
+        <del style="color: #94a3b8; font-size: 11px; display: block; text-decoration: line-through;">{{ $companySettings->currency_symbol }}{{ number_format($p->selling_price,2) }}</del>
+        <strong style="color: #059669; font-size: 13px; display: inline-block;">{{ $companySettings->currency_symbol }}{{ number_format($p->effective_price,2) }}</strong>
+        <span style="display: inline-block; font-size: 10px; font-weight: 800; background: #fee2e2; color: #dc2626; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">-{{ $p->discount_percent_calculated }}%</span>
+    @else
+        <strong>{{ $companySettings->currency_symbol }}{{ number_format($p->selling_price,2) }}</strong>
+    @endif
+</td>
 <td><span class="stock-pill {{ $p->available_stock <= $p->min_stock ? 'danger' : 'ok' }}">{{ number_format($p->available_stock,2) }} {{ $p->unit }}</span></td><td>{{ number_format($p->reserved_stock,2) }}</td>
 <td class="right actions">@if(auth()->user()->hasPermission('products.manage'))<a href="{{ route('products.edit',$p) }}">Edit</a>@endif @if(auth()->user()->hasPermission('inventory.manage'))<form method="POST" action="{{ route('products.destroy',$p) }}" onsubmit="return confirm('Delete this product?')">@csrf @method('DELETE')<button>Delete</button></form>@endif</td></tr>
 @empty<tr><td colspan="8" class="empty-cell">No products found.</td></tr>@endforelse</tbody></table></div><div class="pagination">{{ $products->links() }}</div></div>

@@ -85,6 +85,126 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function isClothing(): bool
+    {
+        if ($this->has_sizes) {
+            return true;
+        }
+        $cat = mb_strtolower($this->category?->name ?? '');
+        return str_contains($cat, 'cloth')
+            || str_contains($cat, 'saree')
+            || str_contains($cat, 'apparel')
+            || str_contains($cat, 'fashion')
+            || str_contains($cat, 'shirt')
+            || str_contains($cat, 'pant')
+            || str_contains($cat, 'dress');
+    }
+
+    public function isElectronics(): bool
+    {
+        $cat = mb_strtolower($this->category?->name ?? '');
+        return str_contains($cat, 'electronic')
+            || str_contains($cat, 'accessory')
+            || str_contains($cat, 'accessories')
+            || str_contains($cat, 'tech')
+            || str_contains($cat, 'gadget');
+    }
+
+    public function isGrocery(): bool
+    {
+        $cat = mb_strtolower($this->category?->name ?? '');
+        return str_contains($cat, 'grocer')
+            || str_contains($cat, 'beverage')
+            || str_contains($cat, 'food')
+            || str_contains($cat, 'drink');
+    }
+
+    public function isOffice(): bool
+    {
+        $cat = mb_strtolower($this->category?->name ?? '');
+        return str_contains($cat, 'office')
+            || str_contains($cat, 'stationery')
+            || str_contains($cat, 'paper');
+    }
+
+    public function isWatch(): bool
+    {
+        $cat = mb_strtolower($this->category?->name ?? '');
+        return str_contains($cat, 'watch')
+            || str_contains($cat, 'jewelry')
+            || str_contains($cat, 'luxury');
+    }
+
+    public function getCategoryOptionsAttribute(): array
+    {
+        if ($this->isClothing()) {
+            return [
+                'type' => 'clothing',
+                'label' => 'Select Size',
+                'options' => $this->normalizedSizes(),
+                'colorways' => $this->available_colorways,
+                'has_size_guide' => true,
+            ];
+        }
+
+        if ($this->isElectronics()) {
+            $name = mb_strtolower($this->name);
+            if (str_contains($name, 'cable')) {
+                return [
+                    'type' => 'electronics',
+                    'label' => 'Select Cable Length',
+                    'options' => ['1 Meter', '2 Meter', '3 Meter (Extended)'],
+                    'colorways' => [],
+                    'has_size_guide' => false,
+                ];
+            }
+            if (str_contains($name, 'hub') || str_contains($name, 'keyboard') || str_contains($name, 'mouse')) {
+                return [
+                    'type' => 'electronics',
+                    'label' => 'Select Edition & Finish',
+                    'options' => ['Standard Matte', 'Space Gray Edition', 'Pro Performance Edition'],
+                    'colorways' => [],
+                    'has_size_guide' => false,
+                ];
+            }
+            return [
+                'type' => 'electronics',
+                'label' => 'Warranty & Care Option',
+                'options' => ['1-Year Official Warranty', '2-Year TAJ Care+ Extended'],
+                'colorways' => [],
+                'has_size_guide' => false,
+            ];
+        }
+
+        if ($this->isGrocery()) {
+            return [
+                'type' => 'grocery',
+                'label' => 'Select Pack / Weight',
+                'options' => ['Single Pack', 'Trio Pack (Save 10%)', 'Family Carton'],
+                'colorways' => [],
+                'has_size_guide' => false,
+            ];
+        }
+
+        if ($this->isOffice()) {
+            return [
+                'type' => 'office',
+                'label' => 'Select Quantity / Pack',
+                'options' => ['1 Ream (500 Sheets)', '3 Reams Value Pack', 'Box of 5 Reams'],
+                'colorways' => [],
+                'has_size_guide' => false,
+            ];
+        }
+
+        return [
+            'type' => 'standard',
+            'label' => 'Option',
+            'options' => [],
+            'colorways' => [],
+            'has_size_guide' => false,
+        ];
+    }
+
     public function getAvailableStockAttribute(): float
     {
         return max(0, (float) $this->stock - (float) $this->reserved_stock);

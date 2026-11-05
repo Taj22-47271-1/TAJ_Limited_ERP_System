@@ -1471,3 +1471,654 @@
   font-weight: 750;
   color: #e11d48;
 }
+
+
+/* ==========================================================================
+   Reference Video UI/UX Design System: Editorial Luxury E-Commerce
+   ========================================================================== */
+
+/* Top Announcement Ticker Bar */
+.taj-announcement-strip {
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  text-align: center;
+  position: relative;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.taj-announcement-strip a {
+  color: #fbbf24;
+  text-decoration: underline;
+  margin-left: 4px;
+}
+
+/* Category Filter Bar (Reference Video Style) */
+.editorial-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 18px 0 28px;
+}
+.editorial-filter-pill {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #334155;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.editorial-filter-pill:hover,
+.editorial-filter-pill.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+/* Editorial Product Card System (Reference Video Inspiration) */
+.editorial-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+.editorial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+  border-color: #cbd5e1;
+}
+
+/* Media Box with Floating Badges & Quick-Add Size Overlay */
+.editorial-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.15;
+  border-radius: 12px;
+  background: #f8fafc;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editorial-card-media img {
+  max-width: 88%;
+  max-height: 88%;
+  object-fit: contain;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.editorial-card:hover .editorial-card-media img {
+  transform: scale(1.05);
+}
+
+/* Floating Corner Badges */
+.card-badge-left {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  z-index: 5;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.card-badge-left.sale-badge {
+  background: #e11d48;
+  color: #ffffff;
+  border-color: #e11d48;
+}
+
+/* Wishlist Heart Toggle */
+.card-wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+.card-wishlist-btn:hover {
+  background: #ffffff;
+  color: #e11d48;
+  transform: scale(1.1);
+}
+.card-wishlist-btn.active {
+  color: #e11d48;
+  fill: #e11d48;
+}
+
+/* Quick Add Sizes Overlay Bar (Sliding up from image bottom on hover) */
+.card-quick-add-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(8px);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transform: translateY(100%);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+.editorial-card:hover .card-quick-add-bar {
+  transform: translateY(0);
+}
+.quick-add-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-right: 4px;
+}
+.quick-add-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 750;
+  padding: 4px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.quick-add-pill:hover {
+  background: #fbbf24;
+  color: #0f172a;
+  border-color: #fbbf24;
+  transform: scale(1.08);
+}
+
+/* Card Body & Info */
+.editorial-card-body {
+  padding: 12px 4px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.card-star-rating {
+  font-size: 12px;
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.card-review-count {
+  font-size: 11px;
+  color: #64748b;
+}
+.editorial-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  text-decoration: none;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.editorial-card-title:hover {
+  color: #2563eb;
+}
+.editorial-card-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 3px;
+}
+.editorial-orig-price {
+  font-size: 12px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+.editorial-final-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.editorial-final-price.sale-color {
+  color: #e11d48;
+}
+
+/* Color dots preview on card */
+.card-color-dots {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+.card-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: inline-block;
+}
+
+/* Reference Video Floating Toast Notification */
+.reference-video-toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #0f172a;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  z-index: 9999;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+.reference-video-toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+.toast-view-bag {
+  color: #fbbf24;
+  text-decoration: underline;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Product Details Page: Reference Video Layout & Modern Controls
+   ========================================================================== */
+.editorial-product-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 48px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+@media (max-width: 960px) {
+  .editorial-product-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+/* Media View Toggle: [Studio View] [3D / 360 Orbit] */
+.media-mode-toggle {
+  display: inline-flex;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 14px;
+  gap: 4px;
+}
+.media-mode-btn {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.media-mode-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 3D Interactive Turntable Orbit Stage */
+.interactive-orbit-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 520px;
+  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+.interactive-orbit-stage:active {
+  cursor: grabbing;
+}
+.orbit-podium-ring {
+  position: absolute;
+  bottom: 30px;
+  width: 70%;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(251, 191, 36, 0.45);
+  box-shadow: 0 0 30px rgba(251, 191, 36, 0.25);
+  pointer-events: none;
+}
+.orbit-model-wrapper {
+  position: relative;
+  max-width: 85%;
+  max-height: 85%;
+  transition: transform 0.1s ease-out;
+  transform-style: preserve-3d;
+}
+.orbit-model-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.3));
+  pointer-events: none;
+}
+.orbit-hint-pill {
+  position: absolute;
+  bottom: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  letter-spacing: 0.03em;
+}
+
+/* "Find your size" Interactive Modal (Direct Reference Video Match) */
+.size-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.size-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.size-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  padding: 28px;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  transform: translateY(20px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.size-modal-backdrop.open .size-modal-card {
+  transform: translateY(0);
+}
+.size-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.size-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+.size-modal-close {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s;
+}
+.size-modal-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+.size-slider-row {
+  margin-bottom: 20px;
+}
+.size-slider-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 8px;
+}
+.size-slider-header span {
+  font-size: 16px;
+  color: #0f172a;
+}
+.size-range-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  outline: none;
+  -webkit-appearance: none;
+}
+.size-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #0f172a;
+  border: 3px solid #fbbf24;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.size-fit-toggle {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+}
+.fit-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.fit-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.size-result-box {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.size-result-badge {
+  font-size: 28px;
+  font-weight: 900;
+  color: #92400e;
+}
+.size-result-meta {
+  font-size: 12px;
+  color: #78350f;
+  text-align: right;
+}
+.size-modal-action-btn {
+  width: 100%;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 750;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.size-modal-action-btn:hover {
+  background: #1e293b;
+}
+
+/* Accordion Section (Reference Video Details / Specs / Delivery) */
+.editorial-accordion {
+  border-top: 1px solid #e2e8f0;
+  margin-top: 28px;
+}
+.accordion-item {
+  border-bottom: 1px solid #e2e8f0;
+}
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  cursor: pointer;
+  text-align: left;
+}
+.accordion-icon {
+  font-size: 18px;
+  color: #64748b;
+  transition: transform 0.25s ease;
+}
+.accordion-item.open .accordion-icon {
+  transform: rotate(45deg);
+}
+.accordion-content {
+  display: none;
+  padding: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #475569;
+}
+.accordion-item.open .accordion-content {
+  display: block;
+}
+
+/* Verified Customer Reviews Cards (Reference Video Frame 08 & 10) */
+.editorial-reviews-section {
+  max-width: 1280px;
+  margin: 40px auto 0;
+  padding: 0 20px;
+}
+.reviews-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.review-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.review-stars {
+  color: #f59e0b;
+  font-size: 13px;
+}
+.review-headline {
+  font-size: 14px;
+  font-weight: 750;
+  color: #0f172a;
+}
+.review-text {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+}
+.review-author {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.verified-tag {
+  color: #059669;
+  font-weight: 700;
+}

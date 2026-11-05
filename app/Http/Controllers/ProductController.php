@@ -158,6 +158,22 @@ class ProductController extends Controller
         $data['has_sizes'] = $hasSizes;
         $data['size_options'] = $hasSizes ? $sizes->all() : null;
 
+        // Auto-calculate and synchronize discount price & discount percentage
+        $sellingPrice = (float)($data['selling_price'] ?? 0);
+        $discountPrice = isset($data['discount_price']) && $data['discount_price'] !== '' ? (float)$data['discount_price'] : null;
+        $discountPercent = isset($data['discount_percent']) && $data['discount_percent'] !== '' ? (float)$data['discount_percent'] : null;
+
+        if ($discountPrice !== null && $discountPrice > 0 && $discountPrice < $sellingPrice && $sellingPrice > 0) {
+            $data['discount_price'] = round($discountPrice, 2);
+            $data['discount_percent'] = round((($sellingPrice - $discountPrice) / $sellingPrice) * 100, 1);
+        } elseif ($discountPercent !== null && $discountPercent > 0 && $discountPercent < 100 && $sellingPrice > 0) {
+            $data['discount_percent'] = round($discountPercent, 1);
+            $data['discount_price'] = round($sellingPrice * (1 - ($discountPercent / 100)), 2);
+        } else {
+            $data['discount_price'] = null;
+            $data['discount_percent'] = null;
+        }
+
         return $data;
     }
 }
