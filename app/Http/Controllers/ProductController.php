@@ -8,6 +8,7 @@ use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -49,6 +50,8 @@ class ProductController extends Controller
             $data['image_path'] = $imageService->processAndStore($request->file('image'));
         }
 
+        $data['colorways'] = $this->processColorways($request, $imageService, $data['sku'] ?? 'PROD', []);
+
         $product = DB::transaction(function () use ($data, $openingStock, $inventory, $request) {
             $product = Product::create($data);
             if ($openingStock > 0) {
@@ -86,6 +89,8 @@ class ProductController extends Controller
             $data['image_path'] = $imageService->processAndStore($request->file('image'));
         }
 
+        $data['colorways'] = $this->processColorways($request, $imageService, $data['sku'] ?? $product->sku, $product->colorways ?? []);
+
         $product->update($data);
         return redirect()->route('products.index')->with('status','Product updated successfully.');
     }
@@ -95,6 +100,17 @@ class ProductController extends Controller
         abort_unless($request->user()->hasPermission('inventory.manage'), 403);
 
         $productName = $product->name;
+
+        // Clean up any uploaded colorway images from public storage
+        if (! empty($product->colorways) && is_array($product->colorways)) {
+            foreach ($product->colorways as $cw) {
+                $cwImg = $cw['image'] ?? null;
+                if ($cwImg && ! str_starts_with($cwImg, 'assets/') && ! str_starts_with($cwImg, 'http')) {
+                    Storage::disk('public')->delete($cwImg);
+                }
+            }
+        }
+
         // Release unique SKU/barcode so they can be reused if needed
         $product->update([
             'sku' => $product->sku . '-del-' . $product->id,
@@ -124,6 +140,11 @@ class ProductController extends Controller
             'image'=>['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
             'has_sizes'=>['nullable','boolean'],
             'sizes_text'=>['nullable','string','max:300'],
+            'colorways'=>['nullable','array'],
+            'colorways.*.name'=>['nullable','string','max:100'],
+            'colorways.*.color'=>['nullable','string','max:30'],
+            'colorways.*.existing_image'=>['nullable','string','max:500'],
+            'colorways.*.image_file'=>['nullable','file','image','mimes:jpg,jpeg,png,webp','max:4096'],
         ];
 
         if ($request->user()->hasPermission('inventory.manage')) {
@@ -175,5 +196,82 @@ class ProductController extends Controller
         }
 
         return $data;
+    }
+
+    private function processColorways(Request $request, ImageBackgroundService $imageService, string $productSku, ?array $previousColorways = []): ?array
+    {
+        $rawColorways = $request->input('colorways');
+        if (! is_array($rawColorways) || empty($rawColorways)) {
+            // If previous colorways had uploaded files that are now completely removed, clean them up
+            if (! empty($previousColorways) && is_array($previousColorways)) {
+                foreach ($previousColorways as $oldCw) {
+                    $oldImg = $oldCw['image'] ?? null;
+                    if ($oldImg && ! str_starts_with($oldImg, 'assets/') && ! str_starts_with($oldImg, 'http')) {
+                        Storage::disk('public')->delete($oldImg);
+                    }
+                }
+            }
+            return null;
+        }
+
+        $processed = [];
+        $retainedImages = [];
+
+        foreach ($rawColorways as $idx => $cw) {
+            $name = trim($cw['name'] ?? '');
+            if ($name === '') {
+                continue;
+            }
+
+            $color = trim($cw['color'] ?? '#1e293b');
+            $existingImg = trim($cw['existing_image'] ?? '');
+            $imgStored = null;
+
+            // Check if a new image was uploaded for this row
+            $file = null;
+            if ($request->hasFile("colorways.{$idx}.image_file")) {
+                $file = $request->file("colorways.{$idx}.image_file");
+            } elseif ($request->file('colorways') && isset($request->file('colorways')[$idx]['image_file'])) {
+                $file = $request->file('colorways')[$idx]['image_file'];
+            }
+
+            if ($file && $file->isValid()) {
+                $imgStored = $imageService->processAndStore($file, 'public', 'products/colorways');
+                if ($existingImg && ! str_starts_with($existingImg, 'assets/') && ! str_starts_with($existingImg, 'http')) {
+                    Storage::disk('public')->delete($existingImg);
+                }
+            } elseif (! empty($existingImg)) {
+                $imgStored = $existingImg;
+            }
+
+            if ($imgStored) {
+                $retainedImages[] = $imgStored;
+            }
+
+            $slugKey = Str::slug($name, '_') ?: ('color_' . count($processed));
+            $skuSuffix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $name), 0, 4) ?: 'CW' . count($processed));
+
+            $processed[] = [
+                'key' => $slugKey,
+                'name' => $name,
+                'color' => $color,
+                'sku' => $productSku . '-' . $skuSuffix,
+                'image' => $imgStored,
+            ];
+        }
+
+        // Cleanup any old images that were removed in this edit
+        if (! empty($previousColorways) && is_array($previousColorways)) {
+            foreach ($previousColorways as $oldCw) {
+                $oldImg = $oldCw['image'] ?? null;
+                if ($oldImg && ! in_array($oldImg, $retainedImages, true)) {
+                    if (! str_starts_with($oldImg, 'assets/') && ! str_starts_with($oldImg, 'http')) {
+                        Storage::disk('public')->delete($oldImg);
+                    }
+                }
+            }
+        }
+
+        return ! empty($processed) ? $processed : null;
     }
 }

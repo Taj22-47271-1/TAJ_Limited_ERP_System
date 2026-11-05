@@ -221,7 +221,96 @@
 
     </div>
 
+    {{-- Dynamic Product Colorways / Swatches Manager --}}
+    @php
+        $existingColorways = old('colorways', $product->exists ? ($product->colorways ?? []) : []);
+        if (!is_array($existingColorways)) {
+            $existingColorways = [];
+        }
+    @endphp
 
+    <div class="span-2" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 12px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <strong style="font-size: 15px; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                    🎨 Product Colorways / Variant Swatches (Optional)
+                </strong>
+                <p style="margin: 4px 0 0; font-size: 12px; color: #64748b; max-width: 680px;">
+                    Add custom color variants for this product. Upload a photo for each colorway. When customers select a colorway on the storefront, the product image and details switch automatically. 
+                    <strong>If no colorways are added here, the "Select Colorway" section is completely hidden from the customer page.</strong>
+                </p>
+            </div>
+            <button type="button" id="addColorwayBtn" class="btn" style="background: #0f172a; color: #ffffff; font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer;">
+                ➕ Add Colorway
+            </button>
+        </div>
+
+        <div id="colorwaysList" style="display: flex; flex-direction: column; gap: 12px;">
+            @forelse($existingColorways as $idx => $cw)
+                @php
+                    $cwName = $cw['name'] ?? '';
+                    $cwColor = $cw['color'] ?? '#1e293b';
+                    $cwImg = $cw['image'] ?? ($cw['existing_image'] ?? '');
+                    $cwImgUrl = '';
+                    if (!empty($cwImg)) {
+                        $cwImgUrl = (str_starts_with($cwImg, 'http') || str_starts_with($cwImg, 'assets/') || str_starts_with($cwImg, 'storage/')) ? asset($cwImg) : asset('storage/' . $cwImg);
+                    }
+                @endphp
+                <div class="colorway-row" data-index="{{ $idx }}" style="display: grid; grid-template-columns: auto 1fr 120px 1.5fr auto; gap: 12px; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 14px; border-radius: 10px;">
+                    <div class="cw-index-badge" style="font-size: 12px; font-weight: 800; color: #94a3b8; width: 24px; text-align: center;">
+                        #{{ $loop->iteration }}
+                    </div>
+
+                    <div>
+                        <label style="margin: 0; font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Colorway Name *</label>
+                        <input type="text" name="colorways[{{ $idx }}][name]" value="{{ $cwName }}" placeholder="e.g. Royal Blue" required style="width: 100%; padding: 7px 10px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    </div>
+
+                    <div>
+                        <label style="margin: 0; font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Swatch Color</label>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <input type="color" name="colorways[{{ $idx }}][color]" value="{{ $cwColor }}" oninput="this.nextElementSibling.textContent=this.value" style="width: 38px; height: 34px; padding: 2px; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #ffffff;">
+                            <span class="color-hex-label" style="font-size: 11px; font-family: monospace; color: #64748b;">{{ $cwColor }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="margin: 0; font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">
+                            Colorway Image @if($cwImgUrl)<span style="color: #059669; font-weight: normal;">(Uploaded)</span>@endif
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            @if($cwImgUrl)
+                                <div style="width: 38px; height: 38px; border-radius: 8px; border: 1px solid #cbd5e1; overflow: hidden; flex-shrink: 0; background: #ffffff;">
+                                    <img src="{{ $cwImgUrl }}" alt="{{ $cwName }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <input type="hidden" name="colorways[{{ $idx }}][existing_image]" value="{{ $cwImg }}">
+                            @endif
+                            <input type="file" name="colorways[{{ $idx }}][image_file]" accept="image/png,image/jpeg,image/webp" style="font-size: 11px; width: 100%;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="margin: 0; font-size: 11px; visibility: hidden; display: block; margin-bottom: 4px;">Action</label>
+                        <button type="button" class="btn-remove-cw" onclick="removeColorwayRow(this)" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Remove this colorway">
+                            ✕ Delete
+                        </button>
+                    </div>
+                </div>
+            @empty
+                <div id="noColorwaysNotice" style="text-align: center; padding: 24px 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 13px;">
+                    <div style="font-size: 24px; margin-bottom: 4px;">⚪</div>
+                    <strong>No colorway variants added.</strong>
+                    <p style="margin: 4px 0 0; font-size: 12px;">This product will display without color swatches. Click <strong>"➕ Add Colorway"</strong> above to add customized shades with photos.</p>
+                </div>
+            @endforelse
+        </div>
+        
+        <div id="noColorwaysNoticeDynamic" style="display: none; text-align: center; padding: 24px 16px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b; font-size: 13px; margin-top: 12px;">
+            <div style="font-size: 24px; margin-bottom: 4px;">⚪</div>
+            <strong>No colorway variants added.</strong>
+            <p style="margin: 4px 0 0; font-size: 12px;">This product will display without color swatches. Click <strong>"➕ Add Colorway"</strong> above to add customized shades with photos.</p>
+        </div>
+    </div>
 
     <label class="span-2">Description
 
@@ -323,6 +412,83 @@
 
 })();
 
+// Colorways Dynamic Row Manager
+let cwIndexCounter = {{ count($existingColorways) > 0 ? count($existingColorways) + 50 : 0 }};
+
+function addColorwayRow() {
+    const list = document.getElementById('colorwaysList');
+    const notice = document.getElementById('noColorwaysNotice');
+    const dynamicNotice = document.getElementById('noColorwaysNoticeDynamic');
+    if (notice) notice.style.display = 'none';
+    if (dynamicNotice) dynamicNotice.style.display = 'none';
+
+    cwIndexCounter++;
+    const idx = cwIndexCounter;
+    const count = list.querySelectorAll('.colorway-row').length + 1;
+
+    const row = document.createElement('div');
+    row.className = 'colorway-row';
+    row.setAttribute('data-index', idx);
+    row.style.cssText = 'display: grid; grid-template-columns: auto 1fr 120px 1.5fr auto; gap: 12px; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 14px; border-radius: 10px; margin-top: 4px;';
+
+    row.innerHTML = `
+        <div class="cw-index-badge" style="font-size: 12px; font-weight: 800; color: #94a3b8; width: 24px; text-align: center;">
+            #${count}
+        </div>
+        <div>
+            <label style="margin: 0; font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Colorway Name *</label>
+            <input type="text" name="colorways[${idx}][name]" placeholder="e.g. Royal Blue" required style="width: 100%; padding: 7px 10px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+        <div>
+            <label style="margin: 0; font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Swatch Color</label>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <input type="color" name="colorways[${idx}][color]" value="#2563eb" oninput="this.nextElementSibling.textContent=this.value" style="width: 38px; height: 34px; padding: 2px; border: 1px solid #cbd5e1; border-radius: 6px; cursor: pointer; background: #ffffff;">
+                <span class="color-hex-label" style="font-size: 11px; font-family: monospace; color: #64748b;">#2563eb</span>
+            </div>
+        </div>
+        <div>
+            <label style="margin: 0; font-size: 11px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Colorway Image</label>
+            <input type="file" name="colorways[${idx}][image_file]" accept="image/png,image/jpeg,image/webp" style="font-size: 11px; width: 100%;">
+        </div>
+        <div>
+            <label style="margin: 0; font-size: 11px; visibility: hidden; display: block; margin-bottom: 4px;">Action</label>
+            <button type="button" class="btn-remove-cw" onclick="removeColorwayRow(this)" style="background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; padding: 7px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;" title="Remove this colorway">
+                ✕ Delete
+            </button>
+        </div>
+    `;
+
+    list.appendChild(row);
+    const textInput = row.querySelector('input[type="text"]');
+    if (textInput) textInput.focus();
+}
+
+function removeColorwayRow(btn) {
+    const row = btn.closest('.colorway-row');
+    if (!row) return;
+    const list = document.getElementById('colorwaysList');
+    row.remove();
+
+    const rows = list.querySelectorAll('.colorway-row');
+    rows.forEach((r, i) => {
+        const badge = r.querySelector('.cw-index-badge');
+        if (badge) badge.textContent = `#${i + 1}`;
+    });
+
+    if (rows.length === 0) {
+        const notice = document.getElementById('noColorwaysNotice');
+        const dynamicNotice = document.getElementById('noColorwaysNoticeDynamic');
+        if (notice) notice.style.display = 'block';
+        else if (dynamicNotice) dynamicNotice.style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const addBtn = document.getElementById('addColorwayBtn');
+    if (addBtn) {
+        addBtn.addEventListener('click', addColorwayRow);
+    }
+});
 </script>
 
 @endpush

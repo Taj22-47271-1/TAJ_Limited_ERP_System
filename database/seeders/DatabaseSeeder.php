@@ -150,19 +150,7 @@ class DatabaseSeeder extends Seeder
 
             ['Notebook Premium','NOTE-008','100000000008','Office Supplies',70,110,null,null,95,20,'Premium ruled notebook.','assets/images/products/notebook.svg',false,[],null],
 
-            ['Designer Silk Saree','SAREE-009','100000000009','Cloth',2800,4500,3825,15,25,5,'Handcrafted Designer Silk Saree with intricate golden zari border, royal drape silhouette and pure Mulberry silk.','assets/images/products/designer-saree-rose.png',true,['Free Size','S','M','L','XL'],[
-
-                ['key' => 'rose', 'name' => 'Champagne Rose', 'color' => '#e5b2a2', 'sku' => 'SAREE-009-ROS', 'image' => 'assets/images/products/designer-saree-rose.png', 'stock' => 15, 'tag' => 'Rose Gold Weave'],
-
-                ['key' => 'sapphire', 'name' => 'Royal Sapphire', 'color' => '#1e3a8a', 'sku' => 'SAREE-009-SAP', 'image' => 'assets/images/products/designer-saree-sapphire.png', 'stock' => 20, 'tag' => 'Deep Navy Indigo'],
-
-                ['key' => 'noir', 'name' => 'Midnight Noir', 'color' => '#18181b', 'sku' => 'SAREE-009-BLK', 'image' => 'assets/images/products/designer-saree-noir.png', 'stock' => 12, 'tag' => 'Obsidian Black'],
-
-                ['key' => 'emerald', 'name' => 'Imperial Emerald', 'color' => '#065f46', 'sku' => 'SAREE-009-EMR', 'image' => 'assets/images/products/designer-saree-emerald.png', 'stock' => 18, 'tag' => 'Royal Forest'],
-
-                ['key' => 'gold', 'name' => 'Regal Gold', 'color' => '#d97706', 'sku' => 'SAREE-009-GLD', 'image' => 'assets/images/products/designer-saree-gold.png', 'stock' => 10, 'tag' => 'Antique Zari'],
-
-            ]],
+            ['Designer Silk Saree','SAREE-009','100000000009','Cloth',2800,4500,3825,15,25,5,'Handcrafted Designer Silk Saree with intricate golden zari border, royal drape silhouette and pure Mulberry silk.','assets/images/products/designer-saree-rose.png',true,['Free Size','S','M','L','XL'],null],
 
             ['Cosmic Intense Eau de Parfum','PERF-001','100000000010','Perfume',8500,14500,11600,20,30,5,'Cosmic Intense is an opulent oriental fragrance crafted with blood orange, sweet Madagascar vanilla, smokey labdanum, and ambergris.','assets/images/behance/perfume_hero_bottle.png',true,['50ml','100ml'],null],
 

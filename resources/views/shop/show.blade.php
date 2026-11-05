@@ -7,7 +7,7 @@
     $isPerfume = $product->isPerfume();
     $isClothing = $product->isClothing();
     $colorways = $product->available_colorways;
-    $initialImage = $product->image_url;
+    $initialImage = (!empty($colorways) && !empty($colorways[0]['image_url'])) ? $colorways[0]['image_url'] : $product->image_url;
 
     $catOpts = $product->category_options;
     $sizes = $isPerfume ? ($product->size_options ?: ['50ml', '100ml']) : ($product->has_sizes ? $product->normalizedSizes() : []);
@@ -82,7 +82,7 @@
             {{-- Interactive Cart & Options Form --}}
             <form method="POST" action="{{ route('cart.add', $product) }}" id="productPurchaseForm">
                 @csrf
-                <input type="hidden" name="color" id="selectedColorInput" value="">
+                <input type="hidden" name="color" id="selectedColorInput" value="{{ $colorways[0]['name'] ?? '' }}">
                 <input type="hidden" name="size" id="selectedSizeInput" value="{{ $sizes[0] ?? '' }}">
 
                 {{-- Colorway Selector ONLY if product actually has colorways --}}
@@ -100,7 +100,13 @@
                                      data-image="{{ $cw['image_url'] ?? $product->image_url }}"
                                      onclick="selectColorway(this)"
                                      title="{{ $cw['name'] }}">
-                                    <img src="{{ $cw['image_url'] ?? $product->image_url }}" alt="{{ $cw['name'] }}">
+                                    @if(!empty($cw['image']))
+                                        <img src="{{ $cw['image_url'] ?? $product->image_url }}" alt="{{ $cw['name'] }}">
+                                    @elseif(!empty($cw['color']))
+                                        <span style="display: block; width: 100%; height: 100%; border-radius: 50%; background-color: {{ $cw['color'] }};"></span>
+                                    @else
+                                        <img src="{{ $product->image_url }}" alt="{{ $cw['name'] }}">
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

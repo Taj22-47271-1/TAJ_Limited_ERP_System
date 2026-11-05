@@ -241,22 +241,26 @@
                 <div class="atelier-morph-copy">
                     <span class="atelier-kicker">DYNAMIC COLORWAYS</span>
                     <h3>Silk Flow & Variant Morph</h3>
-                    <p>Select any signature shade below. The garment and background lighting adapt dynamically in real-time.</p>
-                    
-                    <div class="atelier-swatches">
-                        @foreach($swatches as $swIdx => $sw)
-                            <button type="button" 
-                                    class="swatch-btn {{ $swIdx === 0 ? 'active' : '' }}" 
-                                    data-color="{{ $sw['key'] ?? 'color_'.$swIdx }}" 
-                                    data-title="{{ $sw['name'] }}" 
-                                    data-image="{{ $sw['image_url'] ?? asset($sw['image'] ?? '') }}" 
-                                    data-sku="{{ $sw['sku'] ?? $cProduct->sku }}"
-                                    data-target-product="{{ $cProduct->id }}" 
-                                    style="--swatch-color: {{ $sw['color'] }}; background-color: {{ $sw['color'] }};" 
-                                    title="{{ $sw['name'] }}"></button>
-                        @endforeach
-                    </div>
-                    <strong class="selected-swatch-name" id="morphLabel-{{ $cProduct->id }}">{{ $swatches[0]['name'] ?? 'Champagne Rose' }} (Selected)</strong>
+                    @if(!empty($swatches))
+                        <p>Select any signature shade below. The garment and background lighting adapt dynamically in real-time.</p>
+                        
+                        <div class="atelier-swatches">
+                            @foreach($swatches as $swIdx => $sw)
+                                <button type="button" 
+                                        class="swatch-btn {{ $swIdx === 0 ? 'active' : '' }}" 
+                                        data-color="{{ $sw['key'] ?? 'color_'.$swIdx }}" 
+                                        data-title="{{ $sw['name'] }}" 
+                                        data-image="{{ $sw['image_url'] ?? asset($sw['image'] ?? '') }}" 
+                                        data-sku="{{ $sw['sku'] ?? $cProduct->sku }}"
+                                        data-target-product="{{ $cProduct->id }}" 
+                                        style="--swatch-color: {{ $sw['color'] }}; background-color: {{ $sw['color'] }};" 
+                                        title="{{ $sw['name'] }}"></button>
+                            @endforeach
+                        </div>
+                        <strong class="selected-swatch-name" id="morphLabel-{{ $cProduct->id }}">{{ $swatches[0]['name'] }} (Selected)</strong>
+                    @else
+                        <p style="color: #94a3b8; font-style: italic; margin-top: 14px;">No custom colorways added for this product. You can add colorways anytime from Product Management.</p>
+                    @endif
                 </div>
 
                 <div class="atelier-morph-stage">

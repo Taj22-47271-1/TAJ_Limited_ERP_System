@@ -191,13 +191,7 @@ class Setting extends Model
                     'desc' => 'Colorfast natural dyes · Pre-shrunk weave · Designed to last across generations.',
                 ],
             ],
-            'swatches' => [
-                ['key' => 'rose', 'name' => 'Champagne Rose', 'color' => '#e5b2a2', 'image' => 'assets/images/products/designer-saree-rose.png', 'tag' => 'Rose Gold Weave'],
-                ['key' => 'sapphire', 'name' => 'Royal Sapphire', 'color' => '#1e3a8a', 'image' => 'assets/images/products/designer-saree-sapphire.png', 'tag' => 'Deep Navy Indigo'],
-                ['key' => 'noir', 'name' => 'Midnight Noir', 'color' => '#18181b', 'image' => 'assets/images/products/designer-saree-noir.png', 'tag' => 'Obsidian Black'],
-                ['key' => 'emerald', 'name' => 'Imperial Emerald', 'color' => '#065f46', 'image' => 'assets/images/products/designer-saree-emerald.png', 'tag' => 'Royal Forest'],
-                ['key' => 'gold', 'name' => 'Regal Gold', 'color' => '#d97706', 'image' => 'assets/images/products/designer-saree-gold.png', 'tag' => 'Antique Zari'],
-            ],
+            'swatches' => [],
             'gallery' => [],
         ];
     }
