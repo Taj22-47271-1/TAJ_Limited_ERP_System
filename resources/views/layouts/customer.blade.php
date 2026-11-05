@@ -167,44 +167,6 @@
 
 
 
-<div class="vc-drawer-backdrop" id="cartDrawerBackdrop"></div>
-
-<aside class="vc-drawer" id="cartDrawer" aria-hidden="true">
-
-    <div class="vc-drawer-head">
-
-        <div><span class="vc-kicker">SHOPPING CART</span><h3>Your bag</h3></div>
-
-        <button type="button" class="vc-drawer-close" id="closeCartDrawer" aria-label="Close cart drawer">✕</button>
-
-    </div>
-
-    <div class="vc-drawer-body" id="cartDrawerBody">
-
-        <div class="vc-drawer-empty">Your cart is empty.</div>
-
-    </div>
-
-    <div class="vc-drawer-foot" id="cartDrawerFoot">
-
-        <div class="vc-drawer-subtotal"><span>Subtotal</span><strong id="drawerSubtotal">{{ $companySettings->currency_symbol }}0.00</strong></div>
-
-        <p class="vc-drawer-note">Taxes & delivery calculated at checkout.</p>
-
-        <div class="vc-drawer-actions">
-
-            <a class="vc-drawer-link" href="{{ route('cart.index') }}">View cart</a>
-
-            <a class="vc-drawer-checkout" href="{{ route('checkout') }}">Checkout</a>
-
-        </div>
-
-    </div>
-
-</aside>
-
-
-
 <footer class="vc-footer">
 
     <div class="vc-footer-inner">

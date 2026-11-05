@@ -1,167 +1,80 @@
 @extends('layouts.customer')
-@section('title', 'taj. — Luxury Store')
+@section('title', 'taj. — Online Store')
 @section('content')
 
 @php
     $currency = $companySettings->currency_symbol ?? '৳';
-    $shelfItems = $perfumeProducts->isNotEmpty() ? $perfumeProducts : $featuredProducts->take(6);
-    $bestsellerHero = $perfumeProducts->firstWhere('sku', 'PERF-006') ?? $perfumeProducts->first() ?? $featuredProducts->first();
-    $carouselItems = $perfumeProducts->where('id', '!=', $bestsellerHero?->id)->take(3);
-    if ($carouselItems->isEmpty()) {
-        $carouselItems = $featuredProducts->where('id', '!=', $bestsellerHero?->id)->take(3);
-    }
 @endphp
 
 {{-- =========================================================================
-     1. NEW ARRIVALS FLOATING BOTTLE SHELF (img_35)
+     1. CLEAN BRANDED HERO SECTION (Replacing unwanted stock photo banners)
      ========================================================================= --}}
-<section class="lux-shelf-section">
-    <div class="lux-shelf-header">
-        <span class="lux-shelf-title">NEW ARRIVALS</span>
-        <a href="{{ route('shop.index') }}" style="font-size: 12px; font-weight: 700; color: var(--lux-black); text-decoration: none;">View catalog →</a>
-    </div>
-    <div class="lux-shelf-scroll">
-        @foreach($shelfItems as $item)
-            <a href="{{ route('shop.show', $item) }}" class="lux-shelf-item">
-                <div class="lux-shelf-stage">
-                    <img src="{{ $item->image_url }}" alt="{{ $item->name }}" loading="lazy">
-                </div>
-                <div class="lux-shelf-name">{{ Str::limit($item->name, 22) }}</div>
-                <div class="lux-shelf-price">
-                    @if($item->has_discount)
-                        {{ $currency }}{{ number_format($item->effective_price, 2) }}
-                    @else
-                        {{ $currency }}{{ number_format($item->selling_price, 2) }}
-                    @endif
-                </div>
-            </a>
-        @endforeach
-    </div>
-</section>
-
-{{-- =========================================================================
-     2. SPECIAL OFFER SPLIT HERO BANNER (img_35)
-     ========================================================================= --}}
-<section class="lux-split-hero">
-    {{-- Left Card: Lifestyle / Model --}}
-    <div class="lux-hero-card" style="background-image: url('{{ asset('assets/images/behance/hero_split_left.jpg') }}');">
-        <div class="lux-hero-card-content">
-            <span class="lux-hero-tag">SPECIAL OFFER</span>
-            <h2 class="lux-hero-headline">Up to 40% off — discover this season's finest fragrances</h2>
-            <p class="lux-hero-subtext">Handcrafted essences, rare oriental woods, and timeless luxury editions with complimentary delivery on eligible orders.</p>
-            <a href="{{ route('shop.index', ['filter' => 'sale']) }}" class="lux-hero-cta">Shop Special Offers <span>→</span></a>
-        </div>
-    </div>
-
-    {{-- Right Card: Pedestal Bottle / Timeless Hits --}}
-    <div class="lux-hero-card" style="background-image: url('{{ asset('assets/images/behance/hero_split_right.jpg') }}');">
-        <div class="lux-hero-card-content">
-            <span class="lux-hero-tag">TIMELESS HITS</span>
-            <h2 class="lux-hero-headline">Iconic Signatures & Rare Blends</h2>
-            <p class="lux-hero-subtext">Explore our most celebrated luxury masterpieces crafted for the discerning connoisseur with pure botanical extracts.</p>
-            <a href="{{ route('shop.index') }}" class="lux-hero-cta">Explore Collection <span>→</span></a>
-        </div>
-    </div>
-</section>
-
-{{-- =========================================================================
-     3. BESTSELLERS SHOWCASE & CAROUSEL (img_42)
-     ========================================================================= --}}
-<section class="lux-bestsellers-section" id="bestsellers">
-    <div class="lux-section-header">
-        <div>
-            <h2>BESTSELLERS</h2>
-            <p>The most coveted luxury perfumes and boutique creations chosen by our clients worldwide.</p>
-        </div>
-        <a href="{{ route('shop.index') }}">All products <span>→</span></a>
-    </div>
-
-    <div class="lux-bestseller-stage-wrap">
-        {{-- Spotlight Hero Stage on Left --}}
-        @if($bestsellerHero)
-            <div class="lux-spotlight-card">
-                <div>
-                    <span class="lux-hero-tag" style="background: rgba(0,0,0,0.06); color: #000; border-color: rgba(0,0,0,0.1); margin-bottom: 16px;">FEATURED MASTERPIECE</span>
-                    <div class="lux-spotlight-img-wrap">
-                        <img src="{{ $bestsellerHero->image_url }}" alt="{{ $bestsellerHero->name }}">
-                    </div>
-                </div>
-                <div class="lux-spotlight-info">
-                    <h3>{{ $bestsellerHero->name }}</h3>
-                    <p>{{ Str::limit($bestsellerHero->description, 100) }}</p>
-                    <div class="lux-spotlight-action">
-                        <div class="lux-spotlight-price">
-                            @if($bestsellerHero->has_discount)
-                                {{ $currency }}{{ number_format($bestsellerHero->effective_price, 2) }}
-                                <del style="font-size: 13px; color: var(--lux-text-light); font-weight: 500; margin-left: 6px;">{{ $currency }}{{ number_format($bestsellerHero->selling_price, 2) }}</del>
-                            @else
-                                {{ $currency }}{{ number_format($bestsellerHero->selling_price, 2) }}
-                            @endif
-                        </div>
-                        <a href="{{ route('shop.show', $bestsellerHero) }}" class="lux-btn-black">
-                            Go to product ↗
-                        </a>
-                    </div>
-                </div>
+<section style="max-width: 1360px; margin: 32px auto 44px; padding: 0 32px;">
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: clamp(36px, 5vw, 56px); color: #ffffff; position: relative; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.08);">
+        <div style="position: relative; z-index: 2; max-width: 640px;">
+            <span style="display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; background: rgba(255,255,255,0.15); padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.2);">
+                TAJ LIMITED ONLINE STORE
+            </span>
+            <h1 style="font-size: clamp(32px, 5vw, 48px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 14px; color: #ffffff;">
+                Simple shopping.<br><span style="color: #c5a880;">Live ERP inventory.</span>
+            </h1>
+            <p style="font-size: 15px; line-height: 1.6; color: #cbd5e1; margin: 0 0 28px;">
+                Browse available products, pay online or choose cash on delivery nationwide. Every product is synchronized live with TAJ Limited ERP stock.
+            </p>
+            <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                <a href="{{ route('shop.index') }}" class="lux-btn-black" style="background: #ffffff; color: #0a0a0a !important; border-color: #ffffff; padding: 12px 26px; font-size: 14px;">
+                    Explore Catalog <span>→</span>
+                </a>
+                <a href="{{ route('shop.index', ['filter' => 'sale']) }}" class="lux-btn-black" style="background: transparent; color: #ffffff !important; border-color: rgba(255,255,255,0.4); padding: 12px 24px; font-size: 14px;">
+                    🔥 Special Offers
+                </a>
             </div>
-        @endif
+        </div>
+        <div style="position: absolute; right: -60px; bottom: -60px; width: 340px; height: 340px; background: radial-gradient(circle, rgba(197, 168, 128, 0.18) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+    </div>
+</section>
 
-        {{-- Bestsellers Carousel Grid on Right --}}
-        <div class="lux-carousel-grid">
-            @foreach($carouselItems as $item)
-                <div class="lux-card">
-                    @if($item->has_discount)
-                        <span class="lux-badge-discount">-{{ $item->discount_percent_calculated }}%</span>
-                    @endif
-                    <button type="button" class="lux-wishlist-toggle" onclick="toggleWishlist({{ $item->id }}, this)" aria-label="Wishlist">
-                        ♡
-                    </button>
-                    <a href="{{ route('shop.show', $item) }}" class="lux-card-media">
-                        <img src="{{ $item->image_url }}" alt="{{ $item->name }}" loading="lazy">
-                    </a>
-                    <span class="lux-card-category">{{ $item->category?->name ?? 'Perfume' }}</span>
-                    <a href="{{ route('shop.show', $item) }}" class="lux-card-title" title="{{ $item->name }}">{{ $item->name }}</a>
-                    <div class="lux-card-price-row">
-                        <span class="lux-card-price">
-                            @if($item->has_discount)
-                                {{ $currency }}{{ number_format($item->effective_price, 2) }}
-                                <span class="lux-card-original-price">{{ $currency }}{{ number_format($item->selling_price, 2) }}</span>
-                            @else
-                                {{ $currency }}{{ number_format($item->selling_price, 2) }}
-                            @endif
-                        </span>
-                    </div>
-                    <div style="margin-top: 14px;">
-                        @if($item->has_sizes || !empty($item->available_colorways))
-                            <a href="{{ route('shop.show', $item) }}" class="lux-btn-black" style="width: 100%; font-size: 12px; padding: 8px 12px;">Choose options</a>
-                        @else
-                            <form method="POST" action="{{ route('cart.add', $item) }}">
-                                @csrf
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="lux-btn-black" style="width: 100%; font-size: 12px; padding: 8px 12px;">Add to cart</button>
-                            </form>
-                        @endif
-                    </div>
-                </div>
-            @endforeach
+{{-- =========================================================================
+     2. ORDER TRACKING SUMMARY STRIP
+     ========================================================================= --}}
+<section style="max-width: 1360px; margin: 0 auto 52px; padding: 0 32px;">
+    <div style="background: #ffffff; border: 1px solid var(--lux-border); border-radius: var(--lux-radius-md); padding: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; box-shadow: var(--lux-shadow-soft);">
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Total Orders</div>
+            <div style="font-size: 26px; font-weight: 900; color: var(--lux-black);">{{ $orderCount }}</div>
+        </div>
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Pending Approval</div>
+            <div style="font-size: 26px; font-weight: 900; color: #d97706;">{{ $pendingCount }}</div>
+        </div>
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">In Processing</div>
+            <div style="font-size: 26px; font-weight: 900; color: #2563eb;">{{ $processingCount }}</div>
+        </div>
+        <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Delivered</div>
+            <div style="font-size: 26px; font-weight: 900; color: #10b981;">{{ $deliveredCount }}</div>
         </div>
     </div>
 </section>
 
 {{-- =========================================================================
-     4. LIVE CATALOG / ALL PRODUCTS GRID (img_42)
+     3. LIVE INVENTORY CATALOG (4-Column Minimal Luxury Cards)
      ========================================================================= --}}
 <section class="lux-bestsellers-section" style="margin-bottom: 72px;">
     <div class="lux-section-header">
         <div>
-            <h2>CATALOG</h2>
-            <p>{{ $featuredProducts->count() }} luxury creations and boutique items available live in stock.</p>
+            <h2>LIVE INVENTORY</h2>
+            <p>{{ $featuredProducts->count() }} products synchronized live with ERP stock.</p>
         </div>
         <a href="{{ route('shop.index') }}">View full catalog <span>→</span></a>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px;">
         @foreach($featuredProducts as $product)
+            @php
+                $swatches = $product->available_colorways;
+            @endphp
             <div class="lux-card">
                 @if($product->has_discount)
                     <span class="lux-badge-discount">-{{ $product->discount_percent_calculated }}%</span>
@@ -172,8 +85,17 @@
                 <a href="{{ route('shop.show', $product) }}" class="lux-card-media">
                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}" loading="lazy">
                 </a>
-                <span class="lux-card-category">{{ $product->category?->name ?? 'Collection' }}</span>
+                <span class="lux-card-category">{{ $product->category?->name ?? 'Product' }}</span>
                 <a href="{{ route('shop.show', $product) }}" class="lux-card-title" title="{{ $product->name }}">{{ $product->name }}</a>
+
+                @if(!empty($swatches))
+                    <div style="display: flex; gap: 6px; margin-bottom: 8px; align-items: center;">
+                        @foreach(array_slice($swatches, 0, 5) as $sw)
+                            <span style="width: 12px; height: 12px; border-radius: 50%; background-color: {{ $sw['color'] }}; border: 1px solid rgba(0,0,0,0.15); display: inline-block;" title="{{ $sw['name'] }}"></span>
+                        @endforeach
+                    </div>
+                @endif
+
                 <div class="lux-card-price-row">
                     <span class="lux-card-price">
                         @if($product->has_discount)
@@ -200,49 +122,6 @@
                 </div>
             </div>
         @endforeach
-    </div>
-</section>
-
-{{-- =========================================================================
-     5. ABOUT US SECTION (img_35)
-     ========================================================================= --}}
-<section class="lux-about-section">
-    <div class="lux-about-grid">
-        <div class="lux-about-content">
-            <span class="lux-about-kicker">ARTISANAL HERITAGE</span>
-            <h2>Pure botanical essence and timeless craftsmanship.</h2>
-            <p>
-                At taj., every formulation is a harmonious symphony of sustainably sourced natural botanicals, rare oriental resins, and meticulous hand-blended extractions. Crafted to awaken evocative memories and express your individual charisma.
-            </p>
-            <div>
-                <a href="{{ route('shop.index') }}" class="lux-btn-black">Discover the story & catalog ↗</a>
-            </div>
-        </div>
-        <div class="lux-about-portrait" style="background-image: url('{{ asset('assets/images/behance/about_portrait.jpg') }}');"></div>
-    </div>
-</section>
-
-{{-- =========================================================================
-     6. ORDER TRACKING SUMMARY STRIP
-     ========================================================================= --}}
-<section style="max-width: 1360px; margin: 0 auto 60px; padding: 0 32px;">
-    <div style="background: var(--lux-surface); border: 1px solid var(--lux-border); border-radius: var(--lux-radius-md); padding: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;">
-        <div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Total Orders</div>
-            <div style="font-size: 24px; font-weight: 800; color: var(--lux-black);">{{ $orderCount }}</div>
-        </div>
-        <div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Pending Approval</div>
-            <div style="font-size: 24px; font-weight: 800; color: #d97706;">{{ $pendingCount }}</div>
-        </div>
-        <div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">In Processing</div>
-            <div style="font-size: 24px; font-weight: 800; color: #2563eb;">{{ $processingCount }}</div>
-        </div>
-        <div>
-            <div style="font-size: 11px; font-weight: 700; color: var(--lux-text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Delivered</div>
-            <div style="font-size: 24px; font-weight: 800; color: #10b981;">{{ $deliveredCount }}</div>
-        </div>
     </div>
 </section>
 

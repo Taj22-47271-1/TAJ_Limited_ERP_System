@@ -7,9 +7,7 @@
     $isPerfume = $product->isPerfume();
     $isClothing = $product->isClothing();
     $colorways = $product->available_colorways;
-    $initialColorway = $colorways[0] ?? null;
-    $initialImage = $initialColorway['image_url'] ?? $product->image_url;
-    $initialSku = $initialColorway['sku'] ?? $product->sku;
+    $initialImage = $product->image_url;
 
     $catOpts = $product->category_options;
     $sizes = $isPerfume ? ($product->size_options ?: ['50ml', '100ml']) : ($product->has_sizes ? $product->normalizedSizes() : []);
@@ -28,9 +26,9 @@
 @endphp
 
 <div class="lux-details-layout">
-    {{-- Breadcrumbs (img_46) --}}
+    {{-- Breadcrumbs --}}
     <nav class="lux-breadcrumbs" aria-label="Breadcrumb">
-        <a href="{{ route('dashboard') }}">Catalog</a>
+        <a href="{{ route('dashboard') }}">Home</a>
         <span class="sep">/</span>
         <a href="{{ route('shop.index', ['category' => $product->category_id]) }}">{{ $product->category?->name ?? 'Collection' }}</a>
         <span class="sep">/</span>
@@ -39,24 +37,18 @@
 
     {{-- Main 2-Column Product Stage --}}
     <div class="lux-product-hero-stage">
-        {{-- LEFT COLUMN: Details, Notes, Sizes, Action (img_46) --}}
+        {{-- LEFT COLUMN: Details, Notes, Sizes, Action --}}
         <div class="lux-product-info">
             <span class="lux-product-kicker">
-                {{ $product->category?->name ?? 'FRAGRANCE' }} · {{ $product->sku }}
+                {{ $product->category?->name ?? 'PRODUCT' }} · SKU: {{ $product->sku }}
             </span>
             <h1 class="lux-product-title">{{ $product->name }}</h1>
-            <p class="lux-product-tagline">
-                @if($isPerfume)
-                    Eau de Parfum · Natural Spray Vaporisateur · Long-Lasting Sillage
-                @elseif($isClothing)
-                    Handcrafted Designer Edition · Pure Silk & Artisanal Weave
-                @else
-                    {{ Str::limit($product->description, 120) }}
-                @endif
-            </p>
-
-            {{-- Visual Notes / Attributes Bar --}}
+            
             @if($isPerfume)
+                <p class="lux-product-tagline">
+                    Eau de Parfum · Natural Spray Vaporisateur · Long-Lasting Sillage
+                </p>
+                {{-- Visual Scent Notes for Fragrances --}}
                 <div class="lux-scent-notes-row">
                     <div class="lux-scent-note-chip">
                         <span class="lux-scent-icon">🍊</span>
@@ -75,18 +67,6 @@
                         <span>Smoky Amber</span>
                     </div>
                 </div>
-
-                <ul class="lux-bullet-list">
-                    <li><strong>Top notes:</strong> Sicilian blood orange, pink peppercorn, Calabrian bergamot</li>
-                    <li><strong>Heart notes:</strong> Madagascar vanilla bean, dark labdanum resin, Turkish rose</li>
-                    <li><strong>Base notes:</strong> Rare ambergris, Atlas cedarwood, white musk</li>
-                </ul>
-            @elseif($isClothing)
-                <ul class="lux-bullet-list">
-                    <li><strong>Fabric:</strong> 100% Pure Mulberry Silk with hand-loomed texture</li>
-                    <li><strong>Embellishment:</strong> Intricate golden dipped zari border</li>
-                    <li><strong>Care:</strong> Professional dry clean recommended</li>
-                </ul>
             @endif
 
             {{-- Full Description Accordion --}}
@@ -94,7 +74,7 @@
                 <details open>
                     <summary>FULL DESCRIPTION <span>⌄</span></summary>
                     <div class="lux-accordion-content">
-                        {{ $product->description ?: 'Formulated with exquisite attention to detail, balancing modern luxury with enduring elegance. Each piece undergoes stringent quality checks to guarantee unmatched perfection.' }}
+                        {{ $product->description ?: 'Premium quality product manufactured to strict standards. Carefully inspected and backed by TAJ Limited quality guarantee.' }}
                     </div>
                 </details>
             </div>
@@ -102,15 +82,15 @@
             {{-- Interactive Cart & Options Form --}}
             <form method="POST" action="{{ route('cart.add', $product) }}" id="productPurchaseForm">
                 @csrf
-                <input type="hidden" name="color" id="selectedColorInput" value="{{ $initialColorway['name'] ?? '' }}">
+                <input type="hidden" name="color" id="selectedColorInput" value="">
                 <input type="hidden" name="size" id="selectedSizeInput" value="{{ $sizes[0] ?? '' }}">
 
-                {{-- Colorway Selector if available --}}
+                {{-- Colorway Selector ONLY if product actually has colorways --}}
                 @if(!empty($colorways))
                     <div class="lux-options-block">
                         <div class="lux-options-label">
                             <span>Select Colorway:</span>
-                            <strong id="activeColorName" style="color: var(--lux-black);">{{ $initialColorway['name'] ?? '' }}</strong>
+                            <strong id="activeColorName" style="color: var(--lux-black);">{{ $colorways[0]['name'] ?? '' }}</strong>
                         </div>
                         <div class="lux-colorways-row">
                             @foreach($colorways as $cw)
@@ -187,36 +167,30 @@
             </form>
         </div>
 
-        {{-- RIGHT COLUMN: Hero Bottle & 3-Angle Stage (img_46) --}}
+        {{-- RIGHT COLUMN: Product Media Stage (Clean, Never Cropped) --}}
         <div class="lux-stage-column">
             <div class="lux-stage-main" id="mainStage">
                 <img src="{{ $initialImage }}" alt="{{ $product->name }}" id="heroBottleImg">
             </div>
 
-            {{-- 3 Top Angle Thumbnails --}}
-            <div class="lux-stage-angles">
-                <div class="lux-angle-thumb active" onclick="switchAngle('{{ $initialImage }}', this)">
-                    <img src="{{ $initialImage }}" alt="Front Angle">
-                </div>
-                @if($isPerfume && file_exists(public_path('assets/images/behance/cosmic_hero_art.png')))
+            {{-- Angle Thumbnails (Only if perfume has alternate art) --}}
+            @if($isPerfume && file_exists(public_path('assets/images/behance/cosmic_hero_art.png')))
+                <div class="lux-stage-angles">
+                    <div class="lux-angle-thumb active" onclick="switchAngle('{{ $initialImage }}', this)">
+                        <img src="{{ $initialImage }}" alt="Front Angle">
+                    </div>
                     <div class="lux-angle-thumb" onclick="switchAngle('{{ asset('assets/images/behance/cosmic_hero_art.png') }}', this)">
                         <img src="{{ asset('assets/images/behance/cosmic_hero_art.png') }}" alt="Artistic Stage">
                     </div>
-                @endif
-                @if(file_exists(public_path('assets/images/behance/bestseller_hero.jpg')))
-                    <div class="lux-angle-thumb" onclick="switchAngle('{{ asset('assets/images/behance/bestseller_hero.jpg') }}', this)">
-                        <img src="{{ asset('assets/images/behance/bestseller_hero.jpg') }}" alt="Pedestal View">
-                    </div>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
     </div>
 
-    {{-- CUSTOMERS SAY REVIEW BLOCK (img_46) --}}
+    {{-- CUSTOMERS SAY REVIEW BLOCK --}}
     <section class="lux-reviews-section">
         <span class="lux-reviews-kicker">[CUSTOMERS SAY]</span>
         <div class="lux-reviews-grid">
-            {{-- Big Rating Score & Breakdown Bars --}}
             <div class="lux-score-box">
                 <div class="lux-big-rating">4.9</div>
                 <div class="lux-stars">★★★★★</div>
@@ -249,69 +223,70 @@
                 </div>
             </div>
 
-            {{-- Real Customer Review Cards --}}
             <div class="lux-customer-cards">
                 <div class="lux-review-card">
                     <div class="lux-review-user">
-                        <span class="lux-review-author">Sarahk1243</span>
+                        <span class="lux-review-author">Verified Customer</span>
                         <span class="lux-review-stars">★★★★★</span>
                     </div>
                     <p class="lux-review-text">
-                        "The scent is breathtaking. The opening of blood orange and smooth bourbon vanilla lasts well past 12 hours. Pure elegance and luxurious presentation."
+                        "High-quality product that arrived in perfect condition. Packaging was excellent and delivery was prompt."
                     </p>
                 </div>
 
                 <div class="lux-review-card">
                     <div class="lux-review-user">
-                        <span class="lux-review-author">Brianna205</span>
+                        <span class="lux-review-author">Satisfied Buyer</span>
                         <span class="lux-review-stars">★★★★★</span>
                     </div>
                     <p class="lux-review-text">
-                        "Absolutely in love with the bottle and formulation. Received compliments non-stop at my gala event. A true signature scent that turns heads."
+                        "Exactly as described on the website. Very pleased with my order and will be shopping again."
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    {{-- SIMILAR PERFUMES / PRODUCTS (img_46) --}}
-    <section class="lux-similar-section">
-        <div class="lux-section-header">
-            <div>
-                <h2>SIMILAR {{ $isPerfume ? 'PERFUMES' : 'PRODUCTS' }}</h2>
-                <p>Curated recommendations complementing your fragrance palette.</p>
-            </div>
-            <a href="{{ route('shop.index') }}">View all <span>→</span></a>
-        </div>
-
-        <div class="lux-similar-grid">
-            @foreach($similarProducts as $sim)
-                <div class="lux-card">
-                    @if($sim->has_discount)
-                        <span class="lux-badge-discount">-{{ $sim->discount_percent_calculated }}%</span>
-                    @endif
-                    <button type="button" class="lux-wishlist-toggle" onclick="toggleWishlist({{ $sim->id }}, this)">
-                        ♡
-                    </button>
-                    <a href="{{ route('shop.show', $sim) }}" class="lux-card-media">
-                        <img src="{{ $sim->image_url }}" alt="{{ $sim->name }}" loading="lazy">
-                    </a>
-                    <span class="lux-card-category">{{ $sim->category?->name ?? 'Collection' }}</span>
-                    <a href="{{ route('shop.show', $sim) }}" class="lux-card-title">{{ $sim->name }}</a>
-                    <div class="lux-card-price-row">
-                        <span class="lux-card-price">
-                            @if($sim->has_discount)
-                                {{ $currency }}{{ number_format($sim->effective_price, 2) }}
-                                <span class="lux-card-original-price">{{ $currency }}{{ number_format($sim->selling_price, 2) }}</span>
-                            @else
-                                {{ $currency }}{{ number_format($sim->selling_price, 2) }}
-                            @endif
-                        </span>
-                    </div>
+    {{-- SIMILAR PRODUCTS --}}
+    @if($similarProducts->isNotEmpty())
+        <section class="lux-similar-section">
+            <div class="lux-section-header">
+                <div>
+                    <h2>SIMILAR PRODUCTS</h2>
+                    <p>More items you may be interested in.</p>
                 </div>
-            @endforeach
-        </div>
-    </section>
+                <a href="{{ route('shop.index') }}">View all <span>→</span></a>
+            </div>
+
+            <div class="lux-similar-grid">
+                @foreach($similarProducts as $sim)
+                    <div class="lux-card">
+                        @if($sim->has_discount)
+                            <span class="lux-badge-discount">-{{ $sim->discount_percent_calculated }}%</span>
+                        @endif
+                        <button type="button" class="lux-wishlist-toggle" onclick="toggleWishlist({{ $sim->id }}, this)">
+                            ♡
+                        </button>
+                        <a href="{{ route('shop.show', $sim) }}" class="lux-card-media">
+                            <img src="{{ $sim->image_url }}" alt="{{ $sim->name }}" loading="lazy">
+                        </a>
+                        <span class="lux-card-category">{{ $sim->category?->name ?? 'Collection' }}</span>
+                        <a href="{{ route('shop.show', $sim) }}" class="lux-card-title">{{ $sim->name }}</a>
+                        <div class="lux-card-price-row">
+                            <span class="lux-card-price">
+                                @if($sim->has_discount)
+                                    {{ $currency }}{{ number_format($sim->effective_price, 2) }}
+                                    <span class="lux-card-original-price">{{ $currency }}{{ number_format($sim->selling_price, 2) }}</span>
+                                @else
+                                    {{ $currency }}{{ number_format($sim->selling_price, 2) }}
+                                @endif
+                            </span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
 </div>
 
 @endsection

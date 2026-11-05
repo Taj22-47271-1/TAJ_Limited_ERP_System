@@ -52,8 +52,8 @@ Route::get('/healthz', function () {
     }
 });
 
-// Root redirect
-Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redirect()->route('shop.index'));
+// Root redirect: Unauthenticated users go directly to login; authenticated users go to dashboard
+Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redirect()->route('login'));
 
 // Public Storefront Browsing (Guests, Customers & Staff)
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');

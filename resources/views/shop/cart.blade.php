@@ -1,116 +1,188 @@
 @extends('layouts.customer')
-@section('title','Shopping Bag — taj. Luxury')
+@section('title', 'Shopping Cart — TAJ Limited')
 @section('content')
 
 @php
     $currency = $companySettings->currency_symbol ?? '৳';
 @endphp
 
-<div class="lux-cart-page">
-    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 32px; border-bottom: 1px solid var(--lux-border); padding-bottom: 20px;">
+<div style="max-width: 1200px; margin: 36px auto 80px; padding: 0 24px;">
+    {{-- Page Header --}}
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 32px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px;">
         <div>
-            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lux-accent-gold);">
-                YOUR SELECTION
+            <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; color: #b45309;">
+                YOUR ORDER
             </span>
-            <h1 style="font-size: 36px; font-weight: 900; letter-spacing: -0.04em; margin: 4px 0 0; color: var(--lux-black);">Shopping Bag</h1>
+            <h1 style="font-size: 32px; font-weight: 900; letter-spacing: -0.03em; margin: 6px 0 0; color: #0f172a;">
+                Shopping Cart
+                @if($items->isNotEmpty())
+                    <span style="font-size: 16px; font-weight: 600; color: #64748b;">({{ $items->count() }} {{ Str::plural('item', $items->count()) }})</span>
+                @endif
+            </h1>
         </div>
-        <a href="{{ route('shop.index') }}" style="font-size: 13px; font-weight: 700; color: var(--lux-black); text-decoration: none;">
-            Continue Shopping →
+        <a href="{{ route('shop.index') }}" style="font-size: 13px; font-weight: 700; color: #0f172a; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            ← Continue Shopping
         </a>
     </div>
 
-    @if(empty($items))
-        <div style="text-align: center; padding: 80px 20px; background: var(--lux-surface); border-radius: var(--lux-radius-md); border: 1px solid var(--lux-border);">
-            <div style="font-size: 40px; margin-bottom: 12px;">🛍️</div>
-            <h2 style="font-size: 20px; font-weight: 800; color: var(--lux-black); margin: 0 0 8px;">Your shopping bag is empty</h2>
-            <p style="font-size: 14px; color: var(--lux-text-muted); margin-bottom: 24px;">Discover our exclusive collection of luxury fragrances and apparel.</p>
-            <a href="{{ route('shop.index') }}" class="lux-btn-black">Explore Catalog</a>
+    @if($items->isEmpty())
+        <div style="text-align: center; padding: 80px 24px; background: #f8fafc; border-radius: 16px; border: 1px dashed #cbd5e1;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🛍️</div>
+            <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 8px;">Your shopping cart is empty</h2>
+            <p style="font-size: 14px; color: #64748b; margin: 0 0 24px;">Explore our catalog to find products and exclusive deals.</p>
+            <a href="{{ route('shop.index') }}" class="btn primary" style="height: 44px; padding: 0 24px; font-size: 14px; border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center;">
+                Browse Products
+            </a>
         </div>
     @else
-        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
-            {{-- Items List (img_56) --}}
-            <div style="display: flex; flex-direction: column;">
-                @foreach($items as $item)
-                    <div class="lux-cart-item-row">
-                        <div class="lux-cart-thumb">
-                            @if(!empty($item['image']))
-                                <img src="{{ $item['image'] }}" alt="{{ $item['product']->name }}">
-                            @elseif($item['product']->image_url)
-                                <img src="{{ $item['product']->image_url }}" alt="{{ $item['product']->name }}">
-                            @else
-                                <span style="font-weight: 800; font-size: 18px;">{{ strtoupper(substr($item['product']->name, 0, 1)) }}</span>
-                            @endif
-                        </div>
-                        <div>
-                            <a href="{{ route('shop.show', $item['product']) }}" style="font-size: 15px; font-weight: 800; color: var(--lux-black); text-decoration: none;">
-                                {{ $item['product']->name }}
-                            </a>
-                            <div class="lux-cart-article">
-                                Article number: {{ $item['product']->sku }}
-                                @if(!empty($item['color'])) · Color: <strong>{{ $item['color'] }}</strong> @endif
-                                @if(!empty($item['size'])) · Size: <strong>{{ $item['size'] }}</strong> @endif
-                            </div>
-                            <div style="margin-top: 6px; font-size: 13px;">
-                                @if($item['has_discount'])
-                                    <strong>{{ $currency }}{{ number_format($item['unit_price'], 2) }}</strong>
-                                    <del style="color: var(--lux-text-light); margin-left: 6px;">{{ $currency }}{{ number_format($item['original_price'], 2) }}</del>
-                                    <span class="lux-badge-discount" style="position: static; margin-left: 6px; vertical-align: middle;">-{{ $item['discount_percent'] }}%</span>
-                                @else
-                                    <strong>{{ $currency }}{{ number_format($item['unit_price'], 2) }}</strong>
-                                @endif
-                            </div>
-                        </div>
+        <div style="display: grid; grid-template-columns: 1fr 380px; gap: 36px; align-items: start;">
+            {{-- LEFT COLUMN: Cart Items Table / Cards --}}
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.02);">
+                <div style="padding: 18px 24px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; display: grid; grid-template-columns: 2fr 1fr 1fr 40px; gap: 16px;">
+                    <span>Product</span>
+                    <span style="text-align: center;">Quantity</span>
+                    <span style="text-align: right;">Total</span>
+                    <span></span>
+                </div>
 
-                        {{-- Quantity Stepper --}}
-                        <div>
-                            <form method="POST" action="{{ route('cart.update', $item['product']) }}" style="display: inline-flex; align-items: center; gap: 8px;">
-                                @csrf @method('PUT')
-                                @if($item['size'])<input type="hidden" name="size" value="{{ $item['size'] }}">@endif
-                                @if(!empty($item['color']))<input type="hidden" name="color" value="{{ $item['color'] }}">@endif
-                                <div class="lux-cart-qty-ctrl">
-                                    <button type="submit" name="quantity" value="{{ max(0, $item['quantity'] - 1) }}">−</button>
-                                    <span>{{ $item['quantity'] }}</span>
-                                    <button type="submit" name="quantity" value="{{ min(floor($item['product']->available_stock), $item['quantity'] + 1) }}">+</button>
+                <div style="display: flex; flex-direction: column;">
+                    @foreach($items as $item)
+                        <div style="padding: 24px; border-bottom: 1px solid #f1f5f9; display: grid; grid-template-columns: 2fr 1fr 1fr 40px; gap: 16px; align-items: center;">
+                            {{-- Product Media & Info --}}
+                            <div style="display: flex; gap: 16px; align-items: center;">
+                                <a href="{{ route('shop.show', $item['product']) }}" style="width: 80px; height: 80px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 6px; text-decoration: none;">
+                                    <img src="{{ $item['image'] }}" alt="{{ $item['product']->name }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                </a>
+                                <div>
+                                    <a href="{{ route('shop.show', $item['product']) }}" style="font-size: 15px; font-weight: 800; color: #0f172a; text-decoration: none; line-height: 1.3; display: block; margin-bottom: 4px;">
+                                        {{ $item['product']->name }}
+                                    </a>
+                                    
+                                    {{-- Selected Size / Color Attributes --}}
+                                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                                        @if(!empty($item['color']))
+                                            <span style="font-size: 11px; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 999px; border: 1px solid #e2e8f0;">
+                                                Color: {{ $item['color'] }}
+                                            </span>
+                                        @endif
+                                        @if(!empty($item['size']))
+                                            <span style="font-size: 11px; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 999px; border: 1px solid #e2e8f0;">
+                                                Size: {{ $item['size'] }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Unit Price Breakdown --}}
+                                    <div style="font-size: 13px;">
+                                        @if($item['has_discount'])
+                                            <span style="font-weight: 800; color: #dc2626;">{{ $currency }}{{ number_format($item['unit_price'], 2) }}</span>
+                                            <del style="font-size: 12px; color: #94a3b8; margin-left: 4px;">{{ $currency }}{{ number_format($item['original_price'], 2) }}</del>
+                                            <span style="font-size: 10px; font-weight: 800; color: #dc2626; background: #fef2f2; padding: 1px 6px; border-radius: 4px; margin-left: 4px;">
+                                                -{{ $item['discount_percent'] }}%
+                                            </span>
+                                        @else
+                                            <span style="font-weight: 700; color: #334155;">{{ $currency }}{{ number_format($item['unit_price'], 2) }}</span>
+                                        @endif
+                                        <small style="color: #94a3b8; font-size: 11px;">each</small>
+                                    </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
 
-                        {{-- Line Total & Remove --}}
-                        <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-                            <strong style="font-size: 16px; font-weight: 900; color: var(--lux-black);">
-                                {{ $currency }}{{ number_format($item['line_total'], 2) }}
-                            </strong>
-                            <form method="POST" action="{{ route('cart.remove', $item['product']) }}">
-                                @csrf @method('DELETE')
-                                @if($item['size'])<input type="hidden" name="size" value="{{ $item['size'] }}">@endif
-                                @if(!empty($item['color']))<input type="hidden" name="color" value="{{ $item['color'] }}">@endif
-                                <button type="submit" style="background: none; border: 0; color: var(--lux-text-light); cursor: pointer; font-size: 13px;" title="Remove item">
-                                    ✕
-                                </button>
-                            </form>
+                            {{-- Quantity Stepper --}}
+                            <div style="display: flex; justify-content: center;">
+                                <form method="POST" action="{{ route('cart.update', $item['product']) }}" style="display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                    @csrf @method('PUT')
+                                    @if($item['size'])<input type="hidden" name="size" value="{{ $item['size'] }}">@endif
+                                    @if(!empty($item['color']))<input type="hidden" name="color" value="{{ $item['color'] }}">@endif
+                                    
+                                    <button type="submit" name="quantity" value="{{ max(0, $item['quantity'] - 1) }}" 
+                                            style="width: 32px; height: 36px; border: 0; background: #f8fafc; font-size: 15px; font-weight: 700; color: #475569; cursor: pointer; transition: background 0.15s;" title="Decrease quantity">−</button>
+                                    
+                                    <span style="width: 38px; text-align: center; font-size: 14px; font-weight: 800; color: #0f172a;">
+                                        {{ number_format($item['quantity'], 0) }}
+                                    </span>
+                                    
+                                    <button type="submit" name="quantity" value="{{ min(floor($item['product']->available_stock), $item['quantity'] + 1) }}" 
+                                            style="width: 32px; height: 36px; border: 0; background: #f8fafc; font-size: 15px; font-weight: 700; color: #475569; cursor: pointer; transition: background 0.15s;" title="Increase quantity">+</button>
+                                </form>
+                            </div>
+
+                            {{-- Subtotal for Product --}}
+                            <div style="text-align: right;">
+                                <span style="font-size: 16px; font-weight: 900; color: #0f172a;">
+                                    {{ $currency }}{{ number_format($item['line_total'], 2) }}
+                                </span>
+                            </div>
+
+                            {{-- Remove Button --}}
+                            <div style="text-align: right;">
+                                <form method="POST" action="{{ route('cart.remove', $item['product']) }}">
+                                    @csrf @method('DELETE')
+                                    @if($item['size'])<input type="hidden" name="size" value="{{ $item['size'] }}">@endif
+                                    @if(!empty($item['color']))<input type="hidden" name="color" value="{{ $item['color'] }}">@endif
+                                    <button type="submit" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #f1f5f9; background: #ffffff; color: #94a3b8; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;" 
+                                            onmouseover="this.style.color='#ef4444'; this.style.borderColor='#fca5a5'; this.style.background='#fef2f2';"
+                                            onmouseout="this.style.color='#94a3b8'; this.style.borderColor='#f1f5f9'; this.style.background='#ffffff';"
+                                            title="Remove from cart">
+                                        ✕
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
 
-            {{-- Summary Card --}}
-            <div style="background: var(--lux-surface); border: 1px solid var(--lux-border); border-radius: var(--lux-radius-md); padding: 28px;">
-                <h3 style="font-size: 18px; font-weight: 800; margin: 0 0 20px; color: var(--lux-black);">Order Summary</h3>
-                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px;">
-                    <span style="color: var(--lux-text-muted);">Subtotal</span>
-                    <strong style="color: var(--lux-black);">{{ $currency }}{{ number_format($subtotal, 2) }}</strong>
+            {{-- RIGHT COLUMN: Cart Summary --}}
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,0.02);">
+                <h3 style="font-size: 18px; font-weight: 900; color: #0f172a; margin: 0 0 20px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;">
+                    Cart Summary
+                </h3>
+
+                {{-- Subtotal --}}
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px;">
+                    <span style="color: #64748b;">Subtotal</span>
+                    <strong style="color: #0f172a;">{{ $currency }}{{ number_format($originalSubtotal, 2) }}</strong>
                 </div>
+
+                {{-- Discount --}}
+                @if($discountTotal > 0)
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px;">
+                        <span style="color: #10b981; font-weight: 600;">Total Discount</span>
+                        <strong style="color: #10b981;">-{{ $currency }}{{ number_format($discountTotal, 2) }}</strong>
+                    </div>
+                @endif
+
+                {{-- Delivery Charge --}}
                 <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 16px;">
-                    <span style="color: var(--lux-text-muted);">Estimated Delivery</span>
-                    <strong style="color: var(--lux-black);">Calculated at checkout</strong>
+                    <span style="color: #64748b;">Delivery Charge</span>
+                    @if($deliveryFee == 0)
+                        <span style="font-weight: 800; color: #10b981; background: #ecfdf5; padding: 2px 8px; border-radius: 4px; font-size: 12px;">FREE</span>
+                    @else
+                        <strong style="color: #0f172a;">{{ $currency }}{{ number_format($deliveryFee, 2) }}</strong>
+                    @endif
                 </div>
-                <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 900; padding-top: 14px; border-top: 1px solid var(--lux-border); color: var(--lux-black); margin-bottom: 24px;">
-                    <span>Total</span>
-                    <span>{{ $currency }}{{ number_format($subtotal, 2) }}</span>
+
+                @if($subtotal < 3000 && $subtotal > 0)
+                    <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #b45309; font-weight: 600; margin-bottom: 18px; line-height: 1.4;">
+                        🚚 Add <strong>{{ $currency }}{{ number_format(3000 - $subtotal, 2) }}</strong> more to get <strong>FREE delivery</strong>!
+                    </div>
+                @endif
+
+                {{-- Grand Total --}}
+                <div style="display: flex; justify-content: space-between; font-size: 20px; font-weight: 900; color: #0f172a; padding-top: 16px; border-top: 2px solid #f1f5f9; margin-bottom: 24px;">
+                    <span>Grand Total</span>
+                    <span>{{ $currency }}{{ number_format($total, 2) }}</span>
                 </div>
-                <a href="{{ route('checkout') }}" class="lux-btn-black" style="width: 100%; height: 50px; font-size: 14px;">
-                    Proceed to Checkout →
+
+                {{-- Proceed to Checkout Button --}}
+                <a href="{{ route('checkout') }}" class="btn primary" style="width: 100%; height: 50px; font-size: 15px; font-weight: 800; border-radius: 12px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.1);">
+                    Proceed to Checkout <span>→</span>
                 </a>
+
+                <div style="margin-top: 18px; text-align: center; font-size: 12px; color: #94a3b8;">
+                    🔒 Secure checkout · Cash on Delivery available
+                </div>
             </div>
         </div>
     @endif

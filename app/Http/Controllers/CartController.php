@@ -20,6 +20,9 @@ class CartController extends Controller
         return response()->json([
             'cart_count' => $totalCount,
             'subtotal' => $data['subtotal'],
+            'original_subtotal' => $data['originalSubtotal'],
+            'discount_total' => $data['discountTotal'],
+            'delivery_fee' => $data['deliveryFee'],
             'total' => $data['total'],
             'items' => $data['items']->map(fn ($it) => [
                 'key' => $it['key'],
@@ -253,9 +256,12 @@ class CartController extends Controller
         })->filter()->values();
 
         $subtotal = (float)$items->sum('line_total');
-        $deliveryFee = $subtotal > 0 ? 80.00 : 0;
+        $originalSubtotal = (float)$items->sum(fn ($it) => $it['quantity'] * $it['original_price']);
+        $discountTotal = max(0, $originalSubtotal - $subtotal);
+        $deliveryFee = $subtotal >= 3000 ? 0.00 : ($subtotal > 0 ? 80.00 : 0.00);
+        $total = $subtotal + $deliveryFee;
 
-        return compact('items', 'subtotal', 'deliveryFee') + ['total' => $subtotal + $deliveryFee];
+        return compact('items', 'subtotal', 'originalSubtotal', 'discountTotal', 'deliveryFee', 'total');
     }
 
     private function normalizedSize(?string $size): ?string
