@@ -18,12 +18,12 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="{{ asset('assets/app.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/app.css') }}?v={{ file_exists(public_path('assets/app.css')) ? filemtime(public_path('assets/app.css')) : '1.0' }}">
 
-<link rel="stylesheet" href="{{ asset('assets/storefront.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/storefront.css') }}?v={{ file_exists(public_path('assets/storefront.css')) ? filemtime(public_path('assets/storefront.css')) : '1.0' }}">
 
-<link rel="stylesheet" href="{{ asset('assets/flatlogic-one.css') }}">
-<link rel="stylesheet" href="{{ asset('assets/behance-luxury.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/flatlogic-one.css') }}?v={{ file_exists(public_path('assets/flatlogic-one.css')) ? filemtime(public_path('assets/flatlogic-one.css')) : '1.0' }}">
+<link rel="stylesheet" href="{{ asset('assets/behance-luxury.css') }}?v={{ file_exists(public_path('assets/behance-luxury.css')) ? filemtime(public_path('assets/behance-luxury.css')) : '1.0' }}">
 
 @stack('head')
 
