@@ -2476,3 +2476,8 @@ nav[role="navigation"] svg,
   display: inline-block;
   vertical-align: middle;
 }
+
+.lux-cart-step-btn:hover {
+  background: #0f172a !important;
+  color: #ffffff !important;
+}

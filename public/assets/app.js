@@ -746,8 +746,8 @@ window.initStorefrontCart = function() {
 
 
 
-    // Only intercept cart.add
-
+    // Only intercept cart.add (Do not intercept PUT/DELETE cart.update or cart.remove)
+    if (form.querySelector('input[name="_method"]')) return;
     if (!form.action.match(/\/cart\/\d+/)) return;
 
 

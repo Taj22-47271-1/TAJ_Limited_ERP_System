@@ -90,20 +90,19 @@
 
                             {{-- Quantity Stepper --}}
                             <div style="display: flex; justify-content: center;">
-                                <form method="POST" action="{{ route('cart.update', $item['product']) }}" style="display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #ffffff;">
+                                <form method="POST" action="{{ route('cart.update', $item['product']) }}" class="lux-cart-qty-form" style="display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 999px; overflow: hidden; background: #ffffff; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
                                     @csrf @method('PUT')
                                     @if($item['size'])<input type="hidden" name="size" value="{{ $item['size'] }}">@endif
                                     @if(!empty($item['color']))<input type="hidden" name="color" value="{{ $item['color'] }}">@endif
+                                    <input type="hidden" name="quantity" class="qty-field" value="{{ (int)$item['quantity'] }}">
                                     
-                                    <button type="submit" name="quantity" value="{{ max(0, $item['quantity'] - 1) }}" 
-                                            style="width: 32px; height: 36px; border: 0; background: #f8fafc; font-size: 15px; font-weight: 700; color: #475569; cursor: pointer; transition: background 0.15s;" title="Decrease quantity">−</button>
+                                    <button type="button" class="lux-cart-step-btn" onclick="stepCartRow(this, -1, {{ (int)$item['product']->available_stock }})" title="Decrease quantity" style="width: 36px; height: 36px; border: 0; background: #f8fafc; font-size: 16px; font-weight: 800; color: #475569; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;">−</button>
                                     
-                                    <span style="width: 38px; text-align: center; font-size: 14px; font-weight: 800; color: #0f172a;">
-                                        {{ number_format($item['quantity'], 0) }}
+                                    <span class="qty-val-text" style="width: 36px; text-align: center; font-size: 14px; font-weight: 800; color: #0f172a; user-select: none;">
+                                        {{ (int)$item['quantity'] }}
                                     </span>
                                     
-                                    <button type="submit" name="quantity" value="{{ min(floor($item['product']->available_stock), $item['quantity'] + 1) }}" 
-                                            style="width: 32px; height: 36px; border: 0; background: #f8fafc; font-size: 15px; font-weight: 700; color: #475569; cursor: pointer; transition: background 0.15s;" title="Increase quantity">+</button>
+                                    <button type="button" class="lux-cart-step-btn" onclick="stepCartRow(this, 1, {{ (int)$item['product']->available_stock }})" title="Increase quantity" style="width: 36px; height: 36px; border: 0; background: #f8fafc; font-size: 16px; font-weight: 800; color: #475569; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center;">+</button>
                                 </form>
                             </div>
 
@@ -189,3 +188,31 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+function stepCartRow(btn, delta, maxStock) {
+    const form = btn.closest('form');
+    if (!form) return;
+    const input = form.querySelector('.qty-field');
+    const display = form.querySelector('.qty-val-text');
+    let current = parseInt(input.value) || 1;
+    let next = current + delta;
+
+    if (next <= 0) {
+        if (!confirm('Remove this item from your cart?')) {
+            return;
+        }
+        next = 0;
+    } else if (maxStock && next > maxStock) {
+        alert('Only ' + maxStock + ' units are available in stock.');
+        return;
+    }
+
+    input.value = next;
+    if (display) display.textContent = next;
+    btn.disabled = true;
+    form.submit();
+}
+</script>
+@endpush
