@@ -1971,6 +1971,7 @@
   background: #e2e8f0;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 .size-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
