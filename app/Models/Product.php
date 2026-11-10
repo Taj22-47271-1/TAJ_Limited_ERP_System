@@ -246,6 +246,17 @@ class Product extends Model
             return asset($this->image_path);
         }
 
+        // Restore image from database if wiped by ephemeral container restart
+        if (! Storage::disk('public')->exists($this->image_path)) {
+            if (\App\Models\StoredFile::ensureOnDisk($this->image_path)) {
+                return Storage::disk('public')->url($this->image_path);
+            }
+            $dataUri = \App\Models\StoredFile::getDataUri($this->image_path);
+            if ($dataUri) {
+                return $dataUri;
+            }
+        }
+
         return Storage::disk('public')->url($this->image_path);
     }
 
@@ -255,6 +266,9 @@ class Product extends Model
         if (! empty($this->colorways) && is_array($this->colorways)) {
             return collect($this->colorways)->map(function ($cw, $idx) {
                 $img = $cw['image'] ?? '';
+                if (! empty($img) && ! str_starts_with($img, 'http') && ! str_starts_with($img, 'assets/') && ! Storage::disk('public')->exists($img)) {
+                    \App\Models\StoredFile::ensureOnDisk($img);
+                }
                 $imgUrl = ! empty($img)
                     ? (str_starts_with($img, 'http') || str_starts_with($img, 'assets/') || str_starts_with($img, 'storage/') ? asset($img) : asset('storage/' . $img))
                     : $this->image_url;

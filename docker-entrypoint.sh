@@ -7,6 +7,14 @@ PORT="${PORT:-10000}"
 sed -i "s/Listen [0-9]*/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -i "s/<VirtualHost \*:[0-9]*>/<VirtualHost \*:${PORT}>/" /etc/apache2/sites-available/000-default.conf
 
+# Support Render persistent disk if mounted (e.g. PERSISTENT_STORAGE_PATH=/var/data)
+if [ -n "$PERSISTENT_STORAGE_PATH" ] && [ -d "$PERSISTENT_STORAGE_PATH" ]; then
+    echo "Found persistent storage at ${PERSISTENT_STORAGE_PATH}. Linking public storage..."
+    mkdir -p "${PERSISTENT_STORAGE_PATH}/public/products"
+    rm -rf /var/www/html/storage/app/public
+    ln -s "${PERSISTENT_STORAGE_PATH}/public" /var/www/html/storage/app/public
+fi
+
 # Ensure Laravel storage and cache directories exist and are writable
 mkdir -p /var/www/html/storage/framework/cache/data \
          /var/www/html/storage/framework/sessions \
@@ -26,6 +34,9 @@ php artisan storage:link --no-interaction || true
 if [ "${SKIP_MIGRATIONS:-false}" != "true" ]; then
     echo "Running database migrations..."
     php artisan migrate --force --isolated || echo "WARNING: Migration failed or database not reachable. Continuing startup."
+
+    echo "Synchronizing persistent database media storage..."
+    php artisan storage:sync-db || echo "WARNING: Storage sync skipped."
 
     echo "Seeding system roles and settings..."
     php artisan db:seed --force || echo "WARNING: Seeding skipped or encountered an issue."

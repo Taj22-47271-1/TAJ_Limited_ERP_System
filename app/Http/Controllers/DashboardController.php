@@ -20,12 +20,18 @@ class DashboardController extends Controller
         $today = now()->toDateString();
 
         if ($user->role === 'customer') {
-            $base = OnlineOrder::where('user_id', $user->id);
-            $orderCount = (clone $base)->count();
-            $pendingCount = (clone $base)->where('order_status','pending')->count();
-            $processingCount = (clone $base)->whereIn('order_status',['approved','processing','packed','shipped','out_for_delivery'])->count();
-            $deliveredCount = (clone $base)->where('order_status','delivered')->count();
-            $recentOrders = (clone $base)->latest()->limit(6)->get();
+            $counts = OnlineOrder::where('user_id', $user->id)
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN order_status = 'pending' THEN 1 END) as pending,
+                    COUNT(CASE WHEN order_status IN ('approved','processing','packed','shipped','out_for_delivery') THEN 1 END) as processing,
+                    COUNT(CASE WHEN order_status = 'delivered' THEN 1 END) as delivered
+                ")->first();
+            $orderCount = (int) ($counts->total ?? 0);
+            $pendingCount = (int) ($counts->pending ?? 0);
+            $processingCount = (int) ($counts->processing ?? 0);
+            $deliveredCount = (int) ($counts->delivered ?? 0);
+            $recentOrders = OnlineOrder::where('user_id', $user->id)->latest()->limit(6)->get();
 
             $featuredProducts = Cache::remember('storefront_featured_products', 30, function () {
                 return Product::where('status', true)->whereRaw('(stock - reserved_stock) > 0')->with('category')->latest()->limit(24)->get();
@@ -59,21 +65,39 @@ class DashboardController extends Controller
         }
 
         if ($user->role !== 'admin' && $user->role !== 'customer') {
-            $mySalesToday = (float) Sale::where('created_by', $user->id)->whereNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
-            $myInvoicesToday = Sale::where('created_by', $user->id)->whereNull('online_order_id')->whereDate('sale_date', $today)->count();
+            $mySalesStats = Sale::where('created_by', $user->id)
+                ->whereNull('online_order_id')
+                ->whereDate('sale_date', $today)
+                ->selectRaw("COALESCE(SUM(total), 0) as total, COUNT(*) as invoices")
+                ->first();
+            $mySalesToday = (float) ($mySalesStats->total ?? 0);
+            $myInvoicesToday = (int) ($mySalesStats->invoices ?? 0);
             $myRecentSales = Sale::with('customer')->where('created_by', $user->id)->whereNull('online_order_id')->latest('id')->limit(8)->get();
             $products = Product::where('status', true)->orderBy('name')->limit(10)->get();
             $customerCount = Customer::where('status', true)->count();
-            $pendingOrders = OnlineOrder::where('order_status','pending')->count();
-            $activeOrders = OnlineOrder::whereIn('order_status',['approved','processing','packed','shipped','out_for_delivery'])->count();
+
+            $orderCounts = OnlineOrder::selectRaw("
+                COUNT(CASE WHEN order_status = 'pending' THEN 1 END) as pending,
+                COUNT(CASE WHEN order_status IN ('approved','processing','packed','shipped','out_for_delivery') THEN 1 END) as active
+            ")->first();
+            $pendingOrders = (int) ($orderCounts->pending ?? 0);
+            $activeOrders = (int) ($orderCounts->active ?? 0);
+
             return view('dashboards.cashier', compact('mySalesToday','myInvoicesToday','myRecentSales','products','customerCount','pendingOrders','activeOrders'));
         }
 
         // Cache admin aggregated analytics for 20 seconds to eliminate database round-trip lag
         $stats = Cache::remember('admin_dashboard_metrics', 20, function () use ($today) {
-            $salesToday = (float) Sale::whereDate('sale_date', $today)->sum('total');
-            $inhouseSalesToday = (float) Sale::whereNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
-            $onlineSalesToday = (float) Sale::whereNotNull('online_order_id')->whereDate('sale_date', $today)->sum('total');
+            $salesAgg = Sale::whereDate('sale_date', $today)
+                ->selectRaw("
+                    COALESCE(SUM(total), 0) as total,
+                    COALESCE(SUM(CASE WHEN online_order_id IS NULL THEN total ELSE 0 END), 0) as inhouse,
+                    COALESCE(SUM(CASE WHEN online_order_id IS NOT NULL THEN total ELSE 0 END), 0) as online
+                ")->first();
+            $salesToday = (float) ($salesAgg->total ?? 0);
+            $inhouseSalesToday = (float) ($salesAgg->inhouse ?? 0);
+            $onlineSalesToday = (float) ($salesAgg->online ?? 0);
+
             $purchasesToday = (float) Purchase::whereDate('purchase_date', $today)->sum('total');
             $expensesToday = (float) Expense::whereDate('expense_date', $today)->sum('amount');
             $grossToday = (float) SaleItem::whereHas('sale', fn ($q) => $q->whereDate('sale_date', $today))
@@ -84,10 +108,17 @@ class DashboardController extends Controller
             $totalProfit = $grossAll - $totalExpenses;
             $stockValue = (float) Product::selectRaw('COALESCE(SUM(stock * purchase_price),0) as v')->value('v');
             $productCount = Product::count();
-            $customerCount = User::where('role','customer')->count();
-            $cashierCount = User::where('role','cashier')->count();
-            $userCount = User::count();
-            $activeUserCount = User::where('is_active', true)->count();
+
+            $userAgg = User::selectRaw("
+                COUNT(*) as total,
+                COUNT(CASE WHEN role = 'customer' THEN 1 END) as customers,
+                COUNT(CASE WHEN role = 'cashier' THEN 1 END) as cashiers,
+                COUNT(CASE WHEN is_active = true THEN 1 END) as active
+            ")->first();
+            $customerCount = (int) ($userAgg->customers ?? 0);
+            $cashierCount = (int) ($userAgg->cashiers ?? 0);
+            $userCount = (int) ($userAgg->total ?? 0);
+            $activeUserCount = (int) ($userAgg->active ?? 0);
 
             $raw = Sale::selectRaw('sale_date as day, SUM(total) as total')
                 ->whereBetween('sale_date', [now()->subDays(6)->toDateString(), $today])

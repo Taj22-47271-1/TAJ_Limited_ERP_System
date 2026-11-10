@@ -168,7 +168,7 @@ class DatabaseSeeder extends Seeder
 
         foreach($products as [$name,$sku,$barcode,$cat,$buy,$sell,$discountPrice,$discountPercent,$stock,$min,$description,$imagePath,$hasSizes,$sizes,$colorways]){
 
-            $product=Product::query()->updateOrCreate(['sku'=>$sku],[
+            $product=Product::query()->firstOrCreate(['sku'=>$sku],[
 
                 'category_id'=>$cats[$cat]->id,'name'=>$name,'barcode'=>$barcode,'unit'=>'pcs','purchase_price'=>$buy,'selling_price'=>$sell,
 

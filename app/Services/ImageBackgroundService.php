@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\StoredFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,9 @@ class ImageBackgroundService
     {
         try {
             if (! extension_loaded('gd')) {
-                return $file->store($folder, $disk);
+                $stored = $file->store($folder, $disk);
+                StoredFile::persist($stored, Storage::disk($disk)->path($stored));
+                return $stored;
             }
 
             $contents = file_get_contents($file->getRealPath());
@@ -104,11 +107,14 @@ class ImageBackgroundService
 
             $filename = $folder . '/' . Str::random(40) . '.png';
             Storage::disk($disk)->put($filename, $pngData);
+            StoredFile::persist($filename, Storage::disk($disk)->path($filename));
 
             return $filename;
         } catch (Throwable $e) {
             Log::warning('ImageBackgroundService fallback: ' . $e->getMessage());
-            return $file->store($folder, $disk);
+            $stored = $file->store($folder, $disk);
+            StoredFile::persist($stored, Storage::disk($disk)->path($stored));
+            return $stored;
         }
     }
 }

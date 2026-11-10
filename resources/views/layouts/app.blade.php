@@ -82,6 +82,10 @@
             <span class="fl-user-avatar">{{ strtoupper(substr($user->name,0,1)) }}</span>
             <div><strong>{{ $user->name }}</strong><small>{{ $roleName }}</small></div>
             <a href="{{ route('password.change') }}" class="fl-account-cog" title="Change password">⚙</a>
+            <form method="POST" action="{{ route('logout') }}" style="margin:0;display:inline-flex;">
+                @csrf
+                <button type="submit" class="fl-sidebar-logout-btn" title="Sign out" aria-label="Sign out">↪</button>
+            </form>
         </div>
     </aside>
 
@@ -129,18 +133,6 @@
     </section>
 </div>
 <script src="{{ asset('assets/app.js') }}"></script>
-<script>
-// Instant link prefetching on hover to make ERP & Storefront navigation zero-lag
-document.addEventListener('mouseover', function(e) {
-    const a = e.target.closest('a');
-    if (!a || !a.href || a.origin !== location.origin || a.target === '_blank' || a.dataset.prefetched) return;
-    a.dataset.prefetched = 'true';
-    const link = document.createElement('link');
-    link.rel = 'prefetch';
-    link.href = a.href;
-    document.head.appendChild(link);
-}, { passive: true });
-</script>
 @stack('scripts')
 </body>
 </html>

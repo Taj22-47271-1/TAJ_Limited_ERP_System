@@ -25,8 +25,14 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Share company settings with all Blade views
+        // Share company settings with all Blade views (zero-latency in-memory memoization)
         View::composer('*', function ($view): void {
+            static $cachedSettings = null;
+            if ($cachedSettings !== null) {
+                $view->with('companySettings', $cachedSettings);
+                return;
+            }
+
             $fallback = new class {
                 public string $company_name = 'TAJ Limited';
                 public string $company_email = 'info@tajlimited.com';
@@ -38,31 +44,37 @@ class AppServiceProvider extends ServiceProvider
             };
 
             try {
-                $settings = Schema::hasTable('settings')
-                    ? Cache::remember(
-                        'company.settings',
-                        60,
-                        fn () => Setting::query()->first() ?? $fallback
-                    )
-                    : $fallback;
+                $cachedSettings = Cache::remember(
+                    'company.settings',
+                    300,
+                    fn () => Setting::query()->first() ?? $fallback
+                );
             } catch (Throwable) {
-                $settings = $fallback;
+                $cachedSettings = $fallback;
             }
 
-            $view->with('companySettings', $settings);
+            $view->with('companySettings', $cachedSettings);
         });
 
         // Share pending online orders count with application layouts and dashboards
         View::composer(['layouts.app', 'layouts.admin', 'layouts.cashier', 'dashboards.*'], function ($view): void {
-            $pendingCount = 0;
-            try {
-                if (Schema::hasTable('online_orders')) {
-                    $pendingCount = Cache::remember('pending_orders_count', 15, fn () => OnlineOrder::where('order_status', 'pending')->count());
-                }
-            } catch (Throwable) {
-                $pendingCount = 0;
+            static $cachedPendingCount = null;
+            if ($cachedPendingCount !== null) {
+                $view->with('pendingOrdersCount', $cachedPendingCount);
+                return;
             }
-            $view->with('pendingOrdersCount', $pendingCount);
+
+            try {
+                $cachedPendingCount = Cache::remember(
+                    'pending_orders_count',
+                    30,
+                    fn () => OnlineOrder::where('order_status', 'pending')->count()
+                );
+            } catch (Throwable) {
+                $cachedPendingCount = 0;
+            }
+
+            $view->with('pendingOrdersCount', $cachedPendingCount);
         });
     }
 }

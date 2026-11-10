@@ -43,6 +43,8 @@
 
     <div class="vc-header-inner">
 
+        <button type="button" class="vc-mobile-menu-btn" id="vcMobileMenuBtn" aria-label="Open navigation menu">☰</button>
+
         <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="lux-brand" aria-label="taj.">
             taj<span class="brand-dot">.</span>
         </a>
@@ -155,6 +157,83 @@
 
 </header>
 
+{{-- Mobile Navigation Drawer & Backdrop --}}
+<div class="vc-mobile-drawer-overlay" id="vcDrawerOverlay"></div>
+<aside class="vc-mobile-drawer" id="vcMobileDrawer" aria-label="Mobile Navigation">
+    <div class="vc-mobile-drawer-header">
+        <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="lux-brand" style="font-size: 24px;">
+            taj<span class="brand-dot">.</span>
+        </a>
+        <button type="button" class="vc-mobile-drawer-close" id="vcDrawerClose" aria-label="Close menu">✕</button>
+    </div>
+
+    @if(auth()->check())
+        <div class="vc-mobile-user-card">
+            <span class="vc-mobile-user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+            <div class="vc-mobile-user-meta">
+                <strong>{{ auth()->user()->name }}</strong>
+                <small>{{ auth()->user()->email }}</small>
+                <span class="vc-mobile-role-badge">{{ ucfirst(auth()->user()->role) }}</span>
+            </div>
+        </div>
+    @else
+        <div class="vc-mobile-guest-card">
+            <p style="margin: 0 0 10px; font-size: 13px; color: #475569;">Welcome to <strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong></p>
+            <div class="vc-mobile-guest-actions" style="display: flex; gap: 8px;">
+                <a href="{{ route('login') }}" class="btn primary" style="background: #0f172a; color: #fff; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700; text-align: center; flex: 1;">Sign In</a>
+                <a href="{{ route('register') }}" class="btn ghost" style="border: 1px solid #cbd5e1; color: #0f172a; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700; text-align: center; flex: 1;">Register</a>
+            </div>
+        </div>
+    @endif
+
+    <nav class="vc-mobile-nav">
+        @if(auth()->check() && auth()->user()->role === 'customer')
+            <a class="{{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+                <span class="vc-mob-icon">🏠</span> <span>Home</span>
+            </a>
+        @endif
+
+        <a class="{{ request()->routeIs('shop.*') ? 'active' : '' }}" href="{{ route('shop.index') }}">
+            <span class="vc-mob-icon">🛍️</span> <span>Shop Collection</span>
+        </a>
+
+        <a class="{{ request()->routeIs('cart.*') ? 'active' : '' }}" href="{{ route('cart.index') }}">
+            <span class="vc-mob-icon">🛒</span> <span>My Cart @if(($cartCount ?? 0) > 0)({{ number_format($cartCount, 0) }})@endif</span>
+        </a>
+
+        @if(auth()->check())
+            @if(auth()->user()->role === 'customer')
+                <a class="{{ request()->routeIs('customer.orders*') ? 'active' : '' }}" href="{{ route('customer.orders') }}">
+                    <span class="vc-mob-icon">📦</span> <span>My Orders</span>
+                </a>
+                <a class="{{ request()->routeIs('customer.profile') ? 'active' : '' }}" href="{{ route('customer.profile') }}">
+                    <span class="vc-mob-icon">👤</span> <span>My Profile</span>
+                </a>
+            @elseif(auth()->user()->role === 'admin' || auth()->user()->role === 'cashier')
+                <a href="{{ route('dashboard') }}" style="color: #2563eb; font-weight: 700;">
+                    <span class="vc-mob-icon">⚙️</span> <span>Admin ERP Dashboard ↗</span>
+                </a>
+            @endif
+
+            <a class="{{ request()->routeIs('password.change') ? 'active' : '' }}" href="{{ route('password.change') }}">
+                <span class="vc-mob-icon">🔒</span> <span>Change Password</span>
+            </a>
+        @endif
+    </nav>
+
+    @if(auth()->check())
+        <div class="vc-mobile-drawer-footer">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                @csrf
+                <button type="submit" class="vc-mobile-logout-button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                    <span>Log Out</span>
+                </button>
+            </form>
+        </div>
+    @endif
+</aside>
+
 
 
 @if(session('status'))<div class="toast success">{{ session('status') }}</div>@endif
@@ -192,40 +271,40 @@
 </footer>
 
 <script src="{{ asset('assets/app.js') }}"></script>
+<script>
+(function() {
+    var drawer = document.getElementById('vcMobileDrawer');
+    var overlay = document.getElementById('vcDrawerOverlay');
+    var openBtn = document.getElementById('vcMobileMenuBtn');
+    var closeBtn = document.getElementById('vcDrawerClose');
+
+    function openNav() {
+        if (drawer) drawer.classList.add('open');
+        if (overlay) overlay.classList.add('open');
+        document.body.classList.add('vc-drawer-open');
+    }
+
+    function closeNav() {
+        if (drawer) drawer.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        document.body.classList.remove('vc-drawer-open');
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openNav);
+    if (closeBtn) closeBtn.addEventListener('click', closeNav);
+    if (overlay) overlay.addEventListener('click', closeNav);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeNav();
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 990) closeNav();
+    });
+})();
+</script>
 
 @stack('scripts')
-
-<script>
-
-// High-Speed Link Prefetching for Instant Navigation
-
-(function() {
-
-    const prefetched = new Set();
-
-    document.addEventListener('mouseover', function(e) {
-
-        const link = e.target.closest('a');
-
-        if (!link || !link.href || prefetched.has(link.href) || !link.href.startsWith(window.location.origin)) return;
-
-        if (link.getAttribute('target') === '_blank' || link.href.includes('#') || link.href.includes('logout')) return;
-
-        prefetched.add(link.href);
-
-        const pre = document.createElement('link');
-
-        pre.rel = 'prefetch';
-
-        pre.href = link.href;
-
-        document.head.appendChild(pre);
-
-    }, { passive: true });
-
-})();
-
-</script>
 
 </body>
 
