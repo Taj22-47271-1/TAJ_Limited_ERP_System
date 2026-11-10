@@ -113,18 +113,30 @@
                     </div>
                 @endif
 
+                @php
+                    $initialSize = !empty($sizes) ? $sizes[0] : null;
+                    $initialPricing = $product->getPricingForSize($initialSize);
+                @endphp
+
                 {{-- Size Options Pills (50ml / 100ml or S / M / L) --}}
                 @if(!empty($sizes))
                     <div class="lux-options-block">
                         <div class="lux-options-label">
                             <span>{{ $isPerfume ? 'Size: ml' : 'Select Size:' }}</span>
-                            <strong id="activeSizeDisplay">{{ $sizes[0] }}</strong>
+                            <strong id="activeSizeDisplay">{{ $initialSize }}</strong>
                         </div>
                         <div class="lux-size-pills">
                             @foreach($sizes as $sz)
+                                @php
+                                    $szPricing = $product->getPricingForSize($sz);
+                                @endphp
                                 <button type="button" 
-                                        class="lux-size-pill {{ $loop->first ? 'active' : '' }}" 
+                                        class="lux-size-pill {{ $sz === $initialSize ? 'active' : '' }}" 
                                         data-size="{{ $sz }}"
+                                        data-effective-price="{{ $szPricing['effective_price'] }}"
+                                        data-selling-price="{{ $szPricing['selling_price'] }}"
+                                        data-has-discount="{{ $szPricing['has_discount'] ? '1' : '0' }}"
+                                        data-discount-percent="{{ $szPricing['discount_percent'] ?? '' }}"
                                         onclick="selectSize(this)">
                                     {{ $sz }}
                                 </button>
@@ -134,20 +146,20 @@
                 @endif
 
                 {{-- Price & Stock Row --}}
-                <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px;">
-                    <span style="font-size: 28px; font-weight: 900; color: var(--lux-black);">
-                        @if($product->has_discount)
-                            {{ $currency }}{{ number_format($product->effective_price, 2) }}
-                            <del style="font-size: 16px; color: var(--lux-text-light); font-weight: 500; margin-left: 8px;">
-                                {{ $currency }}{{ number_format($product->selling_price, 2) }}
+                <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <div id="productDisplayPrice" style="display: inline-flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                        <span class="lux-current-price" style="font-size: 28px; font-weight: 900; color: var(--lux-black);">
+                            {{ $currency }}{{ number_format($initialPricing['effective_price'], 2) }}
+                        </span>
+                        @if($initialPricing['has_discount'])
+                            <del class="lux-orig-price" style="font-size: 16px; color: var(--lux-text-light); font-weight: 500;">
+                                {{ $currency }}{{ number_format($initialPricing['selling_price'], 2) }}
                             </del>
-                            <span class="lux-badge-discount" style="position: static; margin-left: 8px; vertical-align: middle;">
-                                -{{ $product->discount_percent_calculated }}% OFF
+                            <span class="lux-badge-discount" style="position: static; vertical-align: middle;">
+                                -{{ $initialPricing['discount_percent'] }}% OFF
                             </span>
-                        @else
-                            {{ $currency }}{{ number_format($product->selling_price, 2) }}
                         @endif
-                    </span>
+                    </div>
                     <span style="font-size: 12px; font-weight: 600; color: #10b981; margin-left: auto;">
                         ● In Stock ({{ number_format($product->available_stock, 0) }} units)
                     </span>
@@ -167,7 +179,7 @@
                     </button>
 
                     <button type="submit" class="lux-add-to-cart-btn">
-                        <span>ADD TO CART · {{ $currency }}{{ number_format($product->effective_price, 2) }}</span>
+                        <span id="addToCartBtnLabel">ADD TO CART · {{ $currency }}{{ number_format($initialPricing['effective_price'], 2) }}</span>
                     </button>
                 </div>
             </form>
@@ -299,13 +311,47 @@
 
 @push('scripts')
 <script>
+const LUX_CURRENCY = "{{ $currency }}";
+
 function selectSize(btn) {
     document.querySelectorAll('.lux-size-pill').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     const size = btn.getAttribute('data-size');
-    document.getElementById('selectedSizeInput').value = size;
+    const input = document.getElementById('selectedSizeInput');
+    if (input) input.value = size;
     const disp = document.getElementById('activeSizeDisplay');
     if (disp) disp.textContent = size;
+
+    // Dynamically update price based on selected size variant
+    const effPrice = parseFloat(btn.getAttribute('data-effective-price'));
+    const sellPrice = parseFloat(btn.getAttribute('data-selling-price'));
+    const hasDiscount = btn.getAttribute('data-has-discount') === '1';
+    const discPct = btn.getAttribute('data-discount-percent');
+
+    if (!isNaN(effPrice)) {
+        const effFormatted = LUX_CURRENCY + effPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const sellFormatted = LUX_CURRENCY + sellPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        const priceContainer = document.getElementById('productDisplayPrice');
+        if (priceContainer) {
+            if (hasDiscount) {
+                priceContainer.innerHTML = `
+                    <span class="lux-current-price" style="font-size: 28px; font-weight: 900; color: var(--lux-black);">${effFormatted}</span>
+                    <del class="lux-orig-price" style="font-size: 16px; color: var(--lux-text-light); font-weight: 500;">${sellFormatted}</del>
+                    <span class="lux-badge-discount" style="position: static; vertical-align: middle;">-${discPct}% OFF</span>
+                `;
+            } else {
+                priceContainer.innerHTML = `
+                    <span class="lux-current-price" style="font-size: 28px; font-weight: 900; color: var(--lux-black);">${effFormatted}</span>
+                `;
+            }
+        }
+
+        const btnLabel = document.getElementById('addToCartBtnLabel');
+        if (btnLabel) {
+            btnLabel.textContent = `ADD TO CART · ${effFormatted}`;
+        }
+    }
 }
 
 function selectColorway(thumb) {

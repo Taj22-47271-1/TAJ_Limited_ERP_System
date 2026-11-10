@@ -198,25 +198,54 @@
         </label>
 
         <div id="sizeOptionsPanel" class="size-options-panel" @if(!$hasSizes) hidden @endif>
-
             <label>Available sizes
-
-                <input id="sizesText" name="sizes_text" value="{{ $sizeText }}" placeholder="S, M, L, XL">
-
-                <small>Use comma-separated sizes. Example: XS, S, M, L, XL, XXL. This is ideal for clothing, shoes or other products that require a size choice.</small>
-
+                <input id="sizesText" name="sizes_text" value="{{ $sizeText }}" placeholder="S, M, L, XL or 50ml, 100ml">
+                <small>Use comma-separated sizes. Example: <strong>50ml, 100ml</strong> for perfumes or <strong>S, M, L, XL</strong> for clothing.</small>
             </label>
 
-            <div class="size-preset-row" aria-label="Quick size presets">
-
+            <div class="size-preset-row" aria-label="Quick size presets" style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-right: 4px;">Apparel:</span>
                 @foreach(['XS','S','M','L','XL','XXL','3XL'] as $preset)
-
                     <button type="button" class="size-preset" data-size="{{ $preset }}">{{ $preset }}</button>
-
                 @endforeach
-
+                <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin: 0 4px 0 10px;">Perfume / ml:</span>
+                @foreach(['30ml','50ml','100ml','200ml'] as $preset)
+                    <button type="button" class="size-preset" data-size="{{ $preset }}">{{ $preset }}</button>
+                @endforeach
             </div>
 
+            {{-- Size-specific Pricing Section --}}
+            @php
+                $existingSizePrices = old('size_prices', $product->exists ? ($product->size_prices ?? []) : []);
+                if (!is_array($existingSizePrices)) {
+                    $existingSizePrices = [];
+                }
+            @endphp
+            <div style="margin-top: 20px; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+                    <strong style="font-size: 13px; color: #0f172a; display: flex; align-items: center; gap: 6px;">
+                        <span>🏷️</span> Size-Specific Pricing & Discounts (e.g. 50ml vs 100ml)
+                    </strong>
+                    <small style="font-size: 11px; color: #64748b;">
+                        Default product price: <strong>{{ $companySettings->currency_symbol }}<span id="refBaseSellingPrice">{{ number_format((float)($product->selling_price ?: 0), 2) }}</span></strong>
+                    </small>
+                </div>
+                <p style="font-size: 12px; color: #64748b; margin: 0 0 14px;">
+                    Set different prices for each size variant. For example, <strong>50ml = ৳5,000</strong> and <strong>100ml = ৳8,075</strong>. When customers switch sizes on the store, the price will update dynamically. Leaving a size blank will use the regular default price above.
+                </p>
+
+                <div id="sizePricingTableWrapper">
+                    <div style="display: grid; grid-template-columns: 100px 1.2fr 1.2fr 100px; gap: 10px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e2e8f0;">
+                        <span>Size</span>
+                        <span>Selling Price ({{ $companySettings->currency_symbol }})</span>
+                        <span>Discount Price ({{ $companySettings->currency_symbol }})</span>
+                        <span style="text-align: right;">Discount</span>
+                    </div>
+                    <div id="sizePricingRows" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                        {{-- Populated dynamically via renderSizePricingRows() --}}
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -373,44 +402,133 @@
 <script>
 
 (function () {
-
     const toggle = document.getElementById('hasSizesToggle');
-
     const panel = document.getElementById('sizeOptionsPanel');
-
     const input = document.getElementById('sizesText');
+    const baseSellingInput = document.getElementById('sellingPriceInput');
+    const refBaseEl = document.getElementById('refBaseSellingPrice');
+    const container = document.getElementById('sizePricingRows');
 
     if (!toggle || !panel || !input) return;
 
-
-
-    const syncPanel = () => { panel.hidden = !toggle.checked; };
+    const syncPanel = () => { 
+        panel.hidden = !toggle.checked; 
+        if (toggle.checked) renderSizePricingRows();
+    };
 
     toggle.addEventListener('change', syncPanel);
-
     syncPanel();
 
+    if (baseSellingInput && refBaseEl) {
+        baseSellingInput.addEventListener('input', () => {
+            const val = parseFloat(baseSellingInput.value) || 0;
+            refBaseEl.textContent = val.toFixed(2);
+        });
+    }
 
+    const INITIAL_SIZE_PRICES = @json($existingSizePrices ?? []);
 
-    document.querySelectorAll('.size-preset').forEach(button => {
+    function renderSizePricingRows() {
+        if (!container) return;
+        const rawSizes = input.value.split(',').map(v => v.trim()).filter(Boolean);
+        const sizes = [...new Set(rawSizes)];
 
-        button.addEventListener('click', () => {
-
-            const values = input.value.split(',').map(v => v.trim()).filter(Boolean);
-
-            const exists = values.some(v => v.toLowerCase() === button.dataset.size.toLowerCase());
-
-            if (!exists) values.push(button.dataset.size);
-
-            input.value = values.join(', ');
-
-            input.focus();
-
+        const currentDOM = {};
+        container.querySelectorAll('.size-pricing-row').forEach(row => {
+            const sz = row.getAttribute('data-size');
+            const selling = row.querySelector('.size-selling-input')?.value || '';
+            const discount = row.querySelector('.size-discount-input')?.value || '';
+            currentDOM[sz] = { selling, discount };
         });
 
+        container.innerHTML = '';
+
+        if (sizes.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 14px; color: #94a3b8; font-size: 12px; background: #ffffff; border-radius: 8px; border: 1px dashed #cbd5e1;">Type sizes above (e.g. 50ml, 100ml) or click presets to configure prices per size.</div>';
+            return;
+        }
+
+        sizes.forEach(sz => {
+            const norm = sz.toLowerCase();
+            const fromDOM = currentDOM[sz];
+            const fromInitial = INITIAL_SIZE_PRICES[sz] || INITIAL_SIZE_PRICES[norm] || {};
+            const selling = fromDOM !== undefined ? fromDOM.selling : (fromInitial.selling_price ?? '');
+            const discount = fromDOM !== undefined ? fromDOM.discount : (fromInitial.discount_price ?? '');
+
+            const row = document.createElement('div');
+            row.className = 'size-pricing-row';
+            row.setAttribute('data-size', sz);
+            row.style.cssText = 'display: grid; grid-template-columns: 100px 1.2fr 1.2fr 100px; gap: 10px; align-items: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px;';
+
+            row.innerHTML = `
+                <div>
+                    <strong style="display: inline-block; background: #0f172a; color: #ffffff; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                        ${sz}
+                    </strong>
+                </div>
+                <div>
+                    <input type="number" step="0.01" min="0" 
+                           name="size_prices[${sz}][selling_price]" 
+                           class="size-selling-input" 
+                           placeholder="e.g. 5000" 
+                           value="${selling}"
+                           oninput="updateSizeDiscountBadge(this)"
+                           style="width: 100%; padding: 6px 10px; font-size: 13px; font-weight: 600; border: 1px solid #cbd5e1; border-radius: 6px;">
+                </div>
+                <div>
+                    <input type="number" step="0.01" min="0" 
+                           name="size_prices[${sz}][discount_price]" 
+                           class="size-discount-input" 
+                           placeholder="e.g. 4500 (optional)" 
+                           value="${discount}"
+                           oninput="updateSizeDiscountBadge(this)"
+                           style="width: 100%; padding: 6px 10px; font-size: 13px; font-weight: 600; border: 1px solid #cbd5e1; border-radius: 6px;">
+                </div>
+                <div style="text-align: right;">
+                    <span class="size-disc-badge" style="font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; display: none;"></span>
+                </div>
+            `;
+
+            container.appendChild(row);
+            const sellInput = row.querySelector('.size-selling-input');
+            if (sellInput) updateSizeDiscountBadge(sellInput);
+        });
+    }
+
+    input.addEventListener('input', renderSizePricingRows);
+
+    document.querySelectorAll('.size-preset').forEach(button => {
+        button.addEventListener('click', () => {
+            const values = input.value.split(',').map(v => v.trim()).filter(Boolean);
+            const exists = values.some(v => v.toLowerCase() === button.dataset.size.toLowerCase());
+            if (!exists) values.push(button.dataset.size);
+            input.value = values.join(', ');
+            renderSizePricingRows();
+            input.focus();
+        });
     });
 
+    renderSizePricingRows();
 })();
+
+function updateSizeDiscountBadge(inputEl) {
+    const row = inputEl.closest('.size-pricing-row');
+    if (!row) return;
+    const sellVal = parseFloat(row.querySelector('.size-selling-input')?.value);
+    const discVal = parseFloat(row.querySelector('.size-discount-input')?.value);
+    const badge = row.querySelector('.size-disc-badge');
+    if (!badge) return;
+
+    if (!isNaN(sellVal) && !isNaN(discVal) && discVal > 0 && discVal < sellVal && sellVal > 0) {
+        const pct = Math.round(((sellVal - discVal) / sellVal) * 100);
+        badge.textContent = `-${pct}% OFF`;
+        badge.style.display = 'inline-block';
+        badge.style.background = '#fee2e2';
+        badge.style.color = '#dc2626';
+    } else {
+        badge.style.display = 'none';
+    }
+}
 
 // Colorways Dynamic Row Manager
 let cwIndexCounter = {{ count($existingColorways) > 0 ? count($existingColorways) + 50 : 0 }};

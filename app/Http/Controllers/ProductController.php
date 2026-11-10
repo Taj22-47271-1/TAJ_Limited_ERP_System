@@ -144,6 +144,10 @@ class ProductController extends Controller
             'image'=>['nullable','image','mimes:jpg,jpeg,png,webp','max:2048'],
             'has_sizes'=>['nullable','boolean'],
             'sizes_text'=>['nullable','string','max:300'],
+            'size_prices'=>['nullable','array'],
+            'size_prices.*.selling_price'=>['nullable','numeric','min:0'],
+            'size_prices.*.discount_price'=>['nullable','numeric','min:0'],
+            'size_prices.*.discount_percent'=>['nullable','numeric','min:0','max:100'],
             'colorways'=>['nullable','array'],
             'colorways.*.name'=>['nullable','string','max:100'],
             'colorways.*.color'=>['nullable','string','max:30'],
@@ -182,6 +186,41 @@ class ProductController extends Controller
         unset($data['sizes_text']);
         $data['has_sizes'] = $hasSizes;
         $data['size_options'] = $hasSizes ? $sizes->all() : null;
+
+        // Process size-specific pricing if configured
+        $rawSizePrices = $request->input('size_prices');
+        $cleanSizePrices = [];
+        if ($hasSizes && is_array($rawSizePrices)) {
+            foreach ($rawSizePrices as $sizeKey => $szData) {
+                if (! is_array($szData)) continue;
+                $trimmedKey = trim((string)$sizeKey);
+                if (! $sizes->contains(fn ($s) => mb_strtolower($s) === mb_strtolower($trimmedKey))) {
+                    continue;
+                }
+
+                $szSelling = isset($szData['selling_price']) && $szData['selling_price'] !== '' ? (float)$szData['selling_price'] : null;
+                $szDiscount = isset($szData['discount_price']) && $szData['discount_price'] !== '' ? (float)$szData['discount_price'] : null;
+                $szPercent = isset($szData['discount_percent']) && $szData['discount_percent'] !== '' ? (float)$szData['discount_percent'] : null;
+
+                if ($szSelling !== null && $szSelling > 0) {
+                    if ($szDiscount !== null && $szDiscount > 0 && $szDiscount < $szSelling) {
+                        $szPercent = round((($szSelling - $szDiscount) / $szSelling) * 100, 1);
+                    } elseif ($szPercent !== null && $szPercent > 0 && $szPercent < 100) {
+                        $szDiscount = round($szSelling * (1 - ($szPercent / 100)), 2);
+                    } else {
+                        $szDiscount = null;
+                        $szPercent = null;
+                    }
+
+                    $cleanSizePrices[$trimmedKey] = [
+                        'selling_price' => round($szSelling, 2),
+                        'discount_price' => $szDiscount ? round($szDiscount, 2) : null,
+                        'discount_percent' => $szPercent ? round($szPercent, 1) : null,
+                    ];
+                }
+            }
+        }
+        $data['size_prices'] = ! empty($cleanSizePrices) ? $cleanSizePrices : null;
 
         // Auto-calculate and synchronize discount price & discount percentage
         $sellingPrice = (float)($data['selling_price'] ?? 0);

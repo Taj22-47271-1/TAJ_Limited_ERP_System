@@ -13,7 +13,7 @@ class Product extends Model
     protected $fillable = [
         'category_id', 'name', 'sku', 'barcode', 'unit', 'purchase_price', 'selling_price',
         'discount_price', 'discount_percent', 'stock', 'reserved_stock', 'min_stock',
-        'image_path', 'has_sizes', 'size_options', 'colorways', 'status', 'description',
+        'image_path', 'has_sizes', 'size_options', 'size_prices', 'colorways', 'status', 'description',
         'showcase_config',
     ];
 
@@ -38,6 +38,7 @@ class Product extends Model
             'min_stock' => 'decimal:2',
             'has_sizes' => 'boolean',
             'size_options' => 'array',
+            'size_prices' => 'array',
             'colorways' => 'array',
             'status' => 'boolean',
             'showcase_config' => 'array',
@@ -344,7 +345,7 @@ class Product extends Model
 
     public function normalizedSizes(): array
     {
-        if (! $this->has_sizes) {
+        if (! $this->has_sizes && ! $this->isPerfume()) {
             return [];
         }
 
@@ -355,12 +356,20 @@ class Product extends Model
             ->values()
             ->all();
 
-        return ! empty($options) ? $options : ['S', 'M', 'L', 'XL', 'XXL'];
+        if (! empty($options)) {
+            return $options;
+        }
+
+        if ($this->isPerfume()) {
+            return ['50ml', '100ml'];
+        }
+
+        return ['S', 'M', 'L', 'XL', 'XXL'];
     }
 
     public function hasSize(?string $size): bool
     {
-        if (! $this->has_sizes) {
+        if (! $this->has_sizes && ! $this->isPerfume()) {
             return $size === null || trim((string) $size) === '';
         }
 
@@ -371,5 +380,113 @@ class Product extends Model
         return collect($this->normalizedSizes())->contains(
             fn ($option) => mb_strtolower($option) === mb_strtolower(trim($size))
         );
+    }
+
+    /**
+     * Get the size pricing map normalized by lowercase size key.
+     */
+    public function getSizePricesMap(): array
+    {
+        if (empty($this->size_prices) || ! is_array($this->size_prices)) {
+            return [];
+        }
+        $map = [];
+        foreach ($this->size_prices as $key => $val) {
+            if (is_array($val)) {
+                $norm = mb_strtolower(trim((string)$key));
+                $map[$norm] = $val;
+            }
+        }
+        return $map;
+    }
+
+    /**
+     * Get pricing parameters for a specific size.
+     */
+    public function getPricingForSize(?string $size): array
+    {
+        $fallbackSelling = (float) $this->selling_price;
+        $fallbackEffective = (float) $this->effective_price;
+        $fallbackDiscountPercent = $this->discount_percent_calculated;
+        $fallbackHasDiscount = $this->has_discount;
+
+        if ($size === null || trim((string)$size) === '' || empty($this->size_prices) || ! is_array($this->size_prices)) {
+            return [
+                'selling_price' => $fallbackSelling,
+                'effective_price' => $fallbackEffective,
+                'discount_price' => $this->discount_price !== null ? (float)$this->discount_price : null,
+                'discount_percent' => $fallbackDiscountPercent,
+                'has_discount' => $fallbackHasDiscount,
+            ];
+        }
+
+        $normSize = mb_strtolower(trim((string)$size));
+        $map = $this->getSizePricesMap();
+
+        if (! isset($map[$normSize])) {
+            return [
+                'selling_price' => $fallbackSelling,
+                'effective_price' => $fallbackEffective,
+                'discount_price' => $this->discount_price !== null ? (float)$this->discount_price : null,
+                'discount_percent' => $fallbackDiscountPercent,
+                'has_discount' => $fallbackHasDiscount,
+            ];
+        }
+
+        $entry = $map[$normSize];
+        $selling = isset($entry['selling_price']) && is_numeric($entry['selling_price']) && (float)$entry['selling_price'] > 0
+            ? (float)$entry['selling_price']
+            : $fallbackSelling;
+
+        $discountPrice = isset($entry['discount_price']) && is_numeric($entry['discount_price']) && (float)$entry['discount_price'] > 0
+            ? (float)$entry['discount_price']
+            : null;
+
+        $discountPercent = isset($entry['discount_percent']) && is_numeric($entry['discount_percent']) && (float)$entry['discount_percent'] > 0
+            ? (float)$entry['discount_percent']
+            : null;
+
+        $effective = $selling;
+        if ($discountPrice !== null && $discountPrice > 0 && $discountPrice < $selling) {
+            $effective = $discountPrice;
+            if ($discountPercent === null && $selling > 0) {
+                $discountPercent = round((($selling - $discountPrice) / $selling) * 100, 1);
+            }
+        } elseif ($discountPercent !== null && $discountPercent > 0 && $discountPercent < 100) {
+            $effective = round($selling * (1 - ($discountPercent / 100)), 2);
+            if ($discountPrice === null) {
+                $discountPrice = $effective;
+            }
+        }
+
+        $hasDiscount = $effective < $selling;
+
+        return [
+            'selling_price' => $selling,
+            'effective_price' => $effective,
+            'discount_price' => $hasDiscount ? $discountPrice : null,
+            'discount_percent' => $hasDiscount ? $discountPercent : null,
+            'has_discount' => $hasDiscount,
+        ];
+    }
+
+    public function getEffectivePriceForSize(?string $size): float
+    {
+        return $this->getPricingForSize($size)['effective_price'];
+    }
+
+    public function getSellingPriceForSize(?string $size): float
+    {
+        return $this->getPricingForSize($size)['selling_price'];
+    }
+
+    public function getDiscountPercentForSize(?string $size): ?float
+    {
+        return $this->getPricingForSize($size)['discount_percent'];
+    }
+
+    public function hasDiscountForSize(?string $size): bool
+    {
+        return $this->getPricingForSize($size)['has_discount'];
     }
 }

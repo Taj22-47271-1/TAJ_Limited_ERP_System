@@ -32,10 +32,10 @@ class CartController extends Controller
                 'color' => $it['color'],
                 'colorway' => $it['colorway'],
                 'quantity' => $it['quantity'],
-                'selling_price' => (float)$it['product']->effective_price,
-                'original_price' => (float)$it['product']->selling_price,
-                'has_discount' => $it['product']->has_discount,
-                'discount_percent' => $it['product']->discount_percent_calculated,
+                'selling_price' => (float)$it['unit_price'],
+                'original_price' => (float)$it['original_price'],
+                'has_discount' => (bool)$it['has_discount'],
+                'discount_percent' => $it['discount_percent'],
                 'line_total' => $it['line_total'],
                 'image' => $it['image'],
             ]),
@@ -109,10 +109,10 @@ class CartController extends Controller
                     'color' => $it['color'],
                     'colorway' => $it['colorway'],
                     'quantity' => $it['quantity'],
-                    'selling_price' => (float)$it['product']->effective_price,
-                    'original_price' => (float)$it['product']->selling_price,
-                    'has_discount' => $it['product']->has_discount,
-                    'discount_percent' => $it['product']->discount_percent_calculated,
+                    'selling_price' => (float)$it['unit_price'],
+                    'original_price' => (float)$it['original_price'],
+                    'has_discount' => (bool)$it['has_discount'],
+                    'discount_percent' => $it['discount_percent'],
                     'line_total' => $it['line_total'],
                     'image' => $it['image'],
                 ]),
@@ -227,8 +227,9 @@ class CartController extends Controller
                 return null;
             }
 
-            $size = $product->has_sizes ? ($line['size'] ?? null) : null;
-            if ($product->has_sizes && ! $product->hasSize($size)) {
+            $hasAnySizes = $product->has_sizes || $product->isPerfume();
+            $size = $hasAnySizes ? ($line['size'] ?? null) : null;
+            if ($hasAnySizes && ! $product->hasSize($size)) {
                 return null;
             }
 
@@ -237,7 +238,11 @@ class CartController extends Controller
             $image = (! empty($colorway['image_url'])) ? $colorway['image_url'] : $product->image_url;
 
             $quantity = (float)$line['quantity'];
-            $effectivePrice = (float)$product->effective_price;
+            $pricing = $product->getPricingForSize($size);
+            $effectivePrice = (float)$pricing['effective_price'];
+            $sellingPrice = (float)$pricing['selling_price'];
+            $hasDiscount = (bool)$pricing['has_discount'];
+            $discountPercent = $pricing['discount_percent'];
 
             return [
                 'key' => $key,
@@ -248,9 +253,9 @@ class CartController extends Controller
                 'image' => $image,
                 'quantity' => $quantity,
                 'unit_price' => $effectivePrice,
-                'original_price' => (float)$product->selling_price,
-                'has_discount' => $product->has_discount,
-                'discount_percent' => $product->discount_percent_calculated,
+                'original_price' => $sellingPrice,
+                'has_discount' => $hasDiscount,
+                'discount_percent' => $discountPercent,
                 'line_total' => $quantity * $effectivePrice,
             ];
         })->filter()->values();
@@ -274,7 +279,7 @@ class CartController extends Controller
     {
         $size = $this->normalizedSize($size);
 
-        if (! $product->has_sizes) {
+        if (! $product->has_sizes && ! $product->isPerfume()) {
             return null;
         }
 
