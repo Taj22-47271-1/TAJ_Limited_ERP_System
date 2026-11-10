@@ -1912,3 +1912,111 @@ body.vc-drawer-open {
     padding: 20px !important;
   }
 }
+
+/* ==========================================================================
+   LUXURY MINIMAL PAGINATION COMPONENT (BEHANCE / ATELIER DESIGN)
+   ========================================================================== */
+.lux-pagination-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin: 50px auto 30px;
+  width: 100%;
+}
+
+.lux-pagination-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+.lux-page-item {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  text-decoration: none;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+
+.lux-page-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.lux-page-item.active {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  border-color: #0f172a !important;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  transform: translateY(-1px);
+}
+
+.lux-page-item.disabled {
+  color: #cbd5e1 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  opacity: 0.45;
+  border-color: transparent !important;
+}
+
+.lux-page-item svg {
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  display: block;
+}
+
+.lux-page-dots {
+  padding: 0 6px;
+  color: #94a3b8;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+
+.lux-pagination-meta {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.lux-pagination-meta strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Universal SVG safety lock against giant arrows */
+nav[role="navigation"] svg,
+.pagination svg {
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  display: inline-block;
+  vertical-align: middle;
+}
