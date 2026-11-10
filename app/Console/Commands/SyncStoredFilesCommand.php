@@ -51,3 +51,4 @@ class SyncStoredFilesCommand extends Command
         return Command::SUCCESS;
     }
 }
+

@@ -246,6 +246,59 @@
 
 
 
+{{-- Modern Floating Bottom Cart Bar (Pill Design) --}}
+@php
+    $initialCartCount = collect(session('cart', []))->sum(fn($line) => is_array($line) ? (float)($line['quantity'] ?? 0) : (float)$line);
+@endphp
+<div class="vc-floating-cart-bar {{ $initialCartCount > 0 ? 'is-visible' : '' }}" id="vcFloatingCartBar" aria-live="polite">
+    <div class="vc-floating-cart-inner" id="vcFloatingCartTrigger">
+        <div style="display: flex; align-items: center; min-width: 0;">
+            <div class="vc-floating-thumbs" id="vcFloatingThumbs">
+                {{-- Populated dynamically via JS from /cart/summary --}}
+            </div>
+            <div class="vc-floating-info">
+                <strong id="vcFloatingCountText">{{ number_format($initialCartCount, 0) }} {{ $initialCartCount == 1 ? 'item' : 'items' }}</strong>
+                <span id="vcFloatingTotalText">View Cart</span>
+            </div>
+        </div>
+        <div class="vc-floating-right">
+            <span class="vc-floating-view-label" style="font-size: 13px; font-weight: 750; color: #ffffff;">View Cart</span>
+            <span class="vc-floating-arrow" style="font-size: 18px; margin-left: 6px; color: #ffffff;">→</span>
+        </div>
+    </div>
+</div>
+
+{{-- Slide-Up Quick Cart Drawer --}}
+<div class="vc-mini-cart-overlay" id="vcMiniCartOverlay"></div>
+<aside class="vc-mini-cart-drawer" id="vcMiniCartDrawer" aria-label="Quick Cart Drawer">
+    <div class="vc-mini-cart-head">
+        <div>
+            <span style="font-size: 18px;">🛍️</span>
+            <h3>Shopping Bag <small id="vcDrawerCountBadge" style="font-size: 13px; color: #64748b; font-weight: 600;">({{ number_format($initialCartCount, 0) }})</small></h3>
+        </div>
+        <button type="button" class="vc-drawer-close-btn" id="vcMiniCartClose" aria-label="Close cart drawer">✕</button>
+    </div>
+    <div class="vc-mini-cart-items" id="vcMiniCartItems">
+        <div style="text-align: center; padding: 36px 16px; color: #9ca3af; font-size: 13px;">
+            Loading cart items...
+        </div>
+    </div>
+    <div class="vc-mini-cart-footer">
+        <div class="vc-drawer-subtotal-row">
+            <span>Subtotal:</span>
+            <strong id="vcDrawerSubtotal">৳0.00</strong>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <a href="{{ route('cart.index') }}" class="btn ghost" style="flex: 1; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 700; border: 1px solid #cbd5e1; color: #0f172a; background: #ffffff;">
+                View Cart
+            </a>
+            <a href="{{ route('checkout') }}" class="btn primary" style="flex: 1; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 800; background: #0f172a; color: #ffffff;">
+                Checkout →
+            </a>
+        </div>
+    </div>
+</aside>
+
 <footer class="vc-footer">
 
     <div class="vc-footer-inner">

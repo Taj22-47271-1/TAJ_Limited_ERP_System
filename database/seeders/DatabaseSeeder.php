@@ -167,25 +167,55 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach($products as [$name,$sku,$barcode,$cat,$buy,$sell,$discountPrice,$discountPercent,$stock,$min,$description,$imagePath,$hasSizes,$sizes,$colorways]){
+            // Prevent duplicate barcode/SKU unique constraint violations in production
+            $existing = Product::query()
+                ->where('sku', $sku)
+                ->orWhere('barcode', $barcode)
+                ->first();
 
-            $product=Product::query()->firstOrCreate(['sku'=>$sku],[
+            if ($existing) {
+                // Conflicting or existing product already present — skip without modifying real production product
+                continue;
+            }
 
-                'category_id'=>$cats[$cat]->id,'name'=>$name,'barcode'=>$barcode,'unit'=>'pcs','purchase_price'=>$buy,'selling_price'=>$sell,
+            try {
+                $product = Product::create([
+                    'category_id' => $cats[$cat]->id,
+                    'name' => $name,
+                    'sku' => $sku,
+                    'barcode' => $barcode,
+                    'unit' => 'pcs',
+                    'purchase_price' => $buy,
+                    'selling_price' => $sell,
+                    'discount_price' => $discountPrice,
+                    'discount_percent' => $discountPercent,
+                    'stock' => $stock,
+                    'reserved_stock' => 0,
+                    'min_stock' => $min,
+                    'status' => true,
+                    'description' => $description,
+                    'image_path' => $imagePath,
+                    'has_sizes' => $hasSizes,
+                    'size_options' => $sizes,
+                    'colorways' => $colorways,
+                ]);
 
-                'discount_price'=>$discountPrice,'discount_percent'=>$discountPercent,'stock'=>$stock,'reserved_stock'=>0,'min_stock'=>$min,
-
-                'status'=>true,'description'=>$description,'image_path'=>$imagePath,'has_sizes'=>$hasSizes,'size_options'=>$sizes,'colorways'=>$colorways,
-
-            ]);
-
-            StockMovement::query()->firstOrCreate(
-
-                ['product_id'=>$product->id,'movement_type'=>'opening_stock','reference_type'=>'seed','reference_id'=>$product->id],
-
-                ['quantity_in'=>$product->stock,'quantity_out'=>0,'balance_after'=>$product->stock,'unit_cost'=>$product->purchase_price,'note'=>'Seed opening stock','created_by'=>$admin->id]
-
-            );
-
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'movement_type' => 'opening_stock',
+                    'reference_type' => 'seed',
+                    'reference_id' => $product->id,
+                    'quantity_in' => $product->stock,
+                    'quantity_out' => 0,
+                    'balance_after' => $product->stock,
+                    'unit_cost' => $product->purchase_price,
+                    'note' => 'Seed opening stock',
+                    'created_by' => $admin->id,
+                ]);
+            } catch (\Throwable $e) {
+                // Failsafe: gracefully skip without failing the deployment if a conflict occurs
+                continue;
+            }
         }
 
 

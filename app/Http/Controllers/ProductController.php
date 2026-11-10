@@ -107,8 +107,12 @@ class ProductController extends Controller
                 $cwImg = $cw['image'] ?? null;
                 if ($cwImg && ! str_starts_with($cwImg, 'assets/') && ! str_starts_with($cwImg, 'http')) {
                     Storage::disk('public')->delete($cwImg);
+                    \App\Models\StoredFile::where('file_path', $cwImg)->delete();
                 }
             }
+        }
+        if ($product->image_path && ! str_starts_with($product->image_path, 'assets/') && ! str_starts_with($product->image_path, 'http')) {
+            \App\Models\StoredFile::where('file_path', $product->image_path)->delete();
         }
 
         // Release unique SKU/barcode so they can be reused if needed

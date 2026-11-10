@@ -888,6 +888,14 @@ body.behance-luxury-body {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
+.lux-btn-black.is-added,
+.lux-add-to-cart-btn.is-added {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
+  transform: scale(1.02);
+}
 
 /* Right Media Stage */
 .lux-stage-column {
@@ -1249,6 +1257,19 @@ body.behance-luxury-body {
 }
 
 /* Animated State */
+.lux-order-truck-btn .box {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-top: -8px;
+  background: #d97706;
+  border: 1px solid #b45309;
+  border-radius: 2px;
+  opacity: 0;
+  z-index: 6;
+}
 .lux-order-truck-btn.animate {
   pointer-events: none;
 }
@@ -1268,6 +1289,10 @@ body.behance-luxury-body {
 .lux-order-truck-btn.animate .truck .light {
   opacity: 1;
 }
+.lux-order-truck-btn.animate .box {
+  opacity: 1;
+  animation: luxBoxLoadAndDisappear 2.2s ease forwards;
+}
 .lux-order-truck-btn.animate.done {
   background: var(--finish-bg);
 }
@@ -1284,10 +1309,33 @@ body.behance-luxury-body {
   to { background-position: -20px 0; }
 }
 @keyframes luxTruckDrive {
-  0% { transform: translateX(0); }
-  35% { transform: translateX(130px); }
-  65% { transform: translateX(200px); }
-  100% { transform: translateX(360px); }
+  0% { transform: translateX(45px); }
+  35% { transform: translateX(45px); }
+  45% { transform: translateX(70px); }
+  70% { transform: translateX(180px); }
+  100% { transform: translateX(460px); }
+}
+@keyframes luxBoxLoadAndDisappear {
+  0% {
+    opacity: 1;
+    transform: translate(130px, -2px) scale(1);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(100px, -4px) scale(0.95);
+  }
+  30% {
+    opacity: 0.85;
+    transform: translate(65px, -2px) scale(0.85);
+  }
+  36% {
+    opacity: 0;
+    transform: translate(52px, 2px) scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(52px, 2px) scale(0.45);
+  }
 }
 
 /* --------------------------------------------------------------------------

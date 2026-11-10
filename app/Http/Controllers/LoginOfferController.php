@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\StoredFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class LoginOfferController extends Controller
 {
@@ -62,6 +64,7 @@ class LoginOfferController extends Controller
                 $imagePath = $slideData['existing_image'] ?? '';
                 if ($request->hasFile("slide_image_{$index}")) {
                     $uploaded = $request->file("slide_image_{$index}")->store('offers', 'public');
+                    StoredFile::persist($uploaded, Storage::disk('public')->path($uploaded));
                     $imagePath = 'storage/' . $uploaded;
                 } elseif (empty($imagePath) && $linkedProduct) {
                     $imagePath = $linkedProduct->image_path;

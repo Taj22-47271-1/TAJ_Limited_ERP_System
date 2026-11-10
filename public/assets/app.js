@@ -756,9 +756,9 @@ window.initStorefrontCart = function() {
 
 
 
-    const btn = submitter || form.querySelector('button[type="submit"]') || form.querySelector('.vc-add-button, .fashion-add-cart');
+    const btn = submitter || form.querySelector('button[type="submit"]') || form.querySelector('.vc-add-button, .fashion-add-cart, .lux-btn-black');
 
-    const sourceCard = form.closest('.vc-product-card') || form.closest('.fashion-product-detail') || form.closest('.vc-hero-product');
+    const sourceCard = form.closest('.vc-product-card') || form.closest('.fashion-product-detail') || form.closest('.vc-hero-product') || form.closest('.lux-card');
 
     const sourceImg = sourceCard?.querySelector('img') || form.querySelector('img');
 
@@ -848,47 +848,7 @@ window.initStorefrontCart = function() {
 
 
 
-  // Animated Order Confirm Delivery Truck Button (Coding.stella style)
-
-  const truckBtn = document.getElementById('orderTruckBtn');
-
-  if (truckBtn) {
-
-    truckBtn.addEventListener('click', function(e) {
-
-      const form = this.closest('form');
-
-      if (!form) return;
-
-      if (!form.reportValidity()) return;
-
-      if (this.classList.contains('animate')) return;
-
-
-
-      e.preventDefault();
-
-      this.classList.add('animate');
-
-
-
-      setTimeout(() => {
-
-        this.classList.add('done');
-
-      }, 1800);
-
-
-
-      setTimeout(() => {
-
-        form.submit();
-
-      }, 2400);
-
-    });
-
-  }
+  // orderTruckBtn handler is managed cleanly by checkout.blade.php with backend verification
 
 };
 

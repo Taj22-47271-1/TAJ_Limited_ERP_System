@@ -86,8 +86,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/change-password', [ChangePasswordController::class, 'edit'])->name('password.change');
     Route::put('/profile/change-password', [ChangePasswordController::class, 'update'])->name('password.change.update');
 
-    // Customer profile & order management
-    Route::middleware('role:customer')->group(function () {
+    // Customer profile & order management (accessible to all authenticated customer, admin & staff shoppers)
+    Route::middleware('role:customer,admin,cashier')->group(function () {
         Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('customer.profile');
         Route::put('/profile', [CustomerProfileController::class, 'update'])->name('customer.profile.update');
         Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');

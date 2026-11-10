@@ -118,6 +118,15 @@ class OnlineOrderController extends Controller
         $this->clearOrderCaches();
 
         $request->session()->forget('cart');
+        $redirectUrl = $order->payment_method === 'online' ? route('customer.orders.pay', $order) : route('customer.orders.show', $order);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Order placed successfully. It is waiting for approval.',
+                'order_id' => $order->id,
+                'redirect_url' => $redirectUrl,
+            ]);
+        }
         if ($order->payment_method === 'online') {
             return redirect()->route('customer.orders.pay', $order);
         }

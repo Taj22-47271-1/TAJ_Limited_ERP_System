@@ -126,6 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isSubmitting = false;
 
     form.addEventListener('submit', function(e) {
+        e.preventDefault();
         if (isSubmitting) return;
 
         // Check HTML5 validity
@@ -134,21 +135,65 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        e.preventDefault();
         isSubmitting = true;
+        btn.disabled = true;
+        const defaultSpan = btn.querySelector('.default');
+        const originalText = defaultSpan ? defaultSpan.textContent : 'Place Order';
+        if (defaultSpan) defaultSpan.textContent = 'Processing...';
 
-        // Step 1: Start driving animation
-        btn.classList.add('animate');
+        const formData = new FormData(form);
 
-        // Step 2: At 2.0s, switch to green finish with checkmark
-        setTimeout(function() {
-            btn.classList.add('done');
-        }, 2000);
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            }
+        })
+        .then(function(res) {
+            if (!res.ok) {
+                return res.json().then(function(err) { throw err; });
+            }
+            return res.json();
+        })
+        .then(function(data) {
+            if (!data.success) {
+                throw new Error(data.message || 'Order could not be placed.');
+            }
 
-        // Step 3: At 2.6s, submit the form to backend
-        setTimeout(function() {
-            form.submit();
-        }, 2600);
+            // Backend order creation succeeded: run delivery animation
+            if (defaultSpan) defaultSpan.style.opacity = '0';
+            btn.classList.add('animate');
+
+            // At 2.2s, after box entered and car drove forward, show order placed checkmark
+            setTimeout(function() {
+                btn.classList.add('done');
+            }, 2200);
+
+            // At 2.8s, redirect to order confirmation
+            setTimeout(function() {
+                window.location.href = data.redirect_url || "{{ route('dashboard') }}";
+            }, 2800);
+        })
+        .catch(function(err) {
+            isSubmitting = false;
+            btn.disabled = false;
+            btn.classList.remove('animate', 'done');
+            if (defaultSpan) {
+                defaultSpan.style.opacity = '1';
+                defaultSpan.textContent = originalText;
+            }
+
+            let msg = 'Could not place order. Please review your details and try again.';
+            if (err && err.errors) {
+                msg = Object.values(err.errors).flat().join('\n');
+            } else if (err && err.message) {
+                msg = err.message;
+            }
+            alert(msg);
+        });
     });
 });
 </script>

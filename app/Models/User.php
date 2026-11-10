@@ -35,15 +35,27 @@ class User extends Authenticatable
         return $this->hasMany(OnlineOrder::class);
     }
 
+    protected static array $roleCache = [];
+
     public function hasPermission(string $permission): bool
     {
-        $role = $this->relationLoaded('roleDefinition') ? $this->roleDefinition : Role::where('slug', $this->role)->first();
+        if ($this->role === 'admin') {
+            return true;
+        }
+
+        $slug = (string) $this->role;
+        if (! array_key_exists($slug, static::$roleCache)) {
+            static::$roleCache[$slug] = $this->relationLoaded('roleDefinition')
+                ? $this->roleDefinition
+                : Role::where('slug', $slug)->first();
+        }
+
+        $role = static::$roleCache[$slug];
         if ($role) {
             return $role->hasPermission($permission);
         }
 
         return match ($this->role) {
-            'admin' => true,
             'cashier' => in_array($permission, [
                 'dashboard.view','pos.use','sales.view','products.view','products.manage',
                 'orders.view','orders.approve','orders.progress','customers.manage'

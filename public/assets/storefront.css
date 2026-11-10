@@ -89,7 +89,9 @@
 
 /* Instant button feedback on add */
 .vc-add-button.is-added,
-.fashion-add-cart.is-added {
+.fashion-add-cart.is-added,
+.lux-btn-black.is-added,
+.lux-add-to-cart-btn.is-added {
   background: #10b981 !important;
   color: #ffffff !important;
   border-color: #10b981 !important;
@@ -539,7 +541,7 @@
   opacity: 1;
 }
 .order-truck-btn.animate .box {
-  animation: boxDrop 2.2s ease forwards;
+  opacity: 1; animation: boxLoadAndDisappear 2.2s ease forwards;
 }
 .order-truck-btn.animate.done {
   background: var(--finish);
@@ -557,17 +559,33 @@
   to { background-position: -20px 0; }
 }
 @keyframes truckDrive {
-  0% { transform: translateX(0); }
-  35% { transform: translateX(140px); }
-  65% { transform: translateX(150px); }
-  100% { transform: translateX(420px); }
+  0% { transform: translateX(45px); }
+  35% { transform: translateX(45px); }
+  45% { transform: translateX(70px); }
+  70% { transform: translateX(180px); }
+  100% { transform: translateX(460px); }
 }
-@keyframes boxDrop {
-  0% { opacity: 0; transform: translate(100px, -20px) scale(0.6); }
-  25% { opacity: 1; transform: translate(130px, 0) scale(1); }
-  35% { transform: translate(145px, 12px) scale(0.85); }
-  65% { transform: translate(155px, 12px) scale(0.85); }
-  100% { opacity: 0; transform: translate(420px, 12px) scale(0.85); }
+@keyframes boxLoadAndDisappear {
+  0% {
+    opacity: 1;
+    transform: translate(130px, 4px) scale(1);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(100px, 0px) scale(0.95);
+  }
+  30% {
+    opacity: 0.85;
+    transform: translate(65px, 2px) scale(0.85);
+  }
+  36% {
+    opacity: 0;
+    transform: translate(52px, 6px) scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(52px, 6px) scale(0.45);
+  }
 }
 
 

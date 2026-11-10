@@ -3,8 +3,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\StoredFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class ShowcaseController extends Controller
 {
@@ -72,6 +74,7 @@ class ShowcaseController extends Controller
         $loupeImagePath = $currentConfig['loupe']['image'] ?? 'assets/images/products/saree-fabric-texture.jpg';
         if ($request->hasFile('loupe_image')) {
             $path = $request->file('loupe_image')->store('showcase', 'public');
+            StoredFile::persist($path, Storage::disk('public')->path($path));
             $loupeImagePath = 'storage/' . $path;
         }
 
@@ -117,6 +120,7 @@ class ShowcaseController extends Controller
                 $swatchImg = $sw['existing_image'] ?? ($currentConfig['swatches'][$i]['image'] ?? '');
                 if ($request->hasFile("swatch_image_{$i}")) {
                     $savedPath = $request->file("swatch_image_{$i}")->store('showcase/swatches', 'public');
+                    StoredFile::persist($savedPath, Storage::disk('public')->path($savedPath));
                     $swatchImg = 'storage/' . $savedPath;
                 }
 
@@ -138,6 +142,7 @@ class ShowcaseController extends Controller
         if ($request->hasFile('gallery_images')) {
             foreach ($request->file('gallery_images') as $file) {
                 $path = $file->store('showcase/gallery', 'public');
+                StoredFile::persist($path, Storage::disk('public')->path($path));
                 $gallery[] = 'storage/' . $path;
             }
         }

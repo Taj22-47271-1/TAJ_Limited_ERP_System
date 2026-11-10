@@ -38,8 +38,12 @@ if [ "${SKIP_MIGRATIONS:-false}" != "true" ]; then
     echo "Synchronizing persistent database media storage..."
     php artisan storage:sync-db || echo "WARNING: Storage sync skipped."
 
-    echo "Seeding system roles and settings..."
-    php artisan db:seed --force || echo "WARNING: Seeding skipped or encountered an issue."
+    if [ "${SKIP_SEEDING:-false}" != "true" ]; then
+        echo "Seeding system roles and settings..."
+        php artisan db:seed --force || echo "WARNING: Seeding skipped or encountered an issue."
+    else
+        echo "SKIP_SEEDING is enabled. Skipping database seeding."
+    fi
 fi
 
 exec apache2-foreground

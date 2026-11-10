@@ -27,7 +27,9 @@ class ImageBackgroundService
             $contents = file_get_contents($file->getRealPath());
             $src = @imagecreatefromstring($contents);
             if (! $src) {
-                return $file->store($folder, $disk);
+                $stored = $file->store($folder, $disk);
+                StoredFile::persist($stored, Storage::disk($disk)->path($stored));
+                return $stored;
             }
 
             $width = imagesx($src);
@@ -35,7 +37,9 @@ class ImageBackgroundService
 
             if ($width <= 0 || $height <= 0) {
                 imagedestroy($src);
-                return $file->store($folder, $disk);
+                $stored = $file->store($folder, $disk);
+                StoredFile::persist($stored, Storage::disk($disk)->path($stored));
+                return $stored;
             }
 
             // Sample corner colors (top-left, top-right, bottom-left, bottom-right)
@@ -58,7 +62,9 @@ class ImageBackgroundService
             if (! $isLightBg) {
                 // If not a solid white/light background, store normally
                 imagedestroy($src);
-                return $file->store($folder, $disk);
+                $stored = $file->store($folder, $disk);
+                StoredFile::persist($stored, Storage::disk($disk)->path($stored));
+                return $stored;
             }
 
             // Create true color destination image with alpha transparency
