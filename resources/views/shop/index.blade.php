@@ -48,13 +48,13 @@
             @if(request('category'))<input type="hidden" name="category" value="{{ request('category') }}">@endif
             @if(request('filter'))<input type="hidden" name="filter" value="{{ request('filter') }}">@endif
             <div style="position: relative; flex: 1;">
+                <svg viewBox="0 0 24 24" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: #2563eb; fill: none; stroke-width: 2; pointer-events: none; z-index: 2;"><path d="m21 21-4.35-4.35m2.35-5.15A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z"/></svg>
                 <input name="q" value="{{ request('q') }}" placeholder="Search catalog..." 
-                       style="width: 100%; height: 38px; padding: 0 14px 0 34px; border-radius: var(--lux-radius-full); border: 1px solid var(--lux-border-dark); font-size: 13px; outline: none; background: #fafafa;">
-                <svg viewBox="0 0 24 24" style="position: absolute; left: 12px; top: 11px; width: 16px; height: 16px; stroke: #999; fill: none; stroke-width: 2;"><path d="m21 21-4.35-4.35m2.35-5.15A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z"/></svg>
+                       style="width: 100%; height: 40px; padding: 0 16px 0 38px; border-radius: var(--lux-radius-full); border: 1.5px solid #cbd5e1; font-size: 13px; outline: none; background: #ffffff; color: #06153d; font-weight: 500;">
             </div>
-            <button type="submit" class="lux-btn-black" style="height: 38px; padding: 0 16px; font-size: 12px;">Search</button>
+            <button type="submit" class="lux-btn-black" style="height: 40px; padding: 0 18px; font-size: 13px;">Search</button>
             @if(request()->filled('q') || request()->filled('category') || request()->filled('filter'))
-                <a href="{{ route('shop.index') }}" style="font-size: 12px; color: var(--lux-text-muted); text-decoration: none; padding: 0 8px;">Reset</a>
+                <a href="{{ route('shop.index') }}" style="font-size: 12px; color: #2563eb; text-decoration: none; padding: 0 8px; font-weight: 700;">Reset</a>
             @endif
         </form>
     </div>

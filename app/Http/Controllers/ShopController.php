@@ -12,14 +12,41 @@ class ShopController extends Controller
         $query = Product::with('category')->where('status', true)->whereRaw('(stock - reserved_stock) > 0');
         if ($request->filled('q')) {
             $term = trim($request->q);
-            $query->where(fn($q) => $q->where('name','like',"%{$term}%")->orWhere('sku','like',"%{$term}%"));
+            $lowerTerm = '%' . strtolower($term) . '%';
+            $query->where(function ($q) use ($lowerTerm) {
+                $q->whereRaw('LOWER(name) LIKE ?', [$lowerTerm])
+                  ->orWhereRaw('LOWER(sku) LIKE ?', [$lowerTerm])
+                  ->orWhereRaw('LOWER(COALESCE(description, \'\')) LIKE ?', [$lowerTerm]);
+            });
         }
         if ($request->filled('category')) {
             $query->where('category_id', $request->integer('category'));
         }
+        if ($request->get('filter') === 'sale') {
+            $query->where('discount_price', '>', 0);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'products' => $query->latest()->limit(8)->get()->map(fn ($p) => [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'sku' => $p->sku,
+                    'category' => $p->category?->name,
+                    'effective_price' => (float)$p->effective_price,
+                    'selling_price' => (float)$p->selling_price,
+                    'has_discount' => (bool)$p->has_discount,
+                    'discount_percent' => $p->discount_percent_calculated,
+                    'image' => $p->image_url,
+                    'url' => route('shop.show', $p),
+                ]),
+            ]);
+        }
+
         return view('shop.index', [
-            'products'=>$query->latest()->paginate(12)->withQueryString(),
-            'categories'=>Category::where('status',true)->orderBy('name')->get(),
+            'products' => $query->latest()->paginate(12)->withQueryString(),
+            'categories' => Category::where('status', true)->orderBy('name')->get(),
         ]);
     }
 

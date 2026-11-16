@@ -1100,3 +1100,118 @@ html, body {
         font-size: 11.5px;
     }
 }
+
+/* ==========================================================================
+   GLOBAL BRAND FOOTER (SHARED WITH STOREFRONT LUXURY PALETTE)
+   ========================================================================== */
+.taj-login-footer-section {
+    background: linear-gradient(180deg, #06153d 0%, #030c26 100%) !important;
+    border-top: 2px solid rgba(251, 191, 36, 0.35) !important;
+    color: #f8fafc !important;
+    padding: 60px 32px 32px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    position: relative;
+    z-index: 10;
+}
+
+.taj-login-footer-section .vc-footer-inner {
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 2fr 1fr 1fr 1fr !important;
+    gap: 40px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding-bottom: 44px !important;
+}
+
+.taj-login-footer-section .vc-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+}
+
+.taj-login-footer-section .vc-brand-mark {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    font-size: 18px !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35) !important;
+}
+
+.taj-login-footer-section .vc-brand strong {
+    color: #ffffff !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.taj-login-footer-section p {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    max-width: 320px !important;
+    margin: 0 !important;
+}
+
+.taj-login-footer-section h4 {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: #fbbf24 !important;
+    margin: 0 0 16px !important;
+}
+
+.taj-login-footer-section a {
+    display: block !important;
+    font-size: 13px !important;
+    color: #cbd5e1 !important;
+    text-decoration: none !important;
+    margin-bottom: 10px !important;
+    transition: all 0.2s ease !important;
+}
+
+.taj-login-footer-section a:hover {
+    color: #38bdf8 !important;
+    transform: translateX(3px) !important;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.3) !important;
+}
+
+.taj-login-footer-section small {
+    display: block !important;
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 6px !important;
+}
+
+.taj-login-footer-section .vc-copyright {
+    max-width: 1360px !important;
+    margin: 24px auto 0 !important;
+    text-align: center !important;
+    font-size: 12px !important;
+    color: #64748b !important;
+}
+
+@media (max-width: 860px) {
+    .taj-login-footer-section .vc-footer-inner {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 30px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .taj-login-footer-section .vc-footer-inner {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+        padding-bottom: 28px !important;
+    }
+}

@@ -10,27 +10,27 @@
      1. CLEAN BRANDED HERO SECTION (Replacing unwanted stock photo banners)
      ========================================================================= --}}
 <section style="max-width: 1360px; margin: 32px auto 44px; padding: 0 32px;">
-    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 20px; padding: clamp(36px, 5vw, 56px); color: #ffffff; position: relative; overflow: hidden; box-shadow: 0 12px 36px rgba(0,0,0,0.08);">
+    <div style="background: linear-gradient(135deg, #030c26 0%, #06153d 55%, #0a256d 100%); border-radius: 20px; padding: clamp(36px, 5vw, 56px); color: #ffffff; position: relative; overflow: hidden; box-shadow: 0 16px 40px rgba(3, 12, 38, 0.18); border: 1px solid rgba(56, 189, 248, 0.2);">
         <div style="position: relative; z-index: 2; max-width: 640px;">
-            <span style="display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; background: rgba(255,255,255,0.15); padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.2);">
+            <span style="display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 5px 14px; border-radius: 999px; margin-bottom: 16px; border: 1px solid rgba(251, 191, 36, 0.35);">
                 TAJ LIMITED ONLINE STORE
             </span>
             <h1 style="font-size: clamp(32px, 5vw, 48px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.1; margin: 0 0 14px; color: #ffffff;">
-                Simple shopping.<br><span style="color: #c5a880;">Live ERP inventory.</span>
+                Simple shopping.<br><span style="color: #fbbf24;">Live ERP inventory.</span>
             </h1>
             <p style="font-size: 15px; line-height: 1.6; color: #cbd5e1; margin: 0 0 28px;">
                 Browse available products, pay online or choose cash on delivery nationwide. Every product is synchronized live with TAJ Limited ERP stock.
             </p>
             <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-                <a href="{{ route('shop.index') }}" class="lux-btn-black" style="background: #ffffff; color: #0a0a0a !important; border-color: #ffffff; padding: 12px 26px; font-size: 14px;">
+                <a href="{{ route('shop.index') }}" class="lux-btn-black" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #000000 !important; font-weight: 800; border: none; box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35); padding: 12px 26px; font-size: 14px;">
                     Explore Catalog <span>→</span>
                 </a>
-                <a href="{{ route('shop.index', ['filter' => 'sale']) }}" class="lux-btn-black" style="background: transparent; color: #ffffff !important; border-color: rgba(255,255,255,0.4); padding: 12px 24px; font-size: 14px;">
+                <a href="{{ route('shop.index', ['filter' => 'sale']) }}" class="lux-btn-black" style="background: rgba(255, 255, 255, 0.08); color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.25); padding: 12px 24px; font-size: 14px;">
                     🔥 Special Offers
                 </a>
             </div>
         </div>
-        <div style="position: absolute; right: -60px; bottom: -60px; width: 340px; height: 340px; background: radial-gradient(circle, rgba(197, 168, 128, 0.18) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+        <div style="position: absolute; right: -60px; bottom: -60px; width: 360px; height: 360px; background: radial-gradient(circle, rgba(251, 191, 36, 0.18) 0%, rgba(37, 99, 235, 0.15) 45%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
     </div>
 </section>
 

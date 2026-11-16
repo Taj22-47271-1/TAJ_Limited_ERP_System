@@ -45,18 +45,20 @@
 
         <button type="button" class="vc-mobile-menu-btn" id="vcMobileMenuBtn" aria-label="Open navigation menu">☰</button>
 
-        <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="lux-brand" aria-label="taj.">
-            taj<span class="brand-dot">.</span>
+        <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="lux-brand-wrap" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900; font-size: 19px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);">
+                T
+            </div>
+            <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 16px; font-weight: 900; letter-spacing: -0.02em; color: #06153d; line-height: 1.1;">TAJ LIMITED</span>
+                <span style="font-size: 9px; font-weight: 800; letter-spacing: 0.12em; color: #f59e0b; text-transform: uppercase;">ERP • E-Commerce</span>
+            </div>
         </a>
 
-
-
-        <form class="vc-search" method="GET" action="{{ route('shop.index') }}" role="search">
-
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.15A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-
-            <input name="q" value="{{ request('q') }}" placeholder="Search products..." autocomplete="off">
-
+        <form class="vc-search" method="GET" action="{{ route('shop.index') }}" role="search" id="headerSearchForm" style="position: relative;">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="vc-search-icon"><path d="m21 21-4.35-4.35m2.35-5.15A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input name="q" id="headerSearchInput" value="{{ request('q') }}" placeholder="Search products..." autocomplete="off">
+            <div id="headerSearchDropdown" class="vc-search-dropdown" style="display: none;"></div>
         </form>
 
 
@@ -300,32 +302,45 @@
 </aside>
 
 <footer class="vc-footer">
-
     <div class="vc-footer-inner">
-
-        <div>
-
-            <div class="vc-brand"><span class="vc-brand-mark">T</span><strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong></div>
-
+        <div class="vc-footer-brand-col">
+            <div class="vc-brand">
+                <span class="vc-brand-mark">T</span>
+                <strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong>
+            </div>
             <p>Shop products using the same live inventory managed by TAJ Limited ERP.</p>
-
         </div>
 
-        <div><h4>Categories</h4><a href="{{ route('shop.index') }}">All products</a></div>
+        <div>
+            <h4>Categories</h4>
+            <a href="{{ route('shop.index') }}">All products</a>
+            <a href="{{ route('shop.index', ['filter' => 'sale']) }}">Special Offers</a>
+        </div>
 
-        <div><h4>Company</h4><a href="{{ route('shop.index') }}">Shop online</a><a href="{{ route('login') }}">Staff portal</a></div>
+        <div>
+            <h4>Company</h4>
+            <a href="{{ route('shop.index') }}">Shop online</a>
+            <a href="{{ route('login') }}">Staff portal</a>
+            <a href="{{ route('register') }}">Customer Register</a>
+        </div>
 
-        <div><h4>Assistance</h4><small>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</small><small>{{ $companySettings->company_email ?? 'support@tajlimited.com' }}</small></div>
-
+        <div>
+            <h4>Assistance</h4>
+            <small>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</small>
+            <small>{{ $companySettings->company_email ?? 'info@tajlimited.com' }}</small>
+            <small>Dhaka, Bangladesh</small>
+        </div>
     </div>
 
-    <div class="vc-copyright">© {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. Live inventory powered by TAJ ERP.</div>
-
+    <div class="vc-copyright">
+        © {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. Live inventory powered by TAJ ERP.
+    </div>
 </footer>
 
 <script src="{{ asset('assets/app.js') }}"></script>
 <script>
 (function() {
+    // 1. Mobile Drawer Navigation
     var drawer = document.getElementById('vcMobileDrawer');
     var overlay = document.getElementById('vcDrawerOverlay');
     var openBtn = document.getElementById('vcMobileMenuBtn');
@@ -354,6 +369,64 @@
     window.addEventListener('resize', function() {
         if (window.innerWidth > 990) closeNav();
     });
+
+    // 2. Real-Time Instant Search Dropdown
+    var searchInput = document.getElementById('headerSearchInput');
+    var dropdown = document.getElementById('headerSearchDropdown');
+    var debounceTimer = null;
+
+    if (searchInput && dropdown) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            var val = this.value.trim();
+            if (val.length < 2) {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                fetch('{{ route("shop.index") }}?q=' + encodeURIComponent(val), {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.products && data.products.length > 0) {
+                        var html = '';
+                        data.products.forEach(function(p) {
+                            var priceFormatted = parseFloat(p.effective_price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            html += '<a href="' + p.url + '" class="vc-search-dropdown-item">' +
+                                '<img src="' + p.image + '" alt="' + p.name + '">' +
+                                '<div style="flex: 1; min-width: 0;">' +
+                                    '<div class="vc-s-name">' + p.name + '</div>' +
+                                    '<small style="color: #64748b; font-size: 11px;">' + (p.sku || '') + '</small>' +
+                                '</div>' +
+                                '<div class="vc-s-price">' +
+                                    '{{ $companySettings->currency_symbol ?? "৳" }}' + priceFormatted +
+                                    (p.has_discount ? '<span style="display: block; font-size: 10px; color: #d97706; text-align: right;">-' + p.discount_percent + '%</span>' : '') +
+                                '</div>' +
+                            '</a>';
+                        });
+                        html += '<a href="{{ route("shop.index") }}?q=' + encodeURIComponent(val) + '" class="vc-search-dropdown-footer">See all results for "' + val + '" →</a>';
+                        dropdown.innerHTML = html;
+                        dropdown.style.display = 'block';
+                    } else {
+                        dropdown.innerHTML = '<div style="padding: 14px; text-align: center; color: #64748b; font-size: 12px;">No products found for "' + val + '"</div>';
+                        dropdown.style.display = 'block';
+                    }
+                })
+                .catch(function() {
+                    dropdown.style.display = 'none';
+                });
+            }, 200);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
 })();
 </script>
 

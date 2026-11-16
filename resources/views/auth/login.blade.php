@@ -363,6 +363,43 @@
     </section>
 </div>
 
+{{-- Global Luxury Footer (Shared with Customer Storefront) --}}
+<footer class="vc-footer taj-login-footer-section">
+    <div class="vc-footer-inner">
+        <div class="vc-footer-brand-col">
+            <div class="vc-brand">
+                <span class="vc-brand-mark">T</span>
+                <strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong>
+            </div>
+            <p>Shop products using the same live inventory managed by TAJ Limited ERP.</p>
+        </div>
+
+        <div>
+            <h4>Categories</h4>
+            <a href="{{ route('shop.index') }}">All products</a>
+            <a href="{{ route('shop.index', ['filter' => 'sale']) }}">Special Offers</a>
+        </div>
+
+        <div>
+            <h4>Company</h4>
+            <a href="{{ route('shop.index') }}">Shop online</a>
+            <a href="{{ route('login') }}">Staff portal</a>
+            <a href="{{ route('register') }}">Customer Register</a>
+        </div>
+
+        <div>
+            <h4>Assistance</h4>
+            <small>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</small>
+            <small>{{ $companySettings->company_email ?? 'info@tajlimited.com' }}</small>
+            <small>Dhaka, Bangladesh</small>
+        </div>
+    </div>
+
+    <div class="vc-copyright">
+        © {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. Live inventory powered by TAJ ERP.
+    </div>
+</footer>
+
 {{-- Interactive Functionality Scripts --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
