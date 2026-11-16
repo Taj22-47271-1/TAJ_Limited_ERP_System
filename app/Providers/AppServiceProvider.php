@@ -23,6 +23,15 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::defaultView('vendor.pagination.default');
 
+        // Safe auto-migration for product_reviews table if not yet created on production
+        try {
+            if (! Schema::hasTable('product_reviews')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            }
+        } catch (\Throwable) {
+            // Ignore during offline build/cache steps
+        }
+
         // Force HTTPS URLs in production (Render) or when forwarded as HTTPS
         if ($this->app->environment('production') || env('FORCE_HTTPS', false) || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')) {
             URL::forceScheme('https');

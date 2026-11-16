@@ -202,6 +202,14 @@ class ProductController extends Controller
                 $szDiscount = isset($szData['discount_price']) && $szData['discount_price'] !== '' ? (float)$szData['discount_price'] : null;
                 $szPercent = isset($szData['discount_percent']) && $szData['discount_percent'] !== '' ? (float)$szData['discount_percent'] : null;
 
+                // Fall back to main product regular selling price if left blank for this size variant
+                $basePrice = (float)($data['selling_price'] ?? 0);
+                if (($szSelling === null || $szSelling <= 0) && $basePrice > 0) {
+                    if (($szDiscount !== null && $szDiscount > 0) || ($szPercent !== null && $szPercent > 0)) {
+                        $szSelling = $basePrice;
+                    }
+                }
+
                 if ($szSelling !== null && $szSelling > 0) {
                     if ($szDiscount !== null && $szDiscount > 0 && $szDiscount < $szSelling) {
                         $szPercent = round((($szSelling - $szDiscount) / $szSelling) * 100, 1);

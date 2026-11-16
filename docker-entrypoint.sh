@@ -33,7 +33,7 @@ php artisan storage:link --no-interaction || true
 # Automatically run database migrations and seed system defaults
 if [ "${SKIP_MIGRATIONS:-false}" != "true" ]; then
     echo "Running database migrations..."
-    php artisan migrate --force --isolated || echo "WARNING: Migration failed or database not reachable. Continuing startup."
+    php artisan migrate --force || echo "WARNING: Migration failed or database not reachable. Continuing startup."
 
     echo "Synchronizing persistent database media storage..."
     php artisan storage:sync-db || echo "WARNING: Storage sync skipped."
