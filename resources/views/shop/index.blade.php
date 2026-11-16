@@ -127,7 +127,7 @@
 
     {{-- Pagination --}}
     <div style="display: flex; justify-content: center; margin-bottom: 60px;">
-        {{ $products->links() }}
+        {{ $products->links('vendor.pagination.default') }}
     </div>
 </div>
 

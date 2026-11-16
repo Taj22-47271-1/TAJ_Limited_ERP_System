@@ -25,6 +25,29 @@
 <link rel="stylesheet" href="{{ asset('assets/flatlogic-one.css') }}?v={{ file_exists(public_path('assets/flatlogic-one.css')) ? filemtime(public_path('assets/flatlogic-one.css')) : '1.0' }}">
 <link rel="stylesheet" href="{{ asset('assets/behance-luxury.css') }}?v={{ file_exists(public_path('assets/behance-luxury.css')) ? filemtime(public_path('assets/behance-luxury.css')) : '1.0' }}">
 
+<style>
+/* Guarantee mobile drawer and hamburger button are never displayed or rendered inline on desktop */
+@media (min-width: 861px) {
+    .vc-mobile-menu-btn,
+    #vcMobileMenuBtn,
+    .vc-mobile-drawer,
+    #vcMobileDrawer,
+    .vc-mobile-drawer-overlay,
+    #vcDrawerOverlay {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+}
+</style>
+
 @stack('head')
 
 </head>
@@ -160,8 +183,8 @@
 </header>
 
 {{-- Mobile Navigation Drawer & Backdrop --}}
-<div class="vc-mobile-drawer-overlay" id="vcDrawerOverlay"></div>
-<aside class="vc-mobile-drawer" id="vcMobileDrawer" aria-label="Mobile Navigation">
+<div class="vc-mobile-drawer-overlay" id="vcDrawerOverlay" style="display: none;"></div>
+<aside class="vc-mobile-drawer" id="vcMobileDrawer" aria-label="Mobile Navigation" style="display: none;">
     <div class="vc-mobile-drawer-header">
         <a href="{{ auth()->check() ? route('dashboard') : route('shop.index') }}" class="lux-brand" style="font-size: 24px;">
             taj<span class="brand-dot">.</span>
@@ -347,14 +370,34 @@
     var closeBtn = document.getElementById('vcDrawerClose');
 
     function openNav() {
-        if (drawer) drawer.classList.add('open');
-        if (overlay) overlay.classList.add('open');
+        if (drawer) {
+            drawer.style.display = 'flex';
+            drawer.classList.add('open');
+        }
+        if (overlay) {
+            overlay.style.display = 'block';
+            overlay.classList.add('open');
+        }
         document.body.classList.add('vc-drawer-open');
     }
 
     function closeNav() {
-        if (drawer) drawer.classList.remove('open');
-        if (overlay) overlay.classList.remove('open');
+        if (drawer) {
+            drawer.classList.remove('open');
+            setTimeout(function() {
+                if (!drawer.classList.contains('open') && window.innerWidth > 860) {
+                    drawer.style.display = 'none';
+                }
+            }, 300);
+        }
+        if (overlay) {
+            overlay.classList.remove('open');
+            setTimeout(function() {
+                if (!overlay.classList.contains('open')) {
+                    overlay.style.display = 'none';
+                }
+            }, 300);
+        }
         document.body.classList.remove('vc-drawer-open');
     }
 

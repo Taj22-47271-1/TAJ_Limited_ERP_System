@@ -194,7 +194,8 @@
 function stepCartRow(btn, delta, maxStock) {
     const form = btn.closest('form');
     if (!form) return;
-    const input = form.querySelector('.qty-field');
+    const input = form.querySelector('.qty-field') || form.querySelector('input[name="quantity"]');
+    if (!input) return;
     const display = form.querySelector('.qty-val-text');
     let current = parseInt(input.value) || 1;
     let next = current + delta;

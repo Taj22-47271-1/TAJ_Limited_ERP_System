@@ -61,11 +61,7 @@
                     <div class="taj-welcome-lead">Welcome to</div>
                     <div class="taj-welcome-title">{{ $companySettings->company_name ?? 'TAJ Limited' }}</div>
                     <div class="taj-welcome-tagline">
-                        Your Business. Your Store. One Platform.
-                        {{-- Curved Yellow Swoosh Underneath --}}
-                        <svg class="taj-tagline-swoosh" viewBox="0 0 135 10" fill="none">
-                            <path d="M2 3C40 9 95 9 133 3" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
-                        </svg>
+                        Your Business. Your Store. <span class="taj-swoosh-wrap">One Platform.<svg class="taj-tagline-swoosh" viewBox="0 0 135 10" fill="none"><path d="M2 3C40 9 95 9 133 3" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/></svg></span>
                     </div>
                 </div>
 

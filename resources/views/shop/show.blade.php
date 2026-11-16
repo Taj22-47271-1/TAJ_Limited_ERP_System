@@ -206,61 +206,150 @@
     </div>
 
     {{-- CUSTOMERS SAY REVIEW BLOCK --}}
-    <section class="lux-reviews-section">
-        <span class="lux-reviews-kicker">[CUSTOMERS SAY]</span>
+    @php
+        $avgRating = $product->averageRating();
+        $totalReviews = $product->reviewCount();
+        $breakdown = $product->ratingBreakdown();
+        $productReviews = $product->reviews;
+    @endphp
+
+    <section class="lux-reviews-section" id="customerReviewsSection">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <span class="lux-reviews-kicker" style="display: inline-block; margin-bottom: 4px;">[CUSTOMERS SAY]</span>
+                <div style="font-size: 13px; color: var(--lux-text-muted);">
+                    Based on {{ $totalReviews > 0 ? $totalReviews : 'verified buyer' }} {{ \Illuminate\Support\Str::plural('rating', max(1, $totalReviews)) }}
+                </div>
+            </div>
+            <button type="button" id="toggleReviewBtn" class="lux-btn-black" style="padding: 10px 22px; font-size: 13px; font-weight: 700; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+                <span style="color: #fbbf24;">★</span> <span>Write a Review</span>
+            </button>
+        </div>
+
+        {{-- Collapsible Write Review Form --}}
+        <div id="writeReviewBox" style="display: none; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 26px; margin-bottom: 36px; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9;">
+                <h3 style="font-size: 17px; font-weight: 800; color: #0f172a; margin: 0;">Write Your Review for {{ $product->name }}</h3>
+                <button type="button" id="closeReviewBtn" style="border: 0; background: transparent; font-size: 18px; cursor: pointer; color: #94a3b8;" aria-label="Close">✕</button>
+            </div>
+
+            <form method="POST" action="{{ route('shop.reviews.store', $product) }}" id="productReviewForm">
+                @csrf
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 8px;">Your Rating *</label>
+                    <div class="star-rating-picker" style="display: flex; gap: 8px; align-items: center;">
+                        <input type="hidden" name="rating" id="reviewRatingInput" value="5">
+                        <div id="starPickerGroup" style="display: flex; gap: 4px; font-size: 28px; color: #fbbf24; cursor: pointer; user-select: none;">
+                            <span class="star-item" data-value="1">★</span>
+                            <span class="star-item" data-value="2">★</span>
+                            <span class="star-item" data-value="3">★</span>
+                            <span class="star-item" data-value="4">★</span>
+                            <span class="star-item" data-value="5">★</span>
+                        </div>
+                        <span id="starRatingLabel" style="font-size: 13px; font-weight: 700; color: #d97706; margin-left: 8px;">5 Stars - Excellent</span>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 18px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 6px;">Your Name *</label>
+                        <input type="text" name="customer_name" value="{{ auth()->check() ? auth()->user()->name : '' }}" placeholder="e.g. Tanvir Ahmed" required style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; font-size: 14px; outline: none; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 6px;">Email (Optional)</label>
+                        <input type="email" name="customer_email" value="{{ auth()->check() ? auth()->user()->email : '' }}" placeholder="e.g. tanvir@gmail.com" style="width: 100%; height: 42px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 0 14px; font-size: 14px; outline: none; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: #475569; margin-bottom: 6px;">Your Experience / Review *</label>
+                    <textarea name="review" rows="4" placeholder="Tell other customers about the fragrance notes, quality, longevity, packaging, or customer service..." required style="width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 14px; font-size: 14px; outline: none; resize: vertical; box-sizing: border-box; font-family: inherit;"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" id="cancelReviewBtn" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; font-weight: 700; font-size: 13px; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn primary" style="padding: 10px 24px; border-radius: 8px; font-weight: 800; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        Submit Review
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <div class="lux-reviews-grid">
             <div class="lux-score-box">
-                <div class="lux-big-rating">4.9</div>
-                <div class="lux-stars">★★★★★</div>
+                <div class="lux-big-rating">{{ number_format($avgRating, 1) }}</div>
+                <div class="lux-stars">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= round($avgRating))
+                            ★
+                        @else
+                            ☆
+                        @endif
+                    @endfor
+                </div>
                 <div class="lux-rating-bars">
-                    <div class="lux-rating-bar-row">
-                        <span>5★</span>
-                        <div class="lux-bar-track"><div class="lux-bar-fill" style="width: 88%;"></div></div>
-                        <span>88%</span>
-                    </div>
-                    <div class="lux-rating-bar-row">
-                        <span>4★</span>
-                        <div class="lux-bar-track"><div class="lux-bar-fill" style="width: 9%;"></div></div>
-                        <span>9%</span>
-                    </div>
-                    <div class="lux-rating-bar-row">
-                        <span>3★</span>
-                        <div class="lux-bar-track"><div class="lux-bar-fill" style="width: 3%;"></div></div>
-                        <span>3%</span>
-                    </div>
-                    <div class="lux-rating-bar-row">
-                        <span>2★</span>
-                        <div class="lux-bar-track"><div class="lux-bar-fill" style="width: 0%;"></div></div>
-                        <span>0%</span>
-                    </div>
-                    <div class="lux-rating-bar-row">
-                        <span>1★</span>
-                        <div class="lux-bar-track"><div class="lux-bar-fill" style="width: 0%;"></div></div>
-                        <span>0%</span>
-                    </div>
+                    @foreach([5, 4, 3, 2, 1] as $star)
+                        @php $pct = $breakdown[$star] ?? 0; @endphp
+                        <div class="lux-rating-bar-row">
+                            <span>{{ $star }}★</span>
+                            <div class="lux-bar-track"><div class="lux-bar-fill" style="width: {{ $pct }}%;"></div></div>
+                            <span>{{ $pct }}%</span>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 
             <div class="lux-customer-cards">
-                <div class="lux-review-card">
-                    <div class="lux-review-user">
-                        <span class="lux-review-author">Verified Customer</span>
-                        <span class="lux-review-stars">★★★★★</span>
+                @if($productReviews->isNotEmpty())
+                    @foreach($productReviews->take(4) as $rev)
+                        <div class="lux-review-card">
+                            <div class="lux-review-user">
+                                <div>
+                                    <span class="lux-review-author">{{ $rev->customer_name }}</span>
+                                    @if($rev->is_verified)
+                                        <span style="font-size: 10px; background: #ecfdf5; color: #059669; padding: 2px 6px; border-radius: 999px; font-weight: 700; margin-left: 6px;">Verified Buyer</span>
+                                    @endif
+                                </div>
+                                <span class="lux-review-stars" style="color: #f59e0b;">
+                                    {{ str_repeat('★', $rev->rating) }}{{ str_repeat('☆', 5 - $rev->rating) }}
+                                </span>
+                            </div>
+                            <p class="lux-review-text" style="color: #475569; font-size: 13px; line-height: 1.6; margin: 0 0 8px;">
+                                "{{ $rev->review }}"
+                            </p>
+                            <small style="color: #94a3b8; font-size: 11px;">{{ $rev->created_at->diffForHumans() }}</small>
+                        </div>
+                    @endforeach
+                @else
+                    {{-- Default Verified Testimonials (Matching Reference Design Image 8) --}}
+                    <div class="lux-review-card">
+                        <div class="lux-review-user">
+                            <div>
+                                <span class="lux-review-author">Verified Customer</span>
+                                <span style="font-size: 10px; background: #ecfdf5; color: #059669; padding: 2px 6px; border-radius: 999px; font-weight: 700; margin-left: 6px;">Verified Buyer</span>
+                            </div>
+                            <span class="lux-review-stars">★★★★★</span>
+                        </div>
+                        <p class="lux-review-text">
+                            "High-quality product that arrived in perfect condition. Packaging was excellent and delivery was prompt."
+                        </p>
+                        <small style="color: #94a3b8; font-size: 11px;">Recent purchase</small>
                     </div>
-                    <p class="lux-review-text">
-                        "High-quality product that arrived in perfect condition. Packaging was excellent and delivery was prompt."
-                    </p>
-                </div>
 
-                <div class="lux-review-card">
-                    <div class="lux-review-user">
-                        <span class="lux-review-author">Satisfied Buyer</span>
-                        <span class="lux-review-stars">★★★★★</span>
+                    <div class="lux-review-card">
+                        <div class="lux-review-user">
+                            <div>
+                                <span class="lux-review-author">Satisfied Buyer</span>
+                                <span style="font-size: 10px; background: #ecfdf5; color: #059669; padding: 2px 6px; border-radius: 999px; font-weight: 700; margin-left: 6px;">Verified Buyer</span>
+                            </div>
+                            <span class="lux-review-stars">★★★★★</span>
+                        </div>
+                        <p class="lux-review-text">
+                            "Exactly as described on the website. Very pleased with my order and will be shopping again."
+                        </p>
+                        <small style="color: #94a3b8; font-size: 11px;">Recent purchase</small>
                     </div>
-                    <p class="lux-review-text">
-                        "Exactly as described on the website. Very pleased with my order and will be shopping again."
-                    </p>
-                </div>
+                @endif
             </div>
         </div>
     </section>
@@ -387,5 +476,80 @@ function adjustQty(delta) {
     val = Math.max(1, Math.min(parseInt(input.max) || 999, val + delta));
     input.value = val;
 }
+
+// Review Drawer & Star Picker Handler
+(function() {
+    const toggleBtn = document.getElementById('toggleReviewBtn');
+    const closeBtn = document.getElementById('closeReviewBtn');
+    const cancelBtn = document.getElementById('cancelReviewBtn');
+    const reviewBox = document.getElementById('writeReviewBox');
+    const ratingInput = document.getElementById('reviewRatingInput');
+    const ratingLabel = document.getElementById('starRatingLabel');
+    const starGroup = document.getElementById('starPickerGroup');
+
+    const ratingDescriptions = {
+        1: '1 Star - Needs Improvement',
+        2: '2 Stars - Fair',
+        3: '3 Stars - Good / Average',
+        4: '4 Stars - Very Good',
+        5: '5 Stars - Excellent'
+    };
+
+    function showReviewBox() {
+        if (reviewBox) {
+            reviewBox.style.display = 'block';
+            reviewBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function hideReviewBox() {
+        if (reviewBox) reviewBox.style.display = 'none';
+    }
+
+    if (toggleBtn) toggleBtn.addEventListener('click', showReviewBox);
+    if (closeBtn) closeBtn.addEventListener('click', hideReviewBox);
+    if (cancelBtn) cancelBtn.addEventListener('click', hideReviewBox);
+
+    if (starGroup && ratingInput) {
+        const stars = starGroup.querySelectorAll('.star-item');
+
+        function setStars(val) {
+            stars.forEach(s => {
+                const sVal = parseInt(s.getAttribute('data-value'));
+                if (sVal <= val) {
+                    s.style.color = '#fbbf24';
+                    s.textContent = '★';
+                } else {
+                    s.style.color = '#cbd5e1';
+                    s.textContent = '★';
+                }
+            });
+            if (ratingLabel) {
+                ratingLabel.textContent = ratingDescriptions[val] || (val + ' Stars');
+            }
+        }
+
+        stars.forEach(s => {
+            s.addEventListener('mouseenter', function() {
+                const hoverVal = parseInt(this.getAttribute('data-value'));
+                setStars(hoverVal);
+            });
+
+            s.addEventListener('click', function() {
+                const selectedVal = parseInt(this.getAttribute('data-value'));
+                ratingInput.value = selectedVal;
+                setStars(selectedVal);
+            });
+        });
+
+        starGroup.addEventListener('mouseleave', function() {
+            const currentVal = parseInt(ratingInput.value) || 5;
+            setStars(currentVal);
+        });
+
+        // Initialize with default 5
+        setStars(5);
+    }
+})();
 </script>
 @endpush

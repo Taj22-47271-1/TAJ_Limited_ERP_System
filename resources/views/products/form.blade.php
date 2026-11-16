@@ -607,6 +607,110 @@ document.addEventListener('DOMContentLoaded', function () {
         addBtn.addEventListener('click', addColorwayRow);
     }
 });
+
+// Pricing & Dynamic Discount Calculator
+(function() {
+    const currency = '{{ $companySettings->currency_symbol ?? "৳" }}';
+    const sellInput = document.getElementById('sellingPriceInput');
+    const discPctInput = document.getElementById('discountPercentInput');
+    const discPriceInput = document.getElementById('discountPriceInput');
+    const clearBtn = document.getElementById('clearDiscountBtn');
+    const previewOrig = document.getElementById('previewOrigPrice');
+    const previewFinal = document.getElementById('previewFinalPrice');
+    const previewBadge = document.getElementById('previewDiscountBadge');
+    const previewSavings = document.getElementById('previewSavingsText');
+
+    if (!sellInput || !discPctInput || !discPriceInput) return;
+
+    function formatMoney(num) {
+        return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updatePreview() {
+        const orig = parseFloat(sellInput.value) || 0;
+        const discPrice = parseFloat(discPriceInput.value) || 0;
+        const pct = parseFloat(discPctInput.value) || 0;
+
+        if (discPrice > 0 && discPrice < orig && orig > 0) {
+            previewOrig.textContent = currency + formatMoney(orig);
+            previewOrig.style.display = 'inline';
+            previewFinal.textContent = currency + formatMoney(discPrice);
+            previewFinal.style.color = '#059669';
+
+            const effectivePct = pct > 0 ? Math.round(pct) : Math.round(((orig - discPrice) / orig) * 100);
+            previewBadge.textContent = '-' + effectivePct + '% OFF';
+            previewBadge.style.display = 'inline-block';
+            previewBadge.style.background = '#fef3c7';
+            previewBadge.style.color = '#d97706';
+            previewBadge.style.border = '1px solid #fde68a';
+
+            const savedAmount = orig - discPrice;
+            previewSavings.textContent = 'Customer Saves ' + currency + formatMoney(savedAmount) + ' (' + effectivePct + '%)';
+        } else {
+            previewOrig.style.display = 'none';
+            previewFinal.textContent = currency + formatMoney(orig);
+            previewFinal.style.color = '#0f172a';
+            previewBadge.style.display = 'none';
+            previewSavings.textContent = '';
+        }
+    }
+
+    // 1. When admin changes Regular Selling Price
+    sellInput.addEventListener('input', function() {
+        const orig = parseFloat(sellInput.value) || 0;
+        const pct = parseFloat(discPctInput.value) || 0;
+
+        if (pct > 0 && pct < 100 && orig > 0) {
+            const calculated = Math.round((orig * (1 - pct / 100)) * 100) / 100;
+            discPriceInput.value = calculated.toFixed(2);
+        }
+        updatePreview();
+    });
+
+    // 2. When admin types in Discount % (e.g. 20%) -> automatically calculate Discounted Sale Price
+    discPctInput.addEventListener('input', function() {
+        const orig = parseFloat(sellInput.value) || 0;
+        const pct = parseFloat(discPctInput.value);
+
+        if (isNaN(pct) || pct <= 0) {
+            discPriceInput.value = '';
+        } else if (pct >= 100) {
+            discPriceInput.value = '0.00';
+        } else if (orig > 0) {
+            const calculated = Math.round((orig * (1 - pct / 100)) * 100) / 100;
+            discPriceInput.value = calculated.toFixed(2);
+        }
+        updatePreview();
+    });
+
+    // 3. When admin types in Discounted Sale Price -> automatically calculate Discount %
+    discPriceInput.addEventListener('input', function() {
+        const orig = parseFloat(sellInput.value) || 0;
+        const discPrice = parseFloat(discPriceInput.value);
+
+        if (isNaN(discPrice) || discPrice <= 0 || orig <= 0) {
+            discPctInput.value = '';
+        } else if (discPrice < orig) {
+            const calculatedPct = Math.round(((orig - discPrice) / orig) * 100 * 10) / 10;
+            discPctInput.value = calculatedPct;
+        } else {
+            discPctInput.value = '';
+        }
+        updatePreview();
+    });
+
+    // 4. Clear discount button
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            discPctInput.value = '';
+            discPriceInput.value = '';
+            updatePreview();
+        });
+    }
+
+    // Initial calculation on page load
+    updatePreview();
+})();
 </script>
 
 @endpush

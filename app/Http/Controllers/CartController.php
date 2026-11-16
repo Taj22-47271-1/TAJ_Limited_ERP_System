@@ -124,6 +124,12 @@ class CartController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        $qtyInput = $request->input('quantity', $request->input('qty'));
+        if ($qtyInput === null || $qtyInput === '') {
+            $qtyInput = 1;
+        }
+        $request->merge(['quantity' => $qtyInput]);
+
         $data = $request->validate([
             'quantity' => ['required', 'numeric', 'min:0'],
             'size' => ['nullable', 'string', 'max:30'],

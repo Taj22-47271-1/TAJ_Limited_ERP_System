@@ -2468,7 +2468,13 @@ body.vc-drawer-open {
 
 /* Universal SVG safety lock against giant arrows */
 nav[role="navigation"] svg,
-.pagination svg {
+.pagination svg,
+.lux-pagination-nav svg,
+.lux-pagination-container svg,
+svg.w-5,
+svg.h-5,
+[aria-label*="Pagination"] svg,
+[aria-label*="pagination"] svg {
   width: 16px !important;
   height: 16px !important;
   max-width: 16px !important;

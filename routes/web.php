@@ -16,6 +16,7 @@ use App\Http\Controllers\LoginOfferController;
 use App\Http\Controllers\OnlineOrderController;
 use App\Http\Controllers\OnlinePaymentController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductReviewController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -58,6 +59,7 @@ Route::get('/', fn () => auth()->check() ? redirect()->route('dashboard') : redi
 // Public Storefront Browsing (Guests, Customers & Staff)
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 Route::get('/shop/products/{product}', [ShopController::class, 'show'])->name('shop.show');
+Route::post('/shop/products/{product}/reviews', [ProductReviewController::class, 'store'])->name('shop.reviews.store');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::get('/cart/summary', [CartController::class, 'summary'])->name('cart.summary');
 Route::post('/cart/{product}', [CartController::class, 'add'])->name('cart.add');
