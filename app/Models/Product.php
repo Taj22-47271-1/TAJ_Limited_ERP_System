@@ -492,46 +492,83 @@ class Product extends Model
 
     public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ProductReview::class)->where('status', 'approved')->latest();
+        return $this->hasMany(ProductReview::class)->where('status', 'approved');
     }
 
     public function averageRating(): float
     {
-        $avg = $this->reviews()->avg('rating');
-        return $avg ? round((float)$avg, 1) : 4.9;
+        if ($this->relationLoaded('reviews')) {
+            $avg = $this->reviews->avg('rating');
+            return $avg ? round((float)$avg, 1) : 4.9;
+        }
+
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('product_reviews')) {
+                return 4.9;
+            }
+            $avg = $this->reviews()->avg('rating');
+            return $avg ? round((float)$avg, 1) : 4.9;
+        } catch (\Throwable $e) {
+            return 4.9;
+        }
     }
 
     public function reviewCount(): int
     {
-        return $this->reviews()->count();
+        if ($this->relationLoaded('reviews')) {
+            return $this->reviews->count();
+        }
+
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('product_reviews')) {
+                return 0;
+            }
+            return $this->reviews()->count();
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 
     public function ratingBreakdown(): array
     {
+        $defaultBreakdown = [
+            5 => 88,
+            4 => 9,
+            3 => 3,
+            2 => 0,
+            1 => 0,
+        ];
+
         $total = $this->reviewCount();
         if ($total === 0) {
-            // High-end default luxury rating distribution (as shown in Image 8)
-            return [
-                5 => 88,
-                4 => 9,
-                3 => 3,
-                2 => 0,
-                1 => 0,
-            ];
+            return $defaultBreakdown;
         }
 
-        $counts = $this->reviews()
-            ->selectRaw('rating, count(*) as count')
-            ->groupBy('rating')
-            ->pluck('count', 'rating')
-            ->toArray();
+        try {
+            if ($this->relationLoaded('reviews')) {
+                $counts = $this->reviews->countBy('rating')->toArray();
+            } else {
+                if (! \Illuminate\Support\Facades\Schema::hasTable('product_reviews')) {
+                    return $defaultBreakdown;
+                }
 
-        $breakdown = [];
-        for ($star = 5; $star >= 1; $star--) {
-            $starCount = $counts[$star] ?? 0;
-            $breakdown[$star] = (int) round(($starCount / $total) * 100);
+                $counts = ProductReview::where('product_id', $this->id)
+                    ->where('status', 'approved')
+                    ->selectRaw('rating, count(*) as count')
+                    ->groupBy('rating')
+                    ->pluck('count', 'rating')
+                    ->toArray();
+            }
+
+            $breakdown = [];
+            for ($star = 5; $star >= 1; $star--) {
+                $starCount = $counts[$star] ?? 0;
+                $breakdown[$star] = (int) round(($starCount / $total) * 100);
+            }
+
+            return $breakdown;
+        } catch (\Throwable $e) {
+            return $defaultBreakdown;
         }
-
-        return $breakdown;
     }
 }

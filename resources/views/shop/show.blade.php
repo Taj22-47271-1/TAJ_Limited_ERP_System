@@ -233,6 +233,12 @@
                 <button type="button" id="closeReviewBtn" style="border: 0; background: transparent; font-size: 18px; cursor: pointer; color: #94a3b8;" aria-label="Close">✕</button>
             </div>
 
+            @if($errors->has('rating') || $errors->has('review') || $errors->has('customer_name'))
+                <div style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px;">
+                    {{ $errors->first('rating') ?: ($errors->first('review') ?: $errors->first('customer_name')) }}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('shop.reviews.store', $product) }}" id="productReviewForm">
                 @csrf
                 <div style="margin-bottom: 18px;">
@@ -302,6 +308,9 @@
             <div class="lux-customer-cards">
                 @if($productReviews->isNotEmpty())
                     @foreach($productReviews->take(4) as $rev)
+                        @php
+                            $safeRating = max(1, min(5, (int)($rev->rating ?? 5)));
+                        @endphp
                         <div class="lux-review-card">
                             <div class="lux-review-user">
                                 <div>
@@ -311,13 +320,13 @@
                                     @endif
                                 </div>
                                 <span class="lux-review-stars" style="color: #f59e0b;">
-                                    {{ str_repeat('★', $rev->rating) }}{{ str_repeat('☆', 5 - $rev->rating) }}
+                                    {{ str_repeat('★', $safeRating) }}{{ str_repeat('☆', 5 - $safeRating) }}
                                 </span>
                             </div>
                             <p class="lux-review-text" style="color: #475569; font-size: 13px; line-height: 1.6; margin: 0 0 8px;">
                                 "{{ $rev->review }}"
                             </p>
-                            <small style="color: #94a3b8; font-size: 11px;">{{ $rev->created_at->diffForHumans() }}</small>
+                            <small style="color: #94a3b8; font-size: 11px;">{{ optional($rev->created_at)->diffForHumans() ?? 'Recently' }}</small>
                         </div>
                     @endforeach
                 @else
@@ -549,6 +558,21 @@ function adjustQty(delta) {
 
         // Initialize with default 5
         setStars(5);
+    }
+
+    @if($errors->has('rating') || $errors->has('review') || $errors->has('customer_name'))
+        showReviewBox();
+    @endif
+
+    const form = document.getElementById('productReviewForm');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn && !btn.disabled) {
+                btn.disabled = true;
+                btn.textContent = 'Submitting...';
+            }
+        });
     }
 })();
 </script>

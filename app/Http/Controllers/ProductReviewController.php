@@ -43,14 +43,30 @@ class ProductReviewController extends Controller
             $userId = null;
         }
 
+        $cleanReview = strip_tags(trim($validated['review']));
+
         try {
+            // Prevent rapid duplicate submissions within 60 seconds
+            $isDuplicate = ProductReview::where('product_id', $product->id)
+                ->where('review', $cleanReview)
+                ->where('created_at', '>=', now()->subSeconds(60))
+                ->exists();
+
+            if ($isDuplicate) {
+                $message = 'Thank you! Your review has already been received.';
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['success' => true, 'message' => $message]);
+                }
+                return redirect()->route('shop.show', $product)->with('status', $message);
+            }
+
             ProductReview::create([
                 'product_id' => $product->id,
                 'user_id' => $userId,
                 'customer_name' => $name,
                 'customer_email' => $email,
                 'rating' => (int) $validated['rating'],
-                'review' => strip_tags($validated['review']),
+                'review' => $cleanReview,
                 'is_verified' => true,
                 'status' => 'approved',
             ]);
@@ -66,7 +82,7 @@ class ProductReviewController extends Controller
 
             return redirect()->route('shop.show', $product)->with('status', $message);
         } catch (\Throwable $e) {
-            Log::error('Failed to save review: ' . $e->getMessage());
+            Log::error('Failed to save product review: ' . $e->getMessage());
 
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json([
@@ -76,7 +92,7 @@ class ProductReviewController extends Controller
             }
 
             return redirect()->route('shop.show', $product)->withErrors([
-                'review' => 'Unable to submit review: ' . $e->getMessage(),
+                'review' => 'Unable to submit review right now. Please try again.',
             ]);
         }
     }

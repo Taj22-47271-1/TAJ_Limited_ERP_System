@@ -16,31 +16,40 @@ class ForgotPasswordController extends Controller
     public function showForgot() { return view('auth.forgot-password'); }
 
     public function sendOtp(Request $request) {
-        $data=$request->validate(['email'=>['required','email','exists:users,email']]);
-        $recent=PasswordResetOtp::where('email',$data['email'])->latest()->first();
-        if ($recent && $recent->created_at->gt(now()->subMinute())) return back()->withErrors(['email'=>'Please wait 60 seconds before requesting another OTP.']);
+        $data = $request->validate([
+            'email' => ['required', 'email', 'exists:users,email']
+        ], [
+            'email.exists' => 'No account found with this email address.'
+        ]);
 
-        $otp=(string) random_int(100000,999999);
-        PasswordResetOtp::where('email',$data['email'])->delete();
-        PasswordResetOtp::create(['email'=>$data['email'],'otp_hash'=>Hash::make($otp),'expires_at'=>now()->addMinutes(10),'attempts'=>0]);
+        $recent = PasswordResetOtp::where('email', $data['email'])->latest()->first();
+        if ($recent && $recent->created_at->gt(now()->subMinute())) {
+            return back()->withErrors(['email' => 'Please wait 60 seconds before requesting another OTP.']);
+        }
 
-        $sent = false;
+        $otp = (string) random_int(100000, 999999);
+        PasswordResetOtp::where('email', $data['email'])->delete();
+        PasswordResetOtp::create([
+            'email' => $data['email'],
+            'otp_hash' => Hash::make($otp),
+            'expires_at' => now()->addMinutes(10),
+            'attempts' => 0
+        ]);
+
         try {
             Mail::to($data['email'])->send(new PasswordResetOtpMail($otp));
-            $sent = true;
         } catch (Throwable $e) {
-            Log::error('PasswordReset OTP mail failed: ' . $e->getMessage());
+            // Log the error message safely without exposing credentials or OTPs
+            Log::error('PasswordReset OTP email dispatch failed: ' . $e->getMessage());
+
+            return back()->withInput()->withErrors([
+                'email' => 'Unable to deliver verification email at this moment. Please verify your SMTP settings or try again in a few moments.'
+            ]);
         }
 
-        $request->session()->put('password_reset_email',$data['email']);
+        $request->session()->put('password_reset_email', $data['email']);
 
-        if (! $sent) {
-            $request->session()->flash('demo_otp', $otp);
-            return redirect()->route('password.otp.form')
-                ->with('status', "A 6-digit OTP has been generated! (Notice: SMTP delivery not configured on server. Test OTP: {$otp})");
-        }
-
-        return redirect()->route('password.otp.form')->with('status','A 6-digit OTP has been sent to your email.');
+        return redirect()->route('password.otp.form')->with('status', 'A 6-digit verification code has been sent to your email.');
     }
 
     public function showVerify(Request $request) {
