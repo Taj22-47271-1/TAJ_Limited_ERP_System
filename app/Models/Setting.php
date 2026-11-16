@@ -31,59 +31,59 @@ class Setting extends Model
             'slides' => [
                 [
                     'id' => 1,
-                    'product_sku' => 'SAREE-009',
-                    'product_name' => 'Designer Silk Saree (Luxury Atelier)',
-                    'original_price' => 4500.00,
-                    'discount_price' => 3825.00,
-                    'discount_percent' => 15,
-                    'badge' => '🎉 EID UL FITR EXCLUSIVE',
-                    'discount' => '15% OFF',
-                    'title' => 'Exclusive Eid Ethnic Luxury Collection',
-                    'subtitle' => 'Handcrafted pure silk sarees with royal zari drapes. Claim your festive 15% discount today.',
-                    'image' => 'assets/images/products/designer-saree-rose.png',
-                    'tag' => 'EID OFFER',
+                    'product_sku' => 'PERF-001',
+                    'product_name' => 'LoEwe Solo Vulcan Eau de Parfum',
+                    'original_price' => 9500.00,
+                    'discount_price' => 8550.00,
+                    'discount_percent' => 10,
+                    'badge' => 'PREMIUM QUALITY',
+                    'discount' => '10% OFF',
+                    'title' => 'LoEwe Solo',
+                    'subtitle' => 'Vulcan Eau de Parfum',
+                    'image' => 'assets/images/behance/product_loewe_solo.png',
+                    'tag' => 'EXCLUSIVE',
                 ],
                 [
                     'id' => 2,
-                    'product_sku' => 'KB-002',
-                    'product_name' => 'Pro Tactile Mechanical Keyboard',
-                    'original_price' => 2400.00,
-                    'discount_price' => 1920.00,
-                    'discount_percent' => 20,
-                    'badge' => '✨ DURGA PUJA UTSAV',
-                    'discount' => '20% OFF',
-                    'title' => 'High-Performance Workspace Essentials',
-                    'subtitle' => 'Precision mechanical switches, aircraft aluminum top plate, and dynamic backlight.',
-                    'image' => 'assets/images/products/mechanical-keyboard.svg',
-                    'tag' => 'PUJA OFFER',
+                    'product_sku' => 'PERF-002',
+                    'product_name' => 'Montale Soleil de Capri',
+                    'original_price' => 9500.00,
+                    'discount_price' => 8075.00,
+                    'discount_percent' => 15,
+                    'badge' => 'SIGNATURE FRAGRANCE',
+                    'discount' => '-15% OFF',
+                    'title' => 'Montale Soleil',
+                    'subtitle' => 'Soleil de Capri Eau de Parfum',
+                    'image' => 'assets/images/behance/product_montale_soleil.png',
+                    'tag' => 'SPECIAL OFFER',
                 ],
                 [
                     'id' => 3,
-                    'product_sku' => 'HUB-003',
-                    'product_name' => 'Ultra-Fast 7-in-1 USB-C Power Hub',
-                    'original_price' => 1750.00,
-                    'discount_price' => 1487.50,
-                    'discount_percent' => 15,
-                    'badge' => '🎄 BORO DIN & WINTER SPECIAL',
-                    'discount' => '15% OFF',
-                    'title' => 'Winter Festive Specials & Modern Elegance',
-                    'subtitle' => 'Fast 4K HDMI 60Hz, 100W Power Delivery, and multi-display productivity hub.',
-                    'image' => 'assets/images/products/usb-c-hub.svg',
-                    'tag' => 'BORO DIN OFFER',
+                    'product_sku' => 'PERF-003',
+                    'product_name' => 'Cosmic Intense Eau de Parfum',
+                    'original_price' => 8500.00,
+                    'discount_price' => 6800.00,
+                    'discount_percent' => 20,
+                    'badge' => 'ARTISANAL ESSENCE',
+                    'discount' => '-20% OFF',
+                    'title' => 'Cosmic Intense',
+                    'subtitle' => 'Intense Eau de Parfum Natural Spray',
+                    'image' => 'assets/images/behance/perfume_hero_bottle.png',
+                    'tag' => 'DISCOUNT',
                 ],
                 [
                     'id' => 4,
-                    'product_sku' => 'WM-001',
-                    'product_name' => 'Ergonomic Precision Wireless Mouse',
-                    'original_price' => 650.00,
-                    'discount_price' => 585.00,
-                    'discount_percent' => 10,
-                    'badge' => '⚡ FLASH SALE',
-                    'discount' => '10% OFF',
-                    'title' => 'Whisper-Quiet Ergonomic Wireless Mouse',
-                    'subtitle' => 'Dual Bluetooth + 2.4GHz wireless connectivity with 18-month battery life.',
-                    'image' => 'assets/images/products/wireless-mouse.svg',
-                    'tag' => 'FLASH SALE',
+                    'product_sku' => 'SAREE-009',
+                    'product_name' => 'Designer Silk Saree (Luxury Atelier)',
+                    'original_price' => 12500.00,
+                    'discount_price' => 10625.00,
+                    'discount_percent' => 15,
+                    'badge' => 'FESTIVE ATELIER',
+                    'discount' => '-15% OFF',
+                    'title' => 'Mulberry Silk',
+                    'subtitle' => 'Handcrafted Golden Zari Designer Weave',
+                    'image' => 'assets/images/products/designer-saree-gold.png',
+                    'tag' => 'EXCLUSIVE',
                 ],
             ],
         ];
@@ -93,7 +93,20 @@ class Setting extends Model
     {
         $defaults = self::defaultLoginOffers();
         $stored = $this->login_offers ?? [];
-        $merged = array_replace_recursive($defaults, $stored);
+
+        if (!empty($stored) && is_array($stored)) {
+            $slides = (!empty($stored['slides']) && is_array($stored['slides']))
+                ? array_values($stored['slides'])
+                : $defaults['slides'];
+
+            $merged = [
+                'enabled' => array_key_exists('enabled', $stored) ? (bool)$stored['enabled'] : ($defaults['enabled'] ?? true),
+                'interval_seconds' => !empty($stored['interval_seconds']) ? (int)$stored['interval_seconds'] : ($defaults['interval_seconds'] ?? 4),
+                'slides' => $slides,
+            ];
+        } else {
+            $merged = $defaults;
+        }
 
         // Enrich slides with live product pricing if available
         if (! empty($merged['slides']) && is_array($merged['slides'])) {

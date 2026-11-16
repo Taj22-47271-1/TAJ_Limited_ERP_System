@@ -182,6 +182,16 @@
     {{-- =========================================================================
          RIGHT SECTION: PROMOTIONAL CAROUSEL (~64% Desktop)
          ========================================================================= --}}
+    @php
+        $loginOffersConfig = method_exists($companySettings, 'getLoginOffers')
+            ? $companySettings->getLoginOffers()
+            : \App\Models\Setting::defaultLoginOffers();
+        $offerSlides = $loginOffersConfig['slides'] ?? \App\Models\Setting::defaultLoginOffers()['slides'];
+        $slideInterval = max(2, (int)($loginOffersConfig['interval_seconds'] ?? 4)) * 1000;
+        $sliderEnabled = $loginOffersConfig['enabled'] ?? true;
+        $slidesCount = count($offerSlides);
+    @endphp
+
     <section class="taj-promo-pane" id="promoCarouselPane" aria-label="Promotional Showcase">
         {{-- Top-Left Subtle Dot Matrix Grid --}}
         <div class="taj-dot-matrix"></div>
@@ -201,143 +211,104 @@
             </a>
         </div>
 
-        {{-- Carousel Slides Stage --}}
+        {{-- Carousel Slides Stage (Dynamic from Login Offers & Promo Slider Settings) --}}
         <div class="taj-carousel-stage">
             <div class="taj-carousel-track" id="carouselTrack">
-                {{-- SLIDE 1: LOEWE SOLO VULCAN (Exact Reference Design Match) --}}
-                <article class="taj-carousel-slide active" data-index="0">
-                    <div class="taj-slide-info">
-                        <span class="taj-slide-kicker">Premium Quality</span>
-                        <h2 class="taj-slide-title">LoEwe <span class="taj-highlight-gold">Solo</span></h2>
-                        <p class="taj-slide-subtitle">Vulcan Eau de Parfum</p>
-                        <a href="{{ route('shop.index') }}" class="taj-btn-shopnow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="9" cy="21" r="1"/>
-                                <circle cx="20" cy="21" r="1"/>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                            <span>Shop Now →</span>
-                        </a>
-                    </div>
-                    <div class="taj-slide-visual">
-                        <div class="taj-stage-wrap">
-                            {{-- Exact Loewe Solo Photographic Stage from Reference --}}
-                            <img src="{{ asset('assets/images/behance/login_ref_stage_perfect.png') }}" 
-                                 alt="LoEwe Solo Vulcan Eau de Parfum" 
-                                 class="taj-stage-composite-img">
-                        </div>
-                    </div>
-                </article>
+                @foreach($offerSlides as $idx => $slide)
+                    @php
+                        $rawTitle = trim($slide['title'] ?? ($slide['product_name'] ?? 'Exclusive Offer'));
+                        $words = preg_split('/\s+/', $rawTitle);
+                        if (count($words) > 1) {
+                            $lastWord = array_pop($words);
+                            $titlePrefix = implode(' ', $words);
+                        } else {
+                            $titlePrefix = $rawTitle;
+                            $lastWord = '';
+                        }
 
-                {{-- SLIDE 2: MONTALE SOLEIL DE CAPRI --}}
-                <article class="taj-carousel-slide" data-index="1">
-                    <div class="taj-slide-info">
-                        <span class="taj-slide-kicker">Signature Fragrance</span>
-                        <h2 class="taj-slide-title">Montale <span class="taj-highlight-gold">Soleil</span></h2>
-                        <p class="taj-slide-subtitle">Soleil de Capri Eau de Parfum</p>
-                        <div class="taj-slide-badge-row">
-                            <span class="taj-slide-discount-tag">-15% OFF</span>
-                        </div>
-                        <a href="{{ route('shop.index') }}" class="taj-btn-shopnow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="9" cy="21" r="1"/>
-                                <circle cx="20" cy="21" r="1"/>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                            <span>Shop Now →</span>
-                        </a>
-                    </div>
-                    <div class="taj-slide-visual">
-                        <div class="taj-stage-wrap">
-                            <div class="taj-stage-halo"></div>
-                            <div class="taj-stage-pedestal"></div>
-                            <div class="taj-stage-smoke"></div>
-                            <img src="{{ asset('assets/images/behance/product_montale_soleil.png') }}" 
-                                 alt="Montale Soleil de Capri" 
-                                 class="taj-stage-product" 
-                                 loading="lazy">
-                        </div>
-                    </div>
-                </article>
+                        $rawImg = $slide['image'] ?? '';
+                        if (empty($rawImg)) {
+                            $imgUrl = asset('assets/images/behance/product_loewe_solo.png');
+                        } elseif (str_starts_with($rawImg, 'http://') || str_starts_with($rawImg, 'https://')) {
+                            $imgUrl = $rawImg;
+                        } elseif (str_starts_with($rawImg, 'storage/')) {
+                            $imgUrl = asset($rawImg);
+                        } elseif (str_starts_with($rawImg, 'assets/')) {
+                            $imgUrl = asset($rawImg);
+                        } else {
+                            $imgUrl = asset('storage/' . ltrim($rawImg, '/'));
+                        }
 
-                {{-- SLIDE 3: COSMIC INTENSE EAU DE PARFUM --}}
-                <article class="taj-carousel-slide" data-index="2">
-                    <div class="taj-slide-info">
-                        <span class="taj-slide-kicker">Artisanal Essence</span>
-                        <h2 class="taj-slide-title">Cosmic <span class="taj-highlight-gold">Intense</span></h2>
-                        <p class="taj-slide-subtitle">Intense Eau de Parfum Natural Spray</p>
-                        <div class="taj-slide-badge-row">
-                            <span class="taj-slide-discount-tag">-20% OFF</span>
-                        </div>
-                        <a href="{{ route('shop.index') }}" class="taj-btn-shopnow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="9" cy="21" r="1"/>
-                                <circle cx="20" cy="21" r="1"/>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                            <span>Shop Now →</span>
-                        </a>
-                    </div>
-                    <div class="taj-slide-visual">
-                        <div class="taj-stage-wrap">
-                            <div class="taj-stage-halo"></div>
-                            <div class="taj-stage-pedestal"></div>
-                            <div class="taj-stage-smoke"></div>
-                            <img src="{{ asset('assets/images/behance/perfume_hero_bottle.png') }}" 
-                                 alt="Cosmic Intense Eau de Parfum" 
-                                 class="taj-stage-product" 
-                                 loading="lazy">
-                        </div>
-                    </div>
-                </article>
+                        $targetUrl = !empty($slide['product_id'])
+                            ? route('shop.show', $slide['product_id'])
+                            : route('shop.index');
+                    @endphp
 
-                {{-- SLIDE 4: DESIGNER PURE MULBERRY SILK WEAVE --}}
-                <article class="taj-carousel-slide" data-index="3">
-                    <div class="taj-slide-info">
-                        <span class="taj-slide-kicker">Festive Atelier</span>
-                        <h2 class="taj-slide-title">Mulberry <span class="taj-highlight-gold">Silk</span></h2>
-                        <p class="taj-slide-subtitle">Handcrafted Golden Zari Designer Weave</p>
-                        <div class="taj-slide-badge-row">
-                            <span class="taj-slide-discount-tag">-15% OFF</span>
+                    <article class="taj-carousel-slide {{ $loop->first ? 'active' : '' }}" data-index="{{ $idx }}">
+                        <div class="taj-slide-info">
+                            @if(!empty($slide['badge']))
+                                <span class="taj-slide-kicker">{{ $slide['badge'] }}</span>
+                            @endif
+
+                            <h2 class="taj-slide-title">
+                                {{ $titlePrefix }}
+                                @if($lastWord)
+                                    <span class="taj-highlight-gold">{{ $lastWord }}</span>
+                                @endif
+                            </h2>
+
+                            @if(!empty($slide['subtitle']))
+                                <p class="taj-slide-subtitle">{{ $slide['subtitle'] }}</p>
+                            @endif
+
+                            @if(!empty($slide['discount']))
+                                <div class="taj-slide-badge-row">
+                                    <span class="taj-slide-discount-tag">{{ $slide['discount'] }}</span>
+                                </div>
+                            @endif
+
+                            <a href="{{ $targetUrl }}" class="taj-btn-shopnow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="9" cy="21" r="1"/>
+                                    <circle cx="20" cy="21" r="1"/>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                </svg>
+                                <span>Shop Now →</span>
+                            </a>
                         </div>
-                        <a href="{{ route('shop.index') }}" class="taj-btn-shopnow">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="9" cy="21" r="1"/>
-                                <circle cx="20" cy="21" r="1"/>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                            <span>Shop Now →</span>
-                        </a>
-                    </div>
-                    <div class="taj-slide-visual">
-                        <div class="taj-stage-wrap">
-                            <div class="taj-stage-halo"></div>
-                            <div class="taj-stage-pedestal"></div>
-                            <div class="taj-stage-smoke"></div>
-                            <img src="{{ asset('assets/images/products/designer-saree-gold.png') }}" 
-                                 alt="Pure Mulberry Silk" 
-                                 class="taj-stage-product" 
-                                 loading="lazy" 
-                                 style="max-height: 250px;">
+
+                        <div class="taj-slide-visual">
+                            <div class="taj-stage-wrap">
+                                <div class="taj-stage-halo"></div>
+                                <div class="taj-stage-pedestal"></div>
+                                <div class="taj-stage-smoke"></div>
+                                <img src="{{ $imgUrl }}" 
+                                     alt="{{ $slide['title'] ?? 'Promotional Product' }}" 
+                                     class="taj-stage-product" 
+                                     loading="lazy">
+                            </div>
                         </div>
-                    </div>
-                </article>
+                    </article>
+                @endforeach
             </div>
 
-            {{-- Previous & Next Navigation Arrows --}}
-            <button type="button" class="taj-carousel-arrow taj-carousel-prev" id="carouselPrevBtn" aria-label="Previous Slide">‹</button>
-            <button type="button" class="taj-carousel-arrow taj-carousel-next" id="carouselNextBtn" aria-label="Next Slide">›</button>
+            @if($slidesCount > 1)
+                {{-- Previous & Next Navigation Arrows --}}
+                <button type="button" class="taj-carousel-arrow taj-carousel-prev" id="carouselPrevBtn" aria-label="Previous Slide">‹</button>
+                <button type="button" class="taj-carousel-arrow taj-carousel-next" id="carouselNextBtn" aria-label="Next Slide">›</button>
+            @endif
         </div>
 
         {{-- Bottom Controls & Feature Bar --}}
         <div>
-            {{-- Carousel Pagination Dots --}}
-            <div class="taj-promo-dots" id="carouselDots" role="tablist">
-                <span class="taj-dot active" data-slide="0" role="tab" aria-label="Slide 1"></span>
-                <span class="taj-dot" data-slide="1" role="tab" aria-label="Slide 2"></span>
-                <span class="taj-dot" data-slide="2" role="tab" aria-label="Slide 3"></span>
-                <span class="taj-dot" data-slide="3" role="tab" aria-label="Slide 4"></span>
-            </div>
+            @if($slidesCount > 1)
+                {{-- Carousel Pagination Dots --}}
+                <div class="taj-promo-dots" id="carouselDots" role="tablist">
+                    @foreach($offerSlides as $idx => $slide)
+                        <span class="taj-dot {{ $loop->first ? 'active' : '' }}" data-slide="{{ $idx }}" role="tab" aria-label="Slide {{ $idx + 1 }}"></span>
+                    @endforeach
+                </div>
+            @endif
 
             {{-- Bottom Feature Bar --}}
             <div class="taj-feature-bar">
@@ -422,9 +393,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalSlides = slides.length;
     let currentIdx = 0;
     let autoplayTimer = null;
-    const intervalMs = 4500;
+    const intervalMs = {{ $slideInterval }};
+    const isAutoplayEnabled = {{ $sliderEnabled ? 'true' : 'false' }};
 
     function showSlide(index) {
+        if (totalSlides <= 1) return;
         if (index < 0) index = totalSlides - 1;
         if (index >= totalSlides) index = 0;
         currentIdx = index;
@@ -447,6 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function startAutoplay() {
+        if (!isAutoplayEnabled || totalSlides <= 1) return;
         if (autoplayTimer) clearInterval(autoplayTimer);
         autoplayTimer = setInterval(nextSlide, intervalMs);
     }

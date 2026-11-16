@@ -30,6 +30,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Share company settings with all Blade views (zero-latency in-memory memoization)
         View::composer('*', function ($view): void {
+            if ($view->offsetExists('companySettings')) {
+                return;
+            }
+
             static $cachedSettings = null;
             if ($cachedSettings !== null) {
                 $view->with('companySettings', $cachedSettings);
