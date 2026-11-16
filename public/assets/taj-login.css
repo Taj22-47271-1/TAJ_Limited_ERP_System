@@ -1,0 +1,1102 @@
+/* ==========================================================================
+   TAJ LIMITED ERP — LUXURY TWO-COLUMN LOGIN PAGE & PROMOTIONAL CAROUSEL
+   Exact Reference Design Implementation
+   ========================================================================== */
+
+:root {
+    --taj-navy-midnight: #030a21;
+    --taj-navy-deep: #06153d;
+    --taj-navy-rich: #0a2360;
+    --taj-blue-royal: #1d4ed8;
+    --taj-blue-vibrant: #2563eb;
+    --taj-blue-electric: #3b82f6;
+    --taj-blue-sky: #38bdf8;
+    --taj-gold-primary: #fbbf24;
+    --taj-gold-amber: #f59e0b;
+    --taj-gold-glow: rgba(251, 191, 36, 0.45);
+    --taj-text-dark: #0f172a;
+    --taj-text-navy: #0b1a42;
+    --taj-text-slate: #1e293b;
+    --taj-text-muted: #64748b;
+    --taj-text-light: #94a3b8;
+    --taj-border-light: #e2e8f0;
+    --taj-border-card: #edf2f7;
+    --taj-card-bg: #ffffff;
+    --taj-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: var(--taj-font);
+    background-color: #f8fbff;
+    color: var(--taj-text-dark);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* Master Login Shell (Desktop 2-Column Split) */
+.taj-login-viewport {
+    width: 100vw;
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* ==========================================================================
+   LEFT SECTION: LOGIN PANEL (Approx 36% Desktop)
+   ========================================================================== */
+.taj-login-panel {
+    flex: 0 0 36%;
+    width: 36%;
+    min-width: 380px;
+    max-width: 480px;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 36px 14px;
+    background: #ffffff;
+    z-index: 10;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Background Wave Art on Left Panel */
+.taj-left-bg-art {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.taj-left-wave-top {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 220px;
+    height: 220px;
+    opacity: 0.9;
+}
+
+.taj-left-wave-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 120px;
+}
+
+.taj-login-content {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+/* 1. Brand Logo Row */
+.taj-brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    margin-bottom: 12px;
+}
+
+.taj-brand-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    flex-shrink: 0;
+}
+
+.taj-brand-icon span {
+    font-size: 24px;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1;
+    font-family: var(--taj-font);
+}
+
+.taj-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.taj-brand-title {
+    font-size: 17px;
+    font-weight: 900;
+    color: var(--taj-text-navy);
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.taj-brand-sub {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--taj-text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+/* 2. Welcome Headings */
+.taj-welcome-block {
+    margin-bottom: 14px;
+}
+
+.taj-welcome-lead {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--taj-text-dark);
+    margin-bottom: 2px;
+}
+
+.taj-welcome-title {
+    font-size: 34px;
+    font-weight: 900;
+    color: var(--taj-blue-royal);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+}
+
+.taj-welcome-tagline {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--taj-text-slate);
+    position: relative;
+    display: inline-block;
+}
+
+.taj-tagline-swoosh {
+    position: absolute;
+    bottom: -8px;
+    right: 0;
+    width: 135px;
+    height: 10px;
+}
+
+/* 3. Floating Login Card */
+.taj-login-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 22px 24px;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06), 0 2px 8px rgba(15, 23, 42, 0.03);
+    border: 1px solid var(--taj-border-card);
+    margin-bottom: 14px;
+}
+
+.taj-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.taj-card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--taj-text-navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(11, 26, 66, 0.25);
+}
+
+.taj-card-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: #ffffff;
+}
+
+.taj-card-titles h2 {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--taj-text-dark);
+    line-height: 1.2;
+}
+
+.taj-card-titles p {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--taj-text-muted);
+    margin-top: 1px;
+}
+
+/* Alerts */
+.taj-alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+
+.taj-alert-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+}
+
+.taj-alert-success {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+}
+
+/* Input Fields */
+.taj-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.taj-input-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--taj-border-light);
+    border-radius: 10px;
+    padding: 0 14px;
+    height: 44px;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.taj-input-box:focus-within {
+    border-color: var(--taj-blue-vibrant);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.taj-field-icon {
+    width: 18px;
+    height: 18px;
+    stroke: var(--taj-text-muted);
+    flex-shrink: 0;
+}
+
+.taj-input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    font-size: 13.5px;
+    font-family: var(--taj-font);
+    color: var(--taj-text-dark);
+    margin-left: 10px;
+    background: transparent;
+}
+
+.taj-input::placeholder {
+    color: #94a3b8;
+}
+
+.taj-pass-toggle {
+    background: none;
+    border: 0;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--taj-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
+}
+
+.taj-pass-toggle:hover {
+    color: var(--taj-blue-vibrant);
+}
+
+/* Remember Me & Forgot Password */
+.taj-form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 12.5px;
+}
+
+.taj-remember-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--taj-text-slate);
+    font-weight: 500;
+    user-select: none;
+}
+
+.taj-remember-label input[type="checkbox"] {
+    accent-color: var(--taj-blue-vibrant);
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.taj-forgot-link {
+    color: var(--taj-blue-vibrant);
+    text-decoration: none;
+    font-weight: 600;
+    transition: text-decoration 0.15s;
+}
+
+.taj-forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Sign In Button */
+.taj-btn-signin {
+    width: 100%;
+    height: 46px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+    color: #ffffff;
+    border: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    font-family: var(--taj-font);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    margin-top: 16px;
+}
+
+.taj-btn-signin:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+    filter: brightness(1.04);
+}
+
+.taj-btn-signin:active {
+    transform: translateY(0);
+}
+
+/* Create Account */
+.taj-create-row {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--taj-text-muted);
+}
+
+.taj-create-row a {
+    color: var(--taj-blue-vibrant);
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.taj-create-row a:hover {
+    text-decoration: underline;
+}
+
+/* 4. Left Footer (Copyright & Security Shield) */
+.taj-login-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 500;
+    padding-top: 8px;
+    position: relative;
+    z-index: 10;
+}
+
+.taj-login-footer svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   RIGHT SECTION: PROMOTIONAL CAROUSEL (~64% Desktop)
+   ========================================================================== */
+.taj-promo-pane {
+    flex: 1;
+    height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px 44px 16px;
+    background: linear-gradient(135deg, #020a21 0%, #06153d 40%, #0a2360 70%, #071740 100%);
+    overflow: hidden;
+    color: #ffffff;
+}
+
+/* Top-Left Dot Matrix Background Pattern */
+.taj-dot-matrix {
+    position: absolute;
+    top: 50px;
+    left: 36px;
+    width: 90px;
+    height: 72px;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.22) 1.5px, transparent 1.5px);
+    background-size: 14px 14px;
+    opacity: 0.75;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Top-Right Header Badge */
+.taj-promo-topbar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.taj-shop-smart-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-decoration: none;
+}
+
+.taj-shop-smart-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.taj-shop-smart-icon {
+    width: 18px;
+    height: 18px;
+    stroke: var(--taj-gold-primary);
+    stroke-width: 2.2;
+}
+
+.taj-shop-smart-text {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.taj-shop-smart-line {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--taj-gold-primary) 100%);
+    border-radius: 999px;
+    margin-top: 3px;
+}
+
+/* Bottom Flowing Waves on Promo Section */
+.taj-promo-bottom-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 160px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   CAROUSEL CORE STAGE & SLIDES
+   ========================================================================== */
+.taj-carousel-stage {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    width: 100%;
+    min-height: 380px;
+}
+
+.taj-carousel-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.taj-carousel-slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(25px);
+    transition: opacity 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.55s;
+    pointer-events: none;
+}
+
+.taj-carousel-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Slide Left Content (Typography & Button) */
+.taj-slide-info {
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.taj-slide-kicker {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.taj-slide-title {
+    font-size: 44px;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.taj-highlight-gold {
+    color: var(--taj-gold-primary);
+}
+
+.taj-slide-subtitle {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.taj-slide-badge-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.taj-slide-discount-tag {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+/* Shop Now Button */
+.taj-btn-shopnow {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #0f172a;
+    font-size: 14.5px;
+    font-weight: 800;
+    border-radius: 999px;
+    padding: 12px 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.38);
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.taj-btn-shopnow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(245, 158, 11, 0.5);
+    filter: brightness(1.05);
+}
+
+.taj-btn-shopnow svg {
+    width: 17px;
+    height: 17px;
+    stroke: #0f172a;
+}
+
+/* Slide Right Visual (Product Hero Stage with Glowing Halo & Pedestal) */
+.taj-slide-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 340px;
+}
+
+.taj-stage-wrap {
+    position: relative;
+    width: 280px;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Glowing Golden Ring Halo */
+.taj-stage-halo {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 2px solid rgba(251, 191, 36, 0.7);
+    box-shadow: 0 0 35px rgba(251, 191, 36, 0.4), inset 0 0 25px rgba(251, 191, 36, 0.25);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 3D Round Marble Pedestal */
+.taj-stage-pedestal {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 28%, #ffffff 0%, #e2e8f0 45%, #94a3b8 100%);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 40px rgba(56, 189, 248, 0.35);
+    z-index: 2;
+}
+
+/* Ambient Blue Mist / Smoke */
+.taj-stage-smoke {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 110px;
+    background: radial-gradient(ellipse at 50% 70%, rgba(56, 189, 248, 0.35) 0%, rgba(37, 99, 235, 0.15) 50%, transparent 75%);
+    pointer-events: none;
+    filter: blur(14px);
+    z-index: 2;
+}
+
+/* Product Image Resting on Pedestal */
+.taj-stage-product {
+    position: relative;
+    z-index: 3;
+    max-height: 260px;
+    max-width: 220px;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+    margin-bottom: 24px;
+}
+
+.taj-stage-wrap:hover .taj-stage-product {
+    transform: translateY(-4px) scale(1.02);
+}
+
+/* When the slide image is already a pre-composed stage */
+.taj-stage-composite-img {
+    max-height: 310px;
+    max-width: 280px;
+    object-fit: contain;
+    position: relative;
+    z-index: 3;
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.6));
+}
+
+/* ==========================================================================
+   CAROUSEL CONTROLS: ARROWS & PAGINATION DOTS
+   ========================================================================== */
+.taj-carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(5, 15, 45, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 20;
+    user-select: none;
+}
+
+.taj-carousel-arrow:hover {
+    background: rgba(37, 99, 235, 0.85);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.taj-carousel-prev {
+    left: 8px;
+}
+
+.taj-carousel-next {
+    right: 8px;
+}
+
+/* Pagination Dots */
+.taj-promo-dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    position: relative;
+    z-index: 15;
+}
+
+.taj-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.32);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.taj-dot.active {
+    width: 24px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--taj-gold-primary);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+/* ==========================================================================
+   BOTTOM FEATURE BAR (Secure & Reliable | Fast Performance | 24/7 Support)
+   ========================================================================== */
+.taj-feature-bar {
+    position: relative;
+    z-index: 10;
+    background: rgba(8, 22, 58, 0.68);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 12px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 600px;
+    width: 100%;
+    margin: 12px auto 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.taj-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.taj-feature-item svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--taj-gold-primary);
+    fill: none;
+    stroke-width: 2.2;
+    flex-shrink: 0;
+}
+
+.taj-feature-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT SPECIFICATIONS
+   Screens: 1920px, 1440px, 1366px, 1024px, 768px, 414px, 390px, 375px, 360px, 320px
+   ========================================================================== */
+
+/* Large Screens (1440px - 1920px) */
+@media (min-width: 1441px) {
+    .taj-login-panel {
+        padding: 36px 48px 20px;
+        max-width: 520px;
+    }
+    .taj-welcome-title {
+        font-size: 40px;
+    }
+    .taj-slide-title {
+        font-size: 50px;
+    }
+    .taj-stage-wrap {
+        width: 320px;
+        height: 360px;
+    }
+    .taj-stage-halo {
+        width: 280px;
+        height: 280px;
+    }
+    .taj-stage-pedestal {
+        width: 290px;
+        height: 50px;
+    }
+    .taj-stage-product {
+        max-height: 290px;
+    }
+    .taj-stage-composite-img {
+        max-height: 350px;
+        max-width: 310px;
+    }
+}
+
+/* Standard Laptops (1025px - 1366px) */
+@media (max-width: 1366px) {
+    .taj-login-panel {
+        padding: 20px 28px 12px;
+    }
+    .taj-promo-pane {
+        padding: 20px 36px 12px;
+    }
+    .taj-welcome-title {
+        font-size: 30px;
+    }
+    .taj-slide-title {
+        font-size: 38px;
+    }
+    .taj-slide-subtitle {
+        font-size: 16px;
+    }
+    .taj-stage-wrap {
+        width: 250px;
+        height: 280px;
+    }
+    .taj-stage-halo {
+        width: 210px;
+        height: 210px;
+    }
+    .taj-stage-pedestal {
+        width: 220px;
+        height: 38px;
+    }
+    .taj-stage-product {
+        max-height: 230px;
+    }
+    .taj-stage-composite-img {
+        max-height: 270px;
+        max-width: 240px;
+    }
+}
+
+/* Tablet Landscape (901px - 1024px) */
+@media (max-width: 1024px) and (min-width: 901px) {
+    .taj-login-panel {
+        flex: 0 0 42%;
+        width: 42%;
+        padding: 20px 24px 12px;
+    }
+    .taj-promo-pane {
+        padding: 20px 28px 12px;
+    }
+    .taj-welcome-title {
+        font-size: 28px;
+    }
+    .taj-slide-title {
+        font-size: 34px;
+    }
+    .taj-btn-shopnow {
+        padding: 10px 22px;
+        font-size: 13.5px;
+    }
+    .taj-feature-bar {
+        padding: 10px 18px;
+        font-size: 12px;
+    }
+    .taj-feature-item {
+        font-size: 12px;
+        gap: 6px;
+    }
+}
+
+/* Mobile & Tablet Portrait (< 900px): Stack Vertically (Login First, Promo Second) */
+@media (max-width: 900px) {
+    .taj-login-viewport {
+        height: auto;
+        min-height: 100vh;
+        max-height: none;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .taj-login-panel {
+        flex: none;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        height: auto;
+        padding: 32px 24px 28px;
+        overflow: visible;
+    }
+
+    .taj-login-content {
+        max-width: 440px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .taj-welcome-title {
+        font-size: 32px;
+    }
+
+    .taj-login-footer {
+        color: var(--taj-text-muted);
+        justify-content: center;
+        margin-top: 14px;
+    }
+
+    /* Promotional Carousel Section on Mobile */
+    .taj-promo-pane {
+        flex: none;
+        width: 100%;
+        height: auto;
+        min-height: 520px;
+        padding: 36px 20px 28px;
+    }
+
+    .taj-dot-matrix {
+        top: 24px;
+        left: 20px;
+    }
+
+    .taj-promo-topbar {
+        margin-bottom: 16px;
+    }
+
+    .taj-carousel-slide {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    .taj-slide-info {
+        padding-left: 0;
+        align-items: center;
+        order: 2;
+    }
+
+    .taj-slide-title {
+        font-size: 32px;
+    }
+
+    .taj-slide-visual {
+        order: 1;
+        height: 240px;
+    }
+
+    .taj-stage-wrap {
+        width: 220px;
+        height: 240px;
+    }
+
+    .taj-stage-halo {
+        width: 190px;
+        height: 190px;
+    }
+
+    .taj-stage-pedestal {
+        width: 200px;
+        height: 36px;
+    }
+
+    .taj-stage-product {
+        max-height: 190px;
+    }
+
+    .taj-stage-composite-img {
+        max-height: 230px;
+        max-width: 200px;
+    }
+
+    .taj-feature-bar {
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        padding: 12px 16px;
+    }
+
+    .taj-feature-divider {
+        display: none;
+    }
+
+    .taj-carousel-prev {
+        left: 2px;
+    }
+
+    .taj-carousel-next {
+        right: 2px;
+    }
+}
+
+/* Small Screen Phones (320px - 390px) */
+@media (max-width: 390px) {
+    .taj-login-panel {
+        padding: 24px 16px 20px;
+    }
+    .taj-welcome-title {
+        font-size: 28px;
+    }
+    .taj-slide-title {
+        font-size: 28px;
+    }
+    .taj-login-card {
+        padding: 18px 16px;
+    }
+    .taj-feature-item {
+        font-size: 11.5px;
+    }
+}
