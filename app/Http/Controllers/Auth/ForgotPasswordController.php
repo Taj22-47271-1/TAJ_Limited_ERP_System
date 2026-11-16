@@ -24,10 +24,45 @@ class ForgotPasswordController extends Controller
 
         $recent = PasswordResetOtp::where('email', $data['email'])->latest()->first();
         if ($recent && $recent->created_at->gt(now()->subMinute())) {
-            return back()->withErrors(['email' => 'Please wait 60 seconds before requesting another OTP.']);
+            $secondsLeft = max(1, 60 - now()->diffInSeconds($recent->created_at));
+            return back()->withInput()->withErrors(['email' => "Please wait {$secondsLeft} seconds before requesting another OTP."]);
         }
 
         $otp = (string) random_int(100000, 999999);
+        $mailSent = false;
+
+        // 1. Attempt primary delivery (587 TLS)
+        try {
+            Mail::to($data['email'])->send(new PasswordResetOtpMail($otp));
+            $mailSent = true;
+        } catch (Throwable $e) {
+            Log::warning('Primary SMTP (587 TLS) delivery notice: ' . $e->getMessage());
+
+            // 2. Automatic backup delivery (465 SSL)
+            try {
+                $backupMailer = app('mail.manager')->build([
+                    'transport' => 'smtp',
+                    'host' => config('mail.mailers.smtp.host', 'smtp.gmail.com'),
+                    'port' => 465,
+                    'encryption' => 'ssl',
+                    'username' => config('mail.mailers.smtp.username', 'projectw073@gmail.com'),
+                    'password' => config('mail.mailers.smtp.password', 'mwpdfrmyyavfnhba'),
+                    'timeout' => 15,
+                ]);
+                $backupMailer->to($data['email'])->send(new PasswordResetOtpMail($otp));
+                $mailSent = true;
+            } catch (Throwable $e2) {
+                Log::error('Backup SMTP (465 SSL) delivery failed: ' . $e2->getMessage());
+            }
+        }
+
+        if (! $mailSent) {
+            return back()->withInput()->withErrors([
+                'email' => 'Unable to deliver verification email at this moment. Please verify your SMTP settings or try again in a few moments.'
+            ]);
+        }
+
+        // Only persist OTP record AFTER email is confirmed sent!
         PasswordResetOtp::where('email', $data['email'])->delete();
         PasswordResetOtp::create([
             'email' => $data['email'],
@@ -35,17 +70,6 @@ class ForgotPasswordController extends Controller
             'expires_at' => now()->addMinutes(10),
             'attempts' => 0
         ]);
-
-        try {
-            Mail::to($data['email'])->send(new PasswordResetOtpMail($otp));
-        } catch (Throwable $e) {
-            // Log the error message safely without exposing credentials or OTPs
-            Log::error('PasswordReset OTP email dispatch failed: ' . $e->getMessage());
-
-            return back()->withInput()->withErrors([
-                'email' => 'Unable to deliver verification email at this moment. Please verify your SMTP settings or try again in a few moments.'
-            ]);
-        }
 
         $request->session()->put('password_reset_email', $data['email']);
 

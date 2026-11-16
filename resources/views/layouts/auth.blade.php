@@ -7,236 +7,421 @@
     <title>@yield('title') | {{ $companySettings->company_name ?? 'TAJ Limited' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('assets/app.css') }}?v={{ file_exists(public_path('assets/app.css')) ? filemtime(public_path('assets/app.css')) : '1.0' }}">
-    <link rel="stylesheet" href="{{ asset('assets/flatlogic-one.css') }}?v={{ file_exists(public_path('assets/flatlogic-one.css')) ? filemtime(public_path('assets/flatlogic-one.css')) : '1.0' }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/taj-login.css') }}?v={{ file_exists(public_path('assets/taj-login.css')) ? filemtime(public_path('assets/taj-login.css')) : '1.0' }}">
+    @stack('head')
 </head>
-<body class="auth-body fl-auth-body">
-@php
-    $loginOffers = method_exists($companySettings, 'getLoginOffers')
-        ? $companySettings->getLoginOffers()
-        : \App\Models\Setting::defaultLoginOffers();
-    $offerSlides = $loginOffers['slides'] ?? \App\Models\Setting::defaultLoginOffers()['slides'];
-    $slideInterval = max(2, (int)($loginOffers['interval_seconds'] ?? 4)) * 1000;
-@endphp
+<body>
 
-<div class="fl-auth-shell">
-    <section class="fl-auth-form-pane">
-        <a href="{{ route('login') }}" class="fl-auth-brand">
-            <span class="fl-logo-mark">T</span>
-            <span><strong>{{ strtoupper($companySettings->company_name ?? 'TAJ LIMITED') }}</strong><small>SMART BUSINESS ERP</small></span>
-        </a>
+<div class="taj-login-viewport">
+    {{-- =========================================================================
+         LEFT SECTION: AUTH PANEL (Approx 36% Desktop)
+         ========================================================================= --}}
+    <section class="taj-login-panel">
+        {{-- Background Curved Wave Shapes --}}
+        <div class="taj-left-bg-art">
+            {{-- Top-Right Decorative Blue Wave --}}
+            <svg class="taj-left-wave-top" viewBox="0 0 220 220" fill="none" preserveAspectRatio="none">
+                <path d="M70 0C120 40 170 80 220 120V0H70Z" fill="url(#tajTopWaveGradAuth)" opacity="0.65"/>
+                <path d="M120 0C160 50 190 100 220 170V0H120Z" fill="url(#tajTopWaveGrad2Auth)" opacity="0.4"/>
+                <defs>
+                    <linearGradient id="tajTopWaveGradAuth" x1="70" y1="0" x2="220" y2="120" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#38bdf8"/>
+                        <stop offset="1" stop-color="#1d4ed8"/>
+                    </linearGradient>
+                    <linearGradient id="tajTopWaveGrad2Auth" x1="120" y1="0" x2="220" y2="170" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#60a5fa"/>
+                        <stop offset="1" stop-color="#2563eb"/>
+                    </linearGradient>
+                </defs>
+            </svg>
 
-        @if(($loginOffers['enabled'] ?? true) && !empty($offerSlides))
-            <!-- Mobile Offer Ticker -->
-            <div class="fl-mobile-offer-bar" onclick="focusLoginForm()">
-                <span class="fl-mob-tag">{{ $offerSlides[0]['discount'] ?? 'FESTIVE OFFER' }}</span>
-                <span class="fl-mob-text">{{ $offerSlides[0]['badge'] ?? 'Special Offer' }}: {{ $offerSlides[0]['title'] }}</span>
-                <span class="fl-mob-arrow">→</span>
-            </div>
-        @endif
-
-        <div class="fl-auth-card">
-            @if(session('status'))<div class="alert success">{{ session('status') }}</div>@endif
-            @if($errors->any())<div class="alert error">{{ $errors->first() }}</div>@endif
-            @yield('content')
+            {{-- Bottom Flowing Wave Strip --}}
+            <svg class="taj-left-wave-bottom" viewBox="0 0 480 120" fill="none" preserveAspectRatio="none">
+                <path d="M0 60C140 20 300 80 480 30V120H0V60Z" fill="#06153d"/>
+                <path d="M0 40C120 15 280 65 480 15V45C300 80 140 20 0 60V40Z" fill="#1d4ed8" opacity="0.85"/>
+                <path d="M0 25C100 5 240 45 480 5V18C280 65 120 15 0 40V25Z" fill="#38bdf8" opacity="0.45"/>
+            </svg>
         </div>
 
-        <div class="fl-auth-meta">© {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }} · Secure business access</div>
+        <div class="taj-login-content">
+            <div>
+                {{-- 1. Brand Header --}}
+                <a href="{{ route('login') }}" class="taj-brand-header">
+                    <div class="taj-brand-icon">
+                        <span>T</span>
+                    </div>
+                    <div class="taj-brand-text">
+                        <span class="taj-brand-title">{{ strtoupper($companySettings->company_name ?? 'TAJ LIMITED') }}</span>
+                        <span class="taj-brand-sub">ERP • E-Commerce</span>
+                    </div>
+                </a>
+
+                {{-- 2. Welcome Headings --}}
+                <div class="taj-welcome-block">
+                    <div class="taj-welcome-lead">Welcome to</div>
+                    <div class="taj-welcome-title">{{ $companySettings->company_name ?? 'TAJ Limited' }}</div>
+                    <div class="taj-welcome-tagline">
+                        Your Business. Your Store. <span class="taj-swoosh-wrap">One Platform.<svg class="taj-tagline-swoosh" viewBox="0 0 135 10" fill="none"><path d="M2 3C40 9 95 9 133 3" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/></svg></span>
+                    </div>
+                </div>
+
+                {{-- 3. Floating Auth Card --}}
+                <div class="taj-login-card">
+                    <div class="taj-card-head">
+                        <div class="taj-card-icon">
+                            @hasSection('card-icon')
+                                @yield('card-icon')
+                            @else
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            @endif
+                        </div>
+                        <div class="taj-card-titles">
+                            <h2>@yield('card-title', 'Sign in to Your Account')</h2>
+                            <p>@yield('card-subtitle', 'Admin, Cashier or Customer')</p>
+                        </div>
+                    </div>
+
+                    {{-- Status / Error Alerts --}}
+                    @if(session('status'))
+                        <div class="taj-alert taj-alert-success">{{ session('status') }}</div>
+                    @endif
+                    @if(isset($errors) && $errors->any())
+                        <div class="taj-alert taj-alert-error">{{ $errors->first() }}</div>
+                    @endif
+
+                    {{-- Page Content / Form --}}
+                    @yield('content')
+                </div>
+            </div>
+
+            {{-- 4. Left Footer (Copyright & Security Shield) --}}
+            <div class="taj-login-footer">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                </svg>
+                <span>© {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. All rights reserved.</span>
+            </div>
+        </div>
     </section>
 
-    @if(($loginOffers['enabled'] ?? true) && !empty($offerSlides))
-        <!-- Dynamic Promotional Offer Slider -->
-        <section class="fl-auth-promo-visual" id="authPromoSlider" aria-label="Promotional Offers">
-            <div class="fl-promo-slider-track" id="sliderTrack">
+    {{-- =========================================================================
+         RIGHT SECTION: PROMOTIONAL CAROUSEL (~64% Desktop)
+         ========================================================================= --}}
+    @php
+        $loginOffersConfig = method_exists($companySettings, 'getLoginOffers')
+            ? $companySettings->getLoginOffers()
+            : \App\Models\Setting::defaultLoginOffers();
+        $offerSlides = $loginOffersConfig['slides'] ?? \App\Models\Setting::defaultLoginOffers()['slides'];
+        $slideInterval = max(2, (int)($loginOffersConfig['interval_seconds'] ?? 4)) * 1000;
+        $sliderEnabled = $loginOffersConfig['enabled'] ?? true;
+        $slidesCount = count($offerSlides);
+    @endphp
+
+    <section class="taj-promo-pane" id="promoCarouselPane" aria-label="Promotional Showcase">
+        {{-- Top-Left Subtle Dot Matrix Grid --}}
+        <div class="taj-dot-matrix"></div>
+
+        {{-- Top-Right Header Badge --}}
+        <div class="taj-promo-topbar">
+            <a href="{{ route('shop.index') }}" class="taj-shop-smart-badge" title="Visit Online Shop">
+                <div class="taj-shop-smart-content">
+                    <svg class="taj-shop-smart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    <span class="taj-shop-smart-text">Shop Smart | Manage Better</span>
+                </div>
+                <div class="taj-shop-smart-line"></div>
+            </a>
+        </div>
+
+        {{-- Carousel Slides Stage (Dynamic from Login Offers & Promo Slider Settings) --}}
+        <div class="taj-carousel-stage">
+            <div class="taj-carousel-track" id="carouselTrack">
                 @foreach($offerSlides as $idx => $slide)
                     @php
-                        $slideImg = !empty($slide['image'])
-                            ? (str_starts_with($slide['image'], 'http') || str_starts_with($slide['image'], 'storage/') || str_starts_with($slide['image'], 'assets/') ? asset($slide['image']) : asset('storage/' . $slide['image']))
-                            : asset('assets/images/offers/eid-offer.svg');
+                        $rawTitle = trim($slide['title'] ?? ($slide['product_name'] ?? 'Exclusive Offer'));
+                        $words = preg_split('/\s+/', $rawTitle);
+                        if (count($words) > 1) {
+                            $lastWord = array_pop($words);
+                            $titlePrefix = implode(' ', $words);
+                        } else {
+                            $titlePrefix = $rawTitle;
+                            $lastWord = '';
+                        }
 
-                        $origPrice = (float)($slide['original_price'] ?? 0);
-                        $finalPrice = (float)($slide['discount_price'] ?? 0);
-                        $hasDiscount = !empty($slide['has_discount']) || ($origPrice > 0 && $finalPrice > 0 && $finalPrice < $origPrice);
-                        $discountPercent = $slide['discount_percent'] ?? ($origPrice > 0 ? round((($origPrice - $finalPrice) / $origPrice) * 100) : 10);
-                        $productName = $slide['product_name'] ?? '';
+                        $rawImg = $slide['image'] ?? '';
+                        if (empty($rawImg)) {
+                            $imgUrl = asset('assets/images/behance/product_loewe_solo.png');
+                        } elseif (str_starts_with($rawImg, 'http://') || str_starts_with($rawImg, 'https://')) {
+                            $imgUrl = $rawImg;
+                        } elseif (str_starts_with($rawImg, 'storage/')) {
+                            $imgUrl = asset($rawImg);
+                        } elseif (str_starts_with($rawImg, 'assets/')) {
+                            $imgUrl = asset($rawImg);
+                        } else {
+                            $imgUrl = asset('storage/' . ltrim($rawImg, '/'));
+                        }
+
+                        $targetUrl = !empty($slide['product_id'])
+                            ? route('shop.show', $slide['product_id'])
+                            : route('shop.index');
                     @endphp
-                    <article class="fl-promo-slide {{ $idx === 0 ? 'active' : '' }}" data-slide="{{ $idx }}" onclick="focusLoginForm()">
-                        <!-- Subtle ambient lighting backdrop -->
-                        <div class="fl-promo-ambient-glow"></div>
-                        <div class="fl-promo-backdrop-pattern"></div>
 
-                        <!-- Full Product Showcase Card (Framed, Never Cropped) -->
-                        <div class="fl-promo-stage-card">
-                            <div class="fl-promo-product-stage">
-                                <img src="{{ $slideImg }}" alt="{{ $productName ?: $slide['title'] }}" class="fl-promo-product-image" loading="{{ $idx === 0 ? 'eager' : 'lazy' }}">
-                                @if($hasDiscount)
-                                    <span class="fl-promo-floating-tag">-{{ $discountPercent }}% OFF</span>
+                    <article class="taj-carousel-slide {{ $loop->first ? 'active' : '' }}" data-index="{{ $idx }}">
+                        <div class="taj-slide-info">
+                            @if(!empty($slide['badge']))
+                                <span class="taj-slide-kicker">{{ $slide['badge'] }}</span>
+                            @endif
+
+                            <h2 class="taj-slide-title">
+                                {{ $titlePrefix }}
+                                @if($lastWord)
+                                    <span class="taj-highlight-gold">{{ $lastWord }}</span>
                                 @endif
-                            </div>
+                            </h2>
 
-                            <div class="fl-promo-content">
-                                <div class="fl-promo-badge-row">
-                                    <span class="fl-promo-badge">{{ $slide['badge'] ?? 'FESTIVE OFFER' }}</span>
-                                    @if($hasDiscount)
-                                        <span class="fl-promo-discount">{{ $discountPercent }}% DISCOUNT</span>
-                                    @endif
+                            @if(!empty($slide['subtitle']))
+                                <p class="taj-slide-subtitle">{{ $slide['subtitle'] }}</p>
+                            @endif
+
+                            @if(!empty($slide['discount']))
+                                <div class="taj-slide-badge-row">
+                                    <span class="taj-slide-discount-tag">{{ $slide['discount'] }}</span>
                                 </div>
+                            @endif
 
-                                @if(!empty($productName))
-                                    <div class="fl-promo-item-kicker">{{ $productName }}</div>
-                                @endif
+                            <a href="{{ $targetUrl }}" class="taj-btn-shopnow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="9" cy="21" r="1"/>
+                                    <circle cx="20" cy="21" r="1"/>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                </svg>
+                                <span>Shop Now →</span>
+                            </a>
+                        </div>
 
-                                <h3>{{ $slide['title'] }}</h3>
-
-                                <!-- Real Product Pricing Display -->
-                                @if($origPrice > 0 && $finalPrice > 0)
-                                    <div class="fl-promo-pricing-row">
-                                        @if($hasDiscount)
-                                            <del class="fl-promo-orig-price">{{ $companySettings->currency_symbol }}{{ number_format($origPrice, 2) }}</del>
-                                            <strong class="fl-promo-final-price">{{ $companySettings->currency_symbol }}{{ number_format($finalPrice, 2) }}</strong>
-                                            <span class="fl-promo-savings-chip">Save {{ $companySettings->currency_symbol }}{{ number_format($origPrice - $finalPrice, 2) }}</span>
-                                        @else
-                                            <strong class="fl-promo-final-price">{{ $companySettings->currency_symbol }}{{ number_format($origPrice, 2) }}</strong>
-                                        @endif
-                                    </div>
-                                @endif
-
-                                @if(!empty($slide['subtitle']))
-                                    <p>{{ $slide['subtitle'] }}</p>
-                                @endif
-
-                                <button type="button" class="fl-promo-action-btn" onclick="event.stopPropagation(); focusLoginForm();">
-                                    <span>⚡ Claim Offer · Sign In Now</span>
-                                    <span>→</span>
-                                </button>
+                        <div class="taj-slide-visual">
+                            <div class="taj-stage-wrap">
+                                <div class="taj-stage-halo"></div>
+                                <div class="taj-stage-pedestal"></div>
+                                <div class="taj-stage-smoke"></div>
+                                <img src="{{ $imgUrl }}" 
+                                     alt="{{ $slide['title'] ?? 'Promotional Product' }}" 
+                                     class="taj-stage-product" 
+                                     loading="lazy">
                             </div>
                         </div>
                     </article>
                 @endforeach
             </div>
 
-            <!-- Slide Navigation Controls -->
-            <div class="fl-promo-controls" onclick="event.stopPropagation();">
-                <div class="fl-promo-dots" id="promoDots">
+            @if($slidesCount > 1)
+                {{-- Previous & Next Navigation Arrows --}}
+                <button type="button" class="taj-carousel-arrow taj-carousel-prev" id="carouselPrevBtn" aria-label="Previous Slide">‹</button>
+                <button type="button" class="taj-carousel-arrow taj-carousel-next" id="carouselNextBtn" aria-label="Next Slide">›</button>
+            @endif
+        </div>
+
+        {{-- Bottom Controls & Feature Bar --}}
+        <div>
+            @if($slidesCount > 1)
+                {{-- Carousel Pagination Dots --}}
+                <div class="taj-promo-dots" id="carouselDots" role="tablist">
                     @foreach($offerSlides as $idx => $slide)
-                        <span class="fl-promo-dot {{ $idx === 0 ? 'active' : '' }}" onclick="goToSlide({{ $idx }})" title="Slide {{ $idx + 1 }}"></span>
+                        <span class="taj-dot {{ $loop->first ? 'active' : '' }}" data-slide="{{ $idx }}" role="tab" aria-label="Slide {{ $idx + 1 }}"></span>
                     @endforeach
                 </div>
-                <div class="fl-promo-nav-btns">
-                    <button type="button" class="fl-promo-nav-btn" onclick="prevSlide()" aria-label="Previous Slide">‹</button>
-                    <button type="button" class="fl-promo-nav-btn" onclick="nextSlide()" aria-label="Next Slide">›</button>
+            @endif
+
+            {{-- Bottom Feature Bar --}}
+            <div class="taj-feature-bar">
+                <div class="taj-feature-item">
+                    {{-- Shield with Checkmark Icon --}}
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                    <span>Secure & Reliable</span>
+                </div>
+                <div class="taj-feature-divider"></div>
+
+                <div class="taj-feature-item">
+                    {{-- Lightning Bolt Icon --}}
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    <span>Fast Performance</span>
+                </div>
+                <div class="taj-feature-divider"></div>
+
+                <div class="taj-feature-item">
+                    {{-- 24/7 Headset Support Icon --}}
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 18v-6a9 9 0 0 1 18 0v6"/>
+                        <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>
+                    </svg>
+                    <span>24/7 Support</span>
                 </div>
             </div>
-        </section>
-    @else
-        <section class="fl-auth-visual" aria-hidden="true">
-            <div class="fl-wave fl-wave-one"></div>
-            <div class="fl-wave fl-wave-two"></div>
-            <span class="fl-float-cube fl-cube-one"></span>
-            <span class="fl-float-cube fl-cube-two"></span>
-            <span class="fl-float-cube fl-cube-three"></span>
-            <span class="fl-paper-plane fl-plane-one">➤</span>
-            <span class="fl-paper-plane fl-plane-two">➤</span>
-            <div class="fl-gear fl-gear-one">⚙</div>
-            <div class="fl-gear fl-gear-two">⚙</div>
-            <div class="fl-laptop">
-                <div class="fl-laptop-screen">
-                    <div class="fl-lock"><span class="fl-lock-loop"></span><span class="fl-lock-body">●</span></div>
-                    <div class="fl-screen-card fl-screen-card-one"></div>
-                    <div class="fl-screen-card fl-screen-card-two"></div>
-                </div>
-                <div class="fl-laptop-base"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-            </div>
-            <div class="fl-auth-visual-copy">
-                <span>TAJ LIMITED ERP</span>
-                <h3>Inventory, POS, online orders and accounting in one workspace.</h3>
-                <p>Role-based access for administrators, cashiers and customers.</p>
-            </div>
-        </section>
-    @endif
+        </div>
+
+        {{-- Bottom Flowing Curves with Radiant Golden Yellow Ribbon --}}
+        <svg class="taj-promo-bottom-waves" viewBox="0 0 900 160" fill="none" preserveAspectRatio="none">
+            <path d="M0 160C180 80 420 140 900 60V160H0Z" fill="#040e2d"/>
+            <path d="M0 160C220 100 500 130 900 85V160H0Z" fill="#1d4ed8" opacity="0.6"/>
+            <path d="M0 160C260 120 540 145 900 110V160H0Z" fill="#38bdf8" opacity="0.3"/>
+            <path d="M460 160C620 145 760 120 900 95V105C760 130 620 152 460 160Z" fill="url(#tajGoldWaveGradAuth)"/>
+            <defs>
+                <linearGradient id="tajGoldWaveGradAuth" x1="460" y1="140" x2="900" y2="100" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f59e0b" stop-opacity="0.3"/>
+                    <stop offset="0.5" stop-color="#fbbf24"/>
+                    <stop offset="1" stop-color="#f59e0b"/>
+                </linearGradient>
+            </defs>
+        </svg>
+    </section>
 </div>
 
-<footer class="corporate-footer auth-footer fl-auth-footer">
-    <div class="footer-grid">
-        <section>
-            <h3>About {{ $companySettings->company_name ?? 'TAJ Limited' }}</h3>
-            <p>Integrated inventory, point-of-sale, online ordering and accounting operations in one secure business platform.</p>
-            <div class="social-row"><span>f</span><span>◎</span><span>in</span><span>▶</span></div>
-        </section>
-        <section><h3>Services</h3><span>Point of Sale</span><span>Inventory Management</span><span>Online Orders</span><span>Accounting</span><span>Business Reports</span></section>
-        <section><h3>Company</h3><span>Home</span><span>Customers</span><span>Suppliers</span><span>Security</span><span>Settings</span></section>
-        <section><h3>Contact Us</h3><strong>ADDRESS</strong><p>{{ $companySettings->company_address ?? 'Dhaka, Bangladesh' }}</p><strong>EMAIL</strong><p>{{ $companySettings->company_email ?? 'info@tajlimited.com' }}</p><strong>CONTACT</strong><p>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</p></section>
+{{-- Global Luxury Footer (Shared with Customer Storefront) --}}
+<footer class="vc-footer taj-login-footer-section">
+    <div class="vc-footer-inner">
+        <div class="vc-footer-brand-col">
+            <div class="vc-brand">
+                <span class="vc-brand-mark">T</span>
+                <strong>{{ $companySettings->company_name ?? 'TAJ Limited' }}</strong>
+            </div>
+            <p>Shop products using the same live inventory managed by TAJ Limited ERP.</p>
+        </div>
+
+        <div>
+            <h4>Categories</h4>
+            <a href="{{ route('shop.index') }}">All products</a>
+            <a href="{{ route('shop.index', ['filter' => 'sale']) }}">Special Offers</a>
+        </div>
+
+        <div>
+            <h4>Company</h4>
+            <a href="{{ route('shop.index') }}">Shop online</a>
+            <a href="{{ route('login') }}">Staff portal</a>
+            <a href="{{ route('register') }}">Customer Register</a>
+        </div>
+
+        <div>
+            <h4>Assistance</h4>
+            <small>{{ $companySettings->company_phone ?? '+880 1XXXXXXXXX' }}</small>
+            <small>{{ $companySettings->company_email ?? 'info@tajlimited.com' }}</small>
+            <small>Dhaka, Bangladesh</small>
+        </div>
     </div>
-    <div class="footer-bottom"><span>© {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. All Rights Reserved.</span><span class="footer-logo"><span class="mini-mark">T</span>{{ strtoupper($companySettings->company_name ?? 'TAJ LIMITED') }}</span><span class="newsletter">ERP • INVENTORY • POS • ACCOUNTING</span></div>
+
+    <div class="vc-copyright">
+        © {{ date('Y') }} {{ $companySettings->company_name ?? 'TAJ Limited' }}. Live inventory powered by TAJ ERP.
+    </div>
 </footer>
-<script src="{{ asset('assets/app.js') }}"></script>
+
+{{-- Interactive Carousel & Accessibility Script --}}
 <script>
-// Promo Carousel Logic with Infinite Auto-Loop and Hover Pause
-(function() {
-    const slides = document.querySelectorAll('.fl-promo-slide');
-    const dots = document.querySelectorAll('.fl-promo-dot');
+document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.taj-carousel-slide');
+    const dots = document.querySelectorAll('.taj-dot');
+    const prevBtn = document.getElementById('carouselPrevBtn');
+    const nextBtn = document.getElementById('carouselNextBtn');
+    const carouselPane = document.getElementById('promoCarouselPane');
+
     const totalSlides = slides.length;
-    if (totalSlides <= 1) return;
+    let currentIdx = 0;
+    let autoplayTimer = null;
+    const intervalMs = {{ $slideInterval }};
+    const isAutoplayEnabled = {{ $sliderEnabled ? 'true' : 'false' }};
 
-    let currentIndex = 0;
-    let timer = null;
-    const intervalTime = {{ $slideInterval ?? 4000 }};
-    const sliderEl = document.getElementById('authPromoSlider');
-
-    window.goToSlide = function(index) {
+    function showSlide(index) {
+        if (totalSlides <= 1) return;
         if (index < 0) index = totalSlides - 1;
         if (index >= totalSlides) index = 0;
-        currentIndex = index;
+        currentIdx = index;
 
-        slides.forEach((s, i) => {
-            s.classList.toggle('active', i === currentIndex);
+        slides.forEach((slide, i) => {
+            slide.classList.toggle('active', i === currentIdx);
         });
-        dots.forEach((d, i) => {
-            d.classList.toggle('active', i === currentIndex);
+
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentIdx);
         });
-    };
+    }
 
-    window.nextSlide = function() {
-        goToSlide(currentIndex + 1);
-    };
+    function nextSlide() {
+        showSlide(currentIdx + 1);
+    }
 
-    window.prevSlide = function() {
-        goToSlide(currentIndex - 1);
-    };
+    function prevSlide() {
+        showSlide(currentIdx - 1);
+    }
 
     function startAutoplay() {
-        if (timer) clearInterval(timer);
-        timer = setInterval(nextSlide, intervalTime);
+        if (!isAutoplayEnabled || totalSlides <= 1) return;
+        if (autoplayTimer) clearInterval(autoplayTimer);
+        autoplayTimer = setInterval(nextSlide, intervalMs);
     }
 
     function stopAutoplay() {
-        if (timer) clearInterval(timer);
+        if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        }
     }
 
-    if (sliderEl) {
-        sliderEl.addEventListener('mouseenter', stopAutoplay);
-        sliderEl.addEventListener('mouseleave', startAutoplay);
+    if (nextBtn) nextBtn.addEventListener('click', function() {
+        nextSlide();
+        startAutoplay();
+    });
+
+    if (prevBtn) prevBtn.addEventListener('click', function() {
+        prevSlide();
+        startAutoplay();
+    });
+
+    dots.forEach((dot, i) => {
+        dot.addEventListener('click', function() {
+            showSlide(i);
+            startAutoplay();
+        });
+    });
+
+    if (carouselPane) {
+        carouselPane.addEventListener('mouseenter', stopAutoplay);
+        carouselPane.addEventListener('mouseleave', startAutoplay);
+    }
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    if (carouselPane) {
+        carouselPane.addEventListener('touchstart', function (e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        carouselPane.addEventListener('touchend', function (e) {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) {
+                nextSlide();
+                startAutoplay();
+            } else if (touchEndX > touchStartX + 40) {
+                prevSlide();
+                startAutoplay();
+            }
+        }, { passive: true });
     }
 
     startAutoplay();
-})();
-
-// Smooth focus to login form when clicking offer
-window.focusLoginForm = function() {
-    const emailInput = document.querySelector('input[name="email"]');
-    if (emailInput) {
-        emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        emailInput.focus();
-        emailInput.style.transition = 'box-shadow 0.3s, border-color 0.3s';
-        emailInput.style.borderColor = '#f59e0b';
-        emailInput.style.boxShadow = '0 0 0 4px rgba(245, 158, 11, 0.25)';
-        setTimeout(() => {
-            emailInput.style.borderColor = '';
-            emailInput.style.boxShadow = '';
-        }, 1500);
-    }
-};
+});
 </script>
+
+@stack('scripts')
 </body>
 </html>
