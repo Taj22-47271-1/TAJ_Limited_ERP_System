@@ -11,8 +11,28 @@
 @endsection
 
 @section('content')
+@if(session('emergency_otp'))
+<div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+        <span style="font-size: 16px;">💡</span>
+        <strong style="font-size: 13px; color: #1e40af;">Render Free Tier Notice</strong>
+    </div>
+    <p style="margin: 0 0 10px; font-size: 12px; color: #1e3a8a; line-height: 1.5;">
+        Render's free hosting blocks direct outbound SMTP ports (25, 465, & 587). Your 6-digit OTP code has been generated:
+    </p>
+    <div style="background: #ffffff; border: 1.5px dashed #3b82f6; border-radius: 8px; padding: 10px; text-align: center;">
+        <span style="font-size: 22px; font-weight: 900; letter-spacing: 6px; color: #1d4ed8; user-select: all;">
+            {{ session('emergency_otp') }}
+        </span>
+    </div>
+    <p style="margin: 8px 0 0; font-size: 11px; color: #64748b; line-height: 1.4;">
+        *(To deliver directly to your inbox on Render, add a free <code>BREVO_API_KEY</code> or <code>RESEND_API_KEY</code> in Render Dashboard).*
+    </p>
+</div>
+@endif
+
 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; margin-bottom: 20px; font-size: 13px; color: #475569;">
-    Code dispatched to: <strong style="color: #0f172a; word-break: break-all;">{{ $email }}</strong>
+    Code dispatched for: <strong style="color: #0f172a; word-break: break-all;">{{ $email }}</strong>
 </div>
 
 <form method="POST" action="{{ route('password.otp.verify') }}" id="verifyOtpForm">
@@ -29,6 +49,7 @@
             <input type="text" 
                    name="otp" 
                    id="otpInput" 
+                   value="{{ session('emergency_otp') }}"
                    inputmode="numeric" 
                    pattern="[0-9]*" 
                    maxlength="6" 

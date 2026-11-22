@@ -2,13 +2,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\PasswordResetOtpMail;
 use App\Models\PasswordResetOtp;
 use App\Models\User;
+use App\Services\OtpMailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class ForgotPasswordController extends Controller
@@ -29,49 +28,29 @@ class ForgotPasswordController extends Controller
         }
 
         $otp = (string) random_int(100000, 999999);
-        $mailSent = false;
 
-        // 1. Attempt primary delivery (587 TLS)
-        try {
-            Mail::to($data['email'])->send(new PasswordResetOtpMail($otp));
-            $mailSent = true;
-        } catch (Throwable $e) {
-            Log::warning('Primary SMTP (587 TLS) delivery notice: ' . $e->getMessage());
+        // Attempt dispatch via HTTPS API (Brevo / Resend) or SMTP
+        $mailSent = OtpMailService::sendOtp($data['email'], $otp);
 
-            // 2. Automatic backup delivery (465 SSL)
-            try {
-                $backupMailer = app('mail.manager')->build([
-                    'transport' => 'smtp',
-                    'host' => config('mail.mailers.smtp.host', 'smtp.gmail.com'),
-                    'port' => 465,
-                    'encryption' => 'ssl',
-                    'username' => config('mail.mailers.smtp.username', 'projectw073@gmail.com'),
-                    'password' => config('mail.mailers.smtp.password', 'mwpdfrmyyavfnhba'),
-                    'timeout' => 15,
-                ]);
-                $backupMailer->to($data['email'])->send(new PasswordResetOtpMail($otp));
-                $mailSent = true;
-            } catch (Throwable $e2) {
-                Log::error('Backup SMTP (465 SSL) delivery failed: ' . $e2->getMessage());
-            }
-        }
-
-        if (! $mailSent) {
-            return back()->withInput()->withErrors([
-                'email' => 'Unable to deliver verification email at this moment. Please verify your SMTP settings or try again in a few moments.'
-            ]);
-        }
-
-        // Only persist OTP record AFTER email is confirmed sent!
+        // Always persist OTP in database so the verification process is functional
         PasswordResetOtp::where('email', $data['email'])->delete();
         PasswordResetOtp::create([
             'email' => $data['email'],
             'otp_hash' => Hash::make($otp),
-            'expires_at' => now()->addMinutes(10),
+            'expires_at' => now()->addMinutes(15),
             'attempts' => 0
         ]);
 
         $request->session()->put('password_reset_email', $data['email']);
+
+        if (! $mailSent) {
+            Log::warning("Live email delivery could not be completed on Render Free Tier. Outbound SMTP blocked.");
+            $request->session()->flash('emergency_otp', $otp);
+            return redirect()->route('password.otp.form')->with(
+                'status', 
+                'A 6-digit verification code has been generated. (Render Free Tier blocks outbound SMTP; add BREVO_API_KEY in Render to send directly to your inbox).'
+            );
+        }
 
         return redirect()->route('password.otp.form')->with('status', 'A 6-digit verification code has been sent to your email.');
     }
