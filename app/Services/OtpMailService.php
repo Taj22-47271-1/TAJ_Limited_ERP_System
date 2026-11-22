@@ -21,8 +21,8 @@ class OtpMailService
         $brevoKey = env('BREVO_API_KEY', config('services.brevo.key'));
         if (!empty($brevoKey)) {
             try {
-                $senderEmail = config('mail.from.address', 'projectw073@gmail.com');
-                $senderName = config('mail.from.name', 'TAJ Limited');
+                $senderEmail = env('BREVO_SENDER_EMAIL', config('mail.from.address', 'projectw073@gmail.com'));
+                $senderName = env('MAIL_FROM_NAME', config('mail.from.name', 'TAJ Limited'));
 
                 $res = Http::timeout(8)->withHeaders([
                     'api-key' => $brevoKey,

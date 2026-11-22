@@ -32,7 +32,18 @@ class ForgotPasswordController extends Controller
         // Attempt dispatch via HTTPS API (Brevo / Resend) or SMTP
         $mailSent = OtpMailService::sendOtp($data['email'], $otp);
 
-        // Always persist OTP in database so the verification process is functional
+        if (! $mailSent) {
+            Log::error("Password reset OTP email failed to dispatch for {$data['email']}. Check outbound SMTP or REST API configuration.");
+            
+            // Clean up any stale OTP records so no invalid or unreceived OTPs linger
+            PasswordResetOtp::where('email', $data['email'])->delete();
+
+            return back()->withInput()->withErrors([
+                'email' => 'Unable to deliver verification email at this moment. Please verify your mail settings or try again in a few moments.'
+            ]);
+        }
+
+        // Only persist OTP in database when email delivery has succeeded
         PasswordResetOtp::where('email', $data['email'])->delete();
         PasswordResetOtp::create([
             'email' => $data['email'],
@@ -43,16 +54,7 @@ class ForgotPasswordController extends Controller
 
         $request->session()->put('password_reset_email', $data['email']);
 
-        if (! $mailSent) {
-            Log::warning("Live email delivery could not be completed on Render Free Tier. Outbound SMTP blocked.");
-            $request->session()->flash('emergency_otp', $otp);
-            return redirect()->route('password.otp.form')->with(
-                'status', 
-                'A 6-digit verification code has been generated. (Render Free Tier blocks outbound SMTP; add BREVO_API_KEY in Render to send directly to your inbox).'
-            );
-        }
-
-        return redirect()->route('password.otp.form')->with('status', 'A 6-digit verification code has been sent to your email.');
+        return redirect()->route('password.otp.form')->with('status', 'A 6-digit verification code has been sent to your email inbox.');
     }
 
     public function showVerify(Request $request) {
